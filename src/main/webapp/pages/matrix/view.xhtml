@@ -1,0 +1,86 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:h="http://java.sun.com/jsf/html"
+     xmlns:f="http://java.sun.com/jsf/core"
+     xmlns:p="http://primefaces.org/ui">
+
+    <h:form>
+        <h:outputText value="#{bichoMatrixViewBean.reloadList()}" />
+    </h:form>
+
+    <p:fieldset legend="Matrices generated">
+        <h:form prependId="false" >
+            <p:growl globalOnly="true" id="messages" />
+            <p:commandButton onclick="PrimeFaces.monitorDownload(start, stop)" ajax="false" value="Download all CSV">
+                <p:fileDownload value="#{bichoMatrixViewBean.downloadAllCSV()}" />
+            </p:commandButton>
+            <p:commandButton type="button" icon="ui-icon-trash" value="Delete All"
+                             id="deleteAllMatrices" onclick="PF('confirmationDeleteAll').show()" />
+            <p:dataTable var="matrix" value="#{bichoMatrixViewBean.matrices}" id="list" rows="10" lazy="false"
+                         emptyMessage="No matrices generated found." paginator="true" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,25,50,100" >
+                <p:column headerText="ID">
+                    <h:outputText value="#{matrix.id}" />
+                </p:column>
+
+                <p:column headerText="Repository">
+                    <h:outputText value="#{matrix.repository}" />
+                </p:column>
+
+                <p:column headerText="Matrix">
+                    <h:outputText value="#{matrix.toString()}" />
+                </p:column>
+
+                <p:column headerText="Class Service">
+                    <h:outputText value="#{matrix.classServicesSingleName}" />
+                </p:column>
+
+                <p:column headerText="Started" >
+                    <h:outputText value="#{matrix.started}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Stoped" >
+                    <h:outputText value="#{matrix.stoped}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Completed">
+                    <h:outputText value="#{matrix.complete}" />
+                </p:column>
+
+                <p:column headerText="Download Files">
+                    <p:commandButton action="#{bichoMatrixViewBean.downloadLOG(matrix)}" ajax="false" value="Log"/>
+                    <p:commandButton action="#{bichoMatrixViewBean.downloadCSV(matrix)}" ajax="false" value="CSV" title="#{matrix.toString()}"/>
+                    <p:commandButton action="#{bichoMatrixViewBean.downloadAllCSVOfOneVersion(matrix.toString())}" ajax="false" value="All CSV" title="#{matrix}"/>
+                    <p:commandButton action="#{bichoMatrixViewBean.downloadParams(matrix)}"  ajax="false" value="Params"/>
+                </p:column>
+
+                <p:column headerText="Options">
+                    <p:commandButton  icon="ui-icon-trash" title="Delete this Matrix" actionListener="#{bichoMatrixViewBean.addMatrixForDeleteInSession(matrix)}"
+                                      id="matrixDelete" oncomplete="PF('confirmation').show()" />
+                </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog  id="confirmDelete" widgetVar="confirmation"
+                              message="Really delete this matrix?" header="Confirmation"
+                              severity="alert">
+                <p:commandButton value="Yes" id="confirmYes" update="list messages" oncomplete="PF('confirmation').hide()" style="position: relative;left: 80px"
+                                 actionListener="#{bichoMatrixViewBean.deleteMatrixInSession()}">
+                </p:commandButton>
+                <p:commandButton value="No" id="confirmNo" oncomplete="PF('confirmation').hide()" style="position: relative;left: 80px"
+                                 actionListener="#{bichoMatrixViewBean.removeMatrixFromSession()}"/>
+            </p:confirmDialog>
+
+            <p:confirmDialog  id="confirmDeleteAll" widgetVar="confirmationDeleteAll"
+                              message="Really delete all matrices?" header="Confirmation"
+                              severity="alert">
+                <p:commandButton value="Yes" update="list messages" oncomplete="PF('confirmationDeleteAll').hide()" style="position: relative;left: 80px"
+                                 actionListener="#{bichoMatrixViewBean.deleteAll()}"/>
+                <p:commandButton value="No" oncomplete="PF('confirmationDeleteAll').hide()" style="position: relative;left: 80px" />
+            </p:confirmDialog>
+        </h:form>
+    </p:fieldset>
+</div>

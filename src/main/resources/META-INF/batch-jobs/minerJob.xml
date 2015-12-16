@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="minerJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
+    <flow id="minerFlow">
+        <step id="bichoStep" next="gitUpdateStep">
+            <chunk item-count="3">
+                <reader ref="bichoReader" />
+                <processor ref="bichoProcessor" />
+                <writer ref="bichoWriter" />
+            </chunk>
+        </step>
+
+        <flow id="minerVersionControl">
+            <step id="gitUpdateStep" next="cvsanalyStep">
+                <chunk item-count="3">
+                    <reader ref="gitUpdateReader" />
+                    <processor ref="gitUpdateProcessor" />
+                    <writer ref="gitUpdateWriter" />
+                </chunk>
+            </step>
+
+            <step id="cvsanalyStep" next="aggregatorStep">
+                <chunk item-count="3">
+                    <reader ref="cvsanalyReader" />
+                    <processor ref="cvsanalyProcessor" />
+                    <writer ref="cvsanalyWriter" />
+                </chunk>
+            </step>
+        </flow>
+
+        <step id="aggregatorStep" >
+            <chunk item-count="3">
+                <reader ref="aggregatorReader" />
+                <processor ref="aggregatorProcessor" />
+                <writer ref="aggregatorWriter" />
+            </chunk>
+        </step>
+    </flow>
+</job>
