@@ -1,2 +1,2 @@
-# recominer
-A tool for recommendation 
+# Recominer
+A tool for joint changes recommendations.
