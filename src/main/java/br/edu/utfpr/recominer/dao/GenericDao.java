@@ -15,7 +15,7 @@ import javax.persistence.criteria.Root;
 @Stateless
 public class GenericDao implements Serializable {
 
-    @PersistenceContext(unitName = "pu")
+    @PersistenceContext(unitName = "postgresql")
     private EntityManager em;
 
     public EntityManager getEntityManager() {

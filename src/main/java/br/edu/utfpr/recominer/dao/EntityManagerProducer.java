@@ -20,12 +20,22 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 public class EntityManagerProducer {
 
     @PersistenceUnit(unitName = "mysql")
-    private EntityManagerFactory factory;
+    private EntityManagerFactory mysqlFactory;
+    
+    @PersistenceUnit(unitName = "postgresql")
+    private EntityManagerFactory postgresqlFactory;
 
     @RequestScoped
     @Produces
-    public EntityManager createEntityManager() {
-        return factory.createEntityManager();
+    @Mysql
+    public EntityManager createMysqlEntityManager() {
+        return mysqlFactory.createEntityManager();
+    }
+    
+    @RequestScoped
+    @Produces
+    public EntityManager createPostgresqlEntityManager() {
+        return postgresqlFactory.createEntityManager();
     }
 
     public EntityManager createEntityManager(String schema) {

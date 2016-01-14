@@ -25,7 +25,7 @@ public class BichoReader extends AbstractItemReader {
         final String projectIssueTrackerSystem = parameters.getProperty("projectIssueTrackerSystem");
         final String url = parameters.getProperty("issueTrackerUrl");
 
-        return new IssueTracker(project, url,
+        return new IssueTracker(project, url, 20,
                 "root", "root",
                 IssueTrackerSystem.valueOf(projectIssueTrackerSystem));
     }

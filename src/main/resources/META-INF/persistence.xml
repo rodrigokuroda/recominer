@@ -1,82 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-    <persistence-unit name="pu" transaction-type="JTA">
-        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <jta-data-source>jgitminerpostgres</jta-data-source>
-        <class>br.edu.utfpr.recominer.model.matrix.EntityMatrixNode</class>
-        <class>br.edu.utfpr.recominer.model.matrix.EntityMatrix</class>
-        <class>br.edu.utfpr.recominer.model.EntityNode</class>
-        <class>br.edu.utfpr.recominer.model.metric.EntityMetric</class>
-        <class>br.edu.utfpr.recominer.model.metric.EntityMetricNode</class>
-        <exclude-unlisted-classes>true</exclude-unlisted-classes>
-        <properties>
-            <property name="eclipselink.ddl-generation" value="create-tables"/>
-            <property name="javax.persistence.schema-generation.database.action" value="create"/>
-            <!--  Optimization #9 - statement caching -->
-            <property name="eclipselink.jdbc.cache-statements" value="true"/>
-            <!--  Optimization #10 - batch writing -->
-            <property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
-            <property name="eclipselink.jdbc.batch-writing.size" value="1000"/>
-            <!--  Optimization #11 - disable caching for batch insert (caching only improves reads, so only adds overhead for inserts) -->
-            <property name="eclipselink.cache.shared.default" value="false"/>
-            <!--  Optimization #12 - turn logging off -->
-            <!-- property name="eclipselink.logging.level" value="FINE" /-->
-            <property name="eclipselink.logging.level" value="off"/>
-            <!--  Optimization #13 - close EntityManager on commit, to avoid cost of resume >
+  <persistence-unit name="postgresql" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/recominer-postgresql</jta-data-source>
+    <class>br.edu.utfpr.recominer.model.matrix.EntityMatrixNode</class>
+    <class>br.edu.utfpr.recominer.model.matrix.EntityMatrix</class>
+    <class>br.edu.utfpr.recominer.model.EntityNode</class>
+    <class>br.edu.utfpr.recominer.model.metric.EntityMetric</class>
+    <class>br.edu.utfpr.recominer.model.metric.EntityMetricNode</class>
+    <class>br.edu.utfpr.recominer.batch.aggregator.Project</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="javax.persistence.schema-generation.database.action" value="create"/>
+      <!--  Optimization #9 - statement caching -->
+      <property name="eclipselink.jdbc.cache-statements" value="true"/>
+      <!--  Optimization #10 - batch writing -->
+      <property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
+      <property name="eclipselink.jdbc.batch-writing.size" value="1000"/>
+      <!--  Optimization #11 - disable caching for batch insert (caching only improves reads, so only adds overhead for inserts) -->
+      <property name="eclipselink.cache.shared.default" value="false"/>
+      <!--  Optimization #12 - turn logging off -->
+      <!-- property name="eclipselink.logging.level" value="FINE" /-->
+      <property name="eclipselink.logging.level" value="off"/>
+      <!--  Optimization #13 - close EntityManager on commit, to avoid cost of resume >
             <property name="eclipselink.persistence-context.close-on-commit" value="true" /-->
-            <!--  Optimization #14 - avoid auto flush cost on query execution -->
-            <property name="eclipselink.persistence-context.flush-mode" value="commit"/>
-            <!--  Optimization #15 - avoid cost of persist on commit >
+      <!--  Optimization #14 - avoid auto flush cost on query execution -->
+      <property name="eclipselink.persistence-context.flush-mode" value="commit"/>
+      <!--  Optimization #15 - avoid cost of persist on commit >
             <property name="eclipselink.persistence-context.persist-on-commit" value="false" /-->
-        </properties>
-    </persistence-unit>
-    <persistence-unit name="mysql" transaction-type="JTA">
-        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-        <jta-data-source>mysql</jta-data-source>
-        <class>br.edu.utfpr.recominer.model.svn.TagRevision</class>
-        <class>br.edu.utfpr.recominer.model.svn.Branch</class>
-        <class>br.edu.utfpr.recominer.model.svn.FileCopy</class>
-        <class>br.edu.utfpr.recominer.model.svn.Tag</class>
-        <class>br.edu.utfpr.recominer.model.svn.FileLink</class>
-        <class>br.edu.utfpr.recominer.model.svn.File</class>
-        <class>br.edu.utfpr.recominer.model.svn.PeopleSvn</class>
-        <class>br.edu.utfpr.recominer.model.svn.Action</class>
-        <class>br.edu.utfpr.recominer.model.svn.Repository</class>
-        <class>br.edu.utfpr.recominer.model.svn.Scmlog</class>
-        <class>br.edu.utfpr.recominer.model.issue.Change</class>
-        <class>br.edu.utfpr.recominer.model.issue.RelatedTo</class>
-        <class>br.edu.utfpr.recominer.model.issue.SupportedTracker</class>
-        <class>br.edu.utfpr.recominer.model.issue.Comment</class>
-        <class>br.edu.utfpr.recominer.model.issue.Issue</class>
-        <class>br.edu.utfpr.recominer.model.issue.Attachment</class>
-        <class>br.edu.utfpr.recominer.model.issue.PeopleIssue</class>
-        <class>br.edu.utfpr.recominer.model.issue.IssueExtBugzilla</class>
-        <class>br.edu.utfpr.recominer.model.issue.IssueWatcher</class>
-        <class>br.edu.utfpr.recominer.model.issue.IssueScmlog</class>
-        <class>br.edu.utfpr.recominer.model.issue.Tracker</class>
-        <class>br.edu.utfpr.recominer.batch.aggregator.Project</class>
-        <exclude-unlisted-classes>true</exclude-unlisted-classes>
-        <properties>
-            <property name="eclipselink.read-only" value="true"/>
-            <!--  Optimization #9 - statement caching -->
-            <!--  Optimization #5 - Read Only -->
-            <property name="eclipselink.jdbc.cache-statements" value="true"/>
-            <!--  Optimization #10 - batch writing >
+    </properties>
+  </persistence-unit>
+  <persistence-unit name="mysql" transaction-type="JTA">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <jta-data-source>jdbc/recominer-mysql</jta-data-source>
+    <class>br.edu.utfpr.recominer.model.svn.TagRevision</class>
+    <class>br.edu.utfpr.recominer.model.svn.Branch</class>
+    <class>br.edu.utfpr.recominer.model.svn.FileCopy</class>
+    <class>br.edu.utfpr.recominer.model.svn.Tag</class>
+    <class>br.edu.utfpr.recominer.model.svn.FileLink</class>
+    <class>br.edu.utfpr.recominer.model.svn.File</class>
+    <class>br.edu.utfpr.recominer.model.svn.PeopleSvn</class>
+    <class>br.edu.utfpr.recominer.model.svn.Action</class>
+    <class>br.edu.utfpr.recominer.model.svn.Repository</class>
+    <class>br.edu.utfpr.recominer.model.svn.Scmlog</class>
+    <class>br.edu.utfpr.recominer.model.issue.Change</class>
+    <class>br.edu.utfpr.recominer.model.issue.RelatedTo</class>
+    <class>br.edu.utfpr.recominer.model.issue.SupportedTracker</class>
+    <class>br.edu.utfpr.recominer.model.issue.Comment</class>
+    <class>br.edu.utfpr.recominer.model.issue.Issue</class>
+    <class>br.edu.utfpr.recominer.model.issue.Attachment</class>
+    <class>br.edu.utfpr.recominer.model.issue.PeopleIssue</class>
+    <class>br.edu.utfpr.recominer.model.issue.IssueExtBugzilla</class>
+    <class>br.edu.utfpr.recominer.model.issue.IssueWatcher</class>
+    <class>br.edu.utfpr.recominer.model.issue.IssueScmlog</class>
+    <class>br.edu.utfpr.recominer.model.issue.Tracker</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <properties>
+      <property name="eclipselink.read-only" value="true"/>
+      <!--  Optimization #9 - statement caching -->
+      <!--  Optimization #5 - Read Only -->
+      <property name="eclipselink.jdbc.cache-statements" value="true"/>
+      <!--  Optimization #10 - batch writing >
             <property name="eclipselink.jdbc.batch-writing" value="JDBC" />
             <property name="eclipselink.jdbc.batch-writing.size" value="1000" /-->
-            <!--  Optimization #11 - disable caching for batch insert (caching only improves reads, so only adds overhead for inserts) -->
-            <property name="eclipselink.cache.shared.default" value="false"/>
-            <!--  Optimization #12 - turn logging off -->
-            <!-- property name="eclipselink.logging.level" value="FINE" /-->
-            <property name="eclipselink.logging.level.sql" value="ALL" />
-            <property name="eclipselink.logging.parameters" value="true" />
-            <property name="eclipselink.logging.session" value="true"/>
-            <!--  Optimization #13 - close EntityManager on commit, to avoid cost of resume >
+      <!--  Optimization #11 - disable caching for batch insert (caching only improves reads, so only adds overhead for inserts) -->
+      <property name="eclipselink.cache.shared.default" value="false"/>
+      <!--  Optimization #12 - turn logging off -->
+      <!-- property name="eclipselink.logging.level" value="FINE" /-->
+      <property name="eclipselink.logging.level.sql" value="ALL"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      <property name="eclipselink.logging.session" value="true"/>
+      <!--  Optimization #13 - close EntityManager on commit, to avoid cost of resume >
             <property name="eclipselink.persistence-context.close-on-commit" value="true" /-->
-            <!--  Optimization #14 - avoid auto flush cost on query execution -->
-            <property name="eclipselink.persistence-context.flush-mode" value="commit"/>
-            <!--  Optimization #15 - avoid cost of persist on commit >
+      <!--  Optimization #14 - avoid auto flush cost on query execution -->
+      <property name="eclipselink.persistence-context.flush-mode" value="commit"/>
+      <!--  Optimization #15 - avoid cost of persist on commit >
             <property name="eclipselink.persistence-context.persist-on-commit" value="false" /-->
-        </properties>
-    </persistence-unit>
+    </properties>
+  </persistence-unit>
 </persistence>
