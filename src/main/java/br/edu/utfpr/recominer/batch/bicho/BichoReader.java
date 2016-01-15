@@ -1,6 +1,11 @@
 package br.edu.utfpr.recominer.batch.bicho;
 
+import br.edu.utfpr.recominer.batch.aggregator.Project;
+import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
+import javax.annotation.PostConstruct;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
@@ -15,18 +20,35 @@ import javax.inject.Named;
 @Named
 public class BichoReader extends AbstractItemReader {
 
+
+    @Inject
+    private GenericBichoDAO dao;
+    
     @Inject
     private JobContext jobContext;
+    
+    private Iterator<Project> iterator;
+    
+    @PostConstruct
+    public void loadProjects() {
+        // reads all VCS' projects available (database schemas)
+        final List<Project> projects = dao.selectAll(Project.class);
+        iterator = projects.listIterator();
+    }
 
     @Override
     public IssueTracker readItem() throws Exception {
-        final Properties parameters = getParameters();
-        final String project = parameters.getProperty("project");
-        final String projectIssueTrackerSystem = parameters.getProperty("projectIssueTrackerSystem");
-        final String url = parameters.getProperty("issueTrackerUrl");
+        if (!iterator.hasNext()) {
+            return null;
+        }
+        
+        final Project project = iterator.next();
+        final String name = project.getProjectName();
+        final String projectIssueTrackerSystem = project.getIssueTrackerSystem();
+        final String url = project.getIssueTrackerUrl();
 
-        return new IssueTracker(project, url, 20,
-                "root", "root",
+        return new IssueTracker(name, url, 20,
+                null, null,
                 IssueTrackerSystem.valueOf(projectIssueTrackerSystem));
     }
 

@@ -1,17 +1,14 @@
 package br.edu.utfpr.recominer.batch;
 
-import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.batch.bicho.BichoReader;
-import br.edu.utfpr.recominer.dao.EntityManagerProducer;
-import br.edu.utfpr.recominer.dao.GenericBichoDAO;
-import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.batch.operations.JobOperator;
+import javax.batch.operations.NoSuchJobExecutionException;
 import javax.batch.runtime.BatchRuntime;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import javax.ejb.Startup;
 
 /**
  * Runs the Bicho batch job every 5 minutes.
@@ -20,29 +17,23 @@ import javax.persistence.EntityManager;
  * @author Rodrigo T. Kuroda
  */
 @Singleton
+@Startup
 public class BatchRunner {
+    
+    private AtomicLong executing = new AtomicLong();
 
-    @Inject
-    private EntityManagerProducer producer;
-
-    @Schedule(second = "*", minute = "*/1", hour = "*", persistent = false)
+    @Schedule(second = "*", minute = "*", hour = "*/1", persistent = false)
     public void startAggregatorJob() {
-        EntityManager entityManager = producer.createPostgresqlEntityManager();
-        GenericBichoDAO dao = new GenericBichoDAO(entityManager);
+        JobOperator jobOperator = BatchRuntime.getJobOperator();
         
-        // reads all VCS' projects available (database schemas)
-        final List<Project> projects = dao.selectAll(Project.class);
-
-        for (Project project : projects) {
-            final Properties properties = new Properties();
-            properties.put("project", project.getProjectName().toLowerCase());
-            properties.put("issueTrackerUrl", project.getIssueTrackerUrl());
-            properties.put("versionControlUrl", project.getVersionControlUrl());
-            properties.put("projectIssueTrackerSystem", project.getIssueTrackerSystem());
-            properties.put("lastCommitAnalysed", project.getLastCommitAnalysed().toString());
-
-            JobOperator jobOperator = BatchRuntime.getJobOperator();
-            jobOperator.start("minerJob", properties);
+        try {
+            jobOperator.getJobInstance(executing.get());
+            return;
+        } catch (NoSuchJobExecutionException e) {
+            // execute only if has no job in execution
+            long jobId = jobOperator.start("minerJob", new Properties());
+            executing.set(jobId);
         }
+        
     }
 }

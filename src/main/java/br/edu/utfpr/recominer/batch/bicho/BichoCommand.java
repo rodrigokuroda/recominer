@@ -18,7 +18,7 @@ class BichoCommand implements ExternalCommand {
     private static final String BICHO_DB_USER = "--db-user-out=root";
     private static final String BICHO_DB_PASSWORD = "--db-password-out=root";
     private static final String BICHO_DB_NAME = "--db-database-out=${DB_NAME}_issues";
-    private static final String BICHO_DELAY = "-d 20";
+    private static final String BICHO_DELAY = "-d";
     private static final String BICHO_DEBUG = "-g";
     private static final String BICHO_ISSUE_TRACKER_SYSTEM = "-b";
     private static final String BICHO_ISSUE_TRACKER_URL = "-u";
@@ -38,10 +38,10 @@ class BichoCommand implements ExternalCommand {
         if (issueTracker.getIssueTrackerSystem() == IssueTrackerSystem.GITHUB
                 && issueTracker.getToken() != null) {
             command.add(BICHO_BACKEND_TOKEN.replace("${TOKEN}", issueTracker.getToken()));
-        } else if (issueTracker.getUser()!= null
-                && issueTracker.getPassword()!= null) {
-            command.add(BICHO_BACKEND_USER.replace("${DB_NAME}", issueTracker.getUser()));
-            command.add(BICHO_BACKEND_PASSWORD.replace("${DB_NAME}", issueTracker.getPassword()));
+        } else if (issueTracker.getUser() != null
+                && issueTracker.getPassword() != null) {
+            command.add(BICHO_BACKEND_USER.replace("${BACKEND_USER}", issueTracker.getUser()));
+            command.add(BICHO_BACKEND_PASSWORD.replace("${BACKEND_PASSWORD}", issueTracker.getPassword()));
         }
 
         command.add(BICHO_DB_USER);

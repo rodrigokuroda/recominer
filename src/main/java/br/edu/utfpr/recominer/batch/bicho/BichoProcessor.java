@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.batch.bicho;
 
+import br.edu.utfpr.recominer.dao.EntityManagerProducer;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import javax.batch.api.chunk.ItemProcessor;
@@ -16,16 +17,14 @@ import javax.persistence.EntityManager;
 public class BichoProcessor implements ItemProcessor {
 
     @Inject
-    @Mysql
-    private EntityManager entityManager;
+    private EntityManagerProducer entityManagerProducer;
 
     @Override
     public Object processItem(Object item) throws Exception {
         IssueTracker it = (IssueTracker) item;
-        
+        EntityManager entityManager = entityManagerProducer.createMysqlEntityManager();
         entityManager.createNativeQuery("CREATE SCHEMA IF NOT EXISTS " + it.getProject() + "_issues").executeUpdate();
-        entityManager.flush();
-        entityManager.close();
+        entityManagerProducer.closeEntityManager(entityManager);
 
         // executing bicho as external process
         ExternalProcess ep = new ExternalProcess(new BichoCommand(it));
