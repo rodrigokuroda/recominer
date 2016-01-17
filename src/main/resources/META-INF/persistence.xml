@@ -9,6 +9,9 @@
     <class>br.edu.utfpr.recominer.model.metric.EntityMetric</class>
     <class>br.edu.utfpr.recominer.model.metric.EntityMetricNode</class>
     <class>br.edu.utfpr.recominer.batch.aggregator.Project</class>
+    <class>br.edu.utfpr.recominer.batch.BatchConfiguration</class>
+    <class>br.edu.utfpr.recominer.batch.bicho.IssueTracker</class>
+    <class>br.edu.utfpr.recominer.batch.cvsanaly.VersionControl</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables"/>

@@ -9,9 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -23,17 +22,7 @@ import javax.validation.constraints.Size;
  * @author Rodrigo T. Kuroda
  */
 @Entity
-@Table(schema = "recominer", name = "projects")
-@NamedQueries({
-    @NamedQuery(name = "Project.findAll", query = "SELECT p FROM Project p"),
-    @NamedQuery(name = "Project.findById", query = "SELECT p FROM Project p WHERE p.id = :id"),
-    @NamedQuery(name = "Project.findByProjectName", query = "SELECT p FROM Project p WHERE p.projectName = :projectName"),
-    @NamedQuery(name = "Project.findByIssueTrackerUrl", query = "SELECT p FROM Project p WHERE p.issueTrackerUrl = :issueTrackerUrl"),
-    @NamedQuery(name = "Project.findByIssueTrackerSystem", query = "SELECT p FROM Project p WHERE p.issueTrackerSystem = :issueTrackerSystem"),
-    @NamedQuery(name = "Project.findByVersionControlUrl", query = "SELECT p FROM Project p WHERE p.versionControlUrl = :versionControlUrl"),
-    @NamedQuery(name = "Project.findByLastCommitAnalysed", query = "SELECT p FROM Project p WHERE p.lastCommitAnalysed = :lastCommitAnalysed"),
-    @NamedQuery(name = "Project.findByLastItsUpdate", query = "SELECT p FROM Project p WHERE p.lastItsUpdate = :lastItsUpdate"),
-    @NamedQuery(name = "Project.findByLastVcsUpdate", query = "SELECT p FROM Project p WHERE p.lastVcsUpdate = :lastVcsUpdate")})
+@Table(name = "project", schema = "recominer")
 public class Project implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,9 +41,8 @@ public class Project implements Serializable {
     @Column(name = "issue_tracker_url")
     private String issueTrackerUrl;
 
-    @NotNull
-    @Column(name = "issue_tracker")
     @ManyToOne
+    @JoinColumn(name = "issue_tracker", referencedColumnName = "id")
     private IssueTracker issueTracker;
 
     @NotNull
@@ -62,9 +50,8 @@ public class Project implements Serializable {
     @Column(name = "version_control_url")
     private String versionControlUrl;
 
-    @NotNull
-    @Column(name = "version_control")
     @ManyToOne
+    @JoinColumn(name = "version_control", referencedColumnName = "id")
     private VersionControl versionControl;
 
     @Column(name = "last_commit_analysed")

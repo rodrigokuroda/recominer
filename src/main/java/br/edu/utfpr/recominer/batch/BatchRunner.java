@@ -1,6 +1,8 @@
 package br.edu.utfpr.recominer.batch;
 
 import br.edu.utfpr.recominer.batch.bicho.BichoReader;
+import br.edu.utfpr.recominer.dao.GenericDao;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.batch.operations.JobOperator;
@@ -9,6 +11,7 @@ import javax.batch.runtime.BatchRuntime;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
 
 /**
  * Runs the Bicho batch job every 5 minutes.
@@ -20,10 +23,13 @@ import javax.ejb.Startup;
 @Startup
 public class BatchRunner {
     
-    private AtomicLong executing = new AtomicLong();
+    private final AtomicLong executing = new AtomicLong();
+    
+    @Inject
+    private GenericDao dao;
 
     @Schedule(second = "*", minute = "*", hour = "*/1", persistent = false)
-    public void startAggregatorJob() {
+    public void startBichoJob() {
         JobOperator jobOperator = BatchRuntime.getJobOperator();
         
         try {
@@ -31,7 +37,14 @@ public class BatchRunner {
             return;
         } catch (NoSuchJobExecutionException e) {
             // execute only if has no job in execution
-            long jobId = jobOperator.start("minerJob", new Properties());
+            
+            final Properties properties = new Properties();
+            List<BatchConfiguration> configurations = dao.selectAll(BatchConfiguration.class);
+            for (BatchConfiguration configuration : configurations) {
+                properties.put(configuration.getConfigurationKey(), configuration.getConfigurationValue());
+            }
+            
+            long jobId = jobOperator.start("minerJob", properties);
             executing.set(jobId);
         }
         

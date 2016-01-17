@@ -25,7 +25,7 @@ public class GitPullCommand implements ExternalCommand {
 
     @Override
     public String[] getCommand() {
-        return new String[]{BASH, GIT, GIT_DIR.replace("${GIT_DIR}", versionControl.getPath()), GIT_WORK_TREE.replace("${WORK_TREE}", versionControl.getPath()), GIT_PULL, GIT_PULL_ALL};
+        return new String[]{BASH, GIT, GIT_DIR.replace("${GIT_DIR}", versionControl.getRepositoryPath()), GIT_WORK_TREE.replace("${WORK_TREE}", versionControl.getRepositoryPath()), GIT_PULL, GIT_PULL_ALL};
     }
 
 }

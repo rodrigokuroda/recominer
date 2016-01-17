@@ -2,7 +2,7 @@
 <job id="minerJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
     <flow id="minerFlow">
-        <step id="bichoStep" next="gitUpdateStep">
+        <step id="bichoStep" next="minerVersionControl">
             <chunk item-count="3">
                 <reader ref="bichoReader" />
                 <processor ref="bichoProcessor" />

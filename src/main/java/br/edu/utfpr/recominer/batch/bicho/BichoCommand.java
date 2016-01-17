@@ -40,8 +40,8 @@ class BichoCommand implements ExternalCommand {
         if (its.getSystem() == IssueTrackerSystem.GITHUB
                 && project.getIssueTracker() != null) {
             command.add(BICHO_BACKEND_TOKEN.replace("${TOKEN}", its.getToken()));
-        } else if (its.getUser() != null && its.getPassword() != null) {
-            command.add(BICHO_BACKEND_USER.replace("${BACKEND_USER}", its.getUser()));
+        } else if (its.getUsername() != null && its.getPassword() != null) {
+            command.add(BICHO_BACKEND_USER.replace("${BACKEND_USER}", its.getUsername()));
             command.add(BICHO_BACKEND_PASSWORD.replace("${BACKEND_PASSWORD}", its.getPassword()));
         }
 

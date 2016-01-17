@@ -62,9 +62,9 @@ public class GenericDao implements Serializable {
         return null;
     }
 
-    public List selectAll(Class classe) {
-        CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
-        cq.select(cq.from(classe));
+    public <T> List<T> selectAll(Class<T> clazz) {
+        CriteriaQuery<T> cq = getEntityManager().getCriteriaBuilder().createQuery(clazz);
+        cq.select(cq.from(clazz));
         return getEntityManager().createQuery(cq).getResultList();
     }
 
