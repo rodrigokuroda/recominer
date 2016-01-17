@@ -1,7 +1,11 @@
 package br.edu.utfpr.recominer.batch.bicho;
 
+import br.edu.utfpr.recominer.batch.aggregator.Project;
+import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import java.util.Date;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
@@ -11,12 +15,16 @@ import javax.inject.Named;
 @Named
 public class BichoWriter extends AbstractItemWriter {
 
+    @Inject
+    private GenericBichoDAO dao;
+
     @Override
-    public void writeItems(List<Object> items) throws Exception {
-        // TODO update status in database
-        for (Object item : items) {
-            System.out.println("Writing: " + item.toString());
-        }
+    public void writeItems(final List<Object> items) throws Exception {
+        items.stream().forEach(item -> {
+            final Project project = (Project) item;
+            project.setLastItsUpdate(new Date());
+            dao.edit(project);
+        });
     }
 
 }

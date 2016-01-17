@@ -1,6 +1,5 @@
 package br.edu.utfpr.recominer.dao;
 
-import br.edu.utfpr.recominer.model.InterfaceEntity;
 import br.edu.utfpr.recominer.util.Util;
 import java.util.List;
 import javax.inject.Inject;
@@ -28,17 +27,17 @@ public class GenericBichoDAO {
         return em;
     }
 
-    public void insert(InterfaceEntity entity) {
+    public void insert(Object entity) {
         getEntityManager().persist(entity);
         getEntityManager().flush();
     }
 
-    public void edit(InterfaceEntity entity) {
+    public void edit(Object entity) {
         getEntityManager().merge(entity);
         getEntityManager().flush();
     }
 
-    public void remove(InterfaceEntity entity) {
+    public void remove(Object entity) {
         getEntityManager().remove(getEntityManager().merge(entity));
     }
 

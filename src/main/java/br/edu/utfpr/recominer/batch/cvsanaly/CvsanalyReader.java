@@ -1,6 +1,11 @@
 package br.edu.utfpr.recominer.batch.cvsanaly;
 
+import br.edu.utfpr.recominer.batch.aggregator.Project;
+import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
+import javax.annotation.PostConstruct;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
@@ -16,19 +21,33 @@ import javax.inject.Named;
 public class CvsanalyReader extends AbstractItemReader {
 
     @Inject
+    private GenericBichoDAO dao;
+
+    @Inject
     private JobContext jobContext;
 
-    @Override
-    public VersionControlSystem readItem() throws Exception {
-        final Properties parameters = getParameters();
-        final String project = parameters.getProperty("project");
-        final String url = parameters.getProperty("issueTrackerUrl");
+    private Iterator<Project> iterator;
 
-        return new VersionControlSystem(project, url, "root", "root");
+    @PostConstruct
+    public void loadProjects() {
+        // reads all VCS' projects available (database schemas)
+        final List<Project> projects = dao.selectAll(Project.class);
+        iterator = projects.listIterator();
+    }
+
+    @Override
+    public Project readItem() throws Exception {
+        if (!iterator.hasNext()) {
+            return null;
+        }
+
+        final Project project = iterator.next();
+        return project;
     }
 
     private Properties getParameters() {
         JobOperator operator = BatchRuntime.getJobOperator();
         return operator.getParameters(jobContext.getExecutionId());
     }
+
 }

@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.batch.bicho;
 
+import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,10 @@ class BichoCommand implements ExternalCommand {
     private static final String BICHO_ISSUE_TRACKER_SYSTEM = "-b";
     private static final String BICHO_ISSUE_TRACKER_URL = "-u";
 
-    private final IssueTracker issueTracker;
+    private final Project project;
 
-    BichoCommand(final IssueTracker issueTracker) {
-        this.issueTracker = issueTracker;
+    BichoCommand(final Project project) {
+        this.project = project;
     }
 
     @Override
@@ -35,28 +36,28 @@ class BichoCommand implements ExternalCommand {
         command.add(PYTHON);
         command.add(BICHO);
 
-        if (issueTracker.getIssueTrackerSystem() == IssueTrackerSystem.GITHUB
-                && issueTracker.getToken() != null) {
-            command.add(BICHO_BACKEND_TOKEN.replace("${TOKEN}", issueTracker.getToken()));
-        } else if (issueTracker.getUser() != null
-                && issueTracker.getPassword() != null) {
-            command.add(BICHO_BACKEND_USER.replace("${BACKEND_USER}", issueTracker.getUser()));
-            command.add(BICHO_BACKEND_PASSWORD.replace("${BACKEND_PASSWORD}", issueTracker.getPassword()));
+        final IssueTracker its = project.getIssueTracker();
+        if (its.getSystem() == IssueTrackerSystem.GITHUB
+                && project.getIssueTracker() != null) {
+            command.add(BICHO_BACKEND_TOKEN.replace("${TOKEN}", its.getToken()));
+        } else if (its.getUser() != null && its.getPassword() != null) {
+            command.add(BICHO_BACKEND_USER.replace("${BACKEND_USER}", its.getUser()));
+            command.add(BICHO_BACKEND_PASSWORD.replace("${BACKEND_PASSWORD}", its.getPassword()));
         }
 
         command.add(BICHO_DB_USER);
         command.add(BICHO_DB_PASSWORD);
-        command.add(BICHO_DB_NAME.replace("${DB_NAME}", issueTracker.getProject()));
+        command.add(BICHO_DB_NAME.replace("${DB_NAME}", project.getProjectName().toLowerCase()));
 
         command.add(BICHO_DELAY);
-        command.add(issueTracker.getDelay().toString());
+        command.add(its.getMiningDelay().toString());
         command.add(BICHO_DEBUG);
 
         command.add(BICHO_ISSUE_TRACKER_SYSTEM);
-        command.add(issueTracker.getIssueTrackerSystem().getCode());
+        command.add(its.getSystem().getCode());
 
         command.add(BICHO_ISSUE_TRACKER_URL);
-        command.add(issueTracker.getUrl());
+        command.add(project.getIssueTrackerUrl());
 
         return command.toArray(new String[command.size()]);
     }

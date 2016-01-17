@@ -1,14 +1,20 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
+import br.edu.utfpr.recominer.batch.bicho.IssueTracker;
+import br.edu.utfpr.recominer.batch.cvsanaly.VersionControl;
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -34,7 +40,7 @@ public class Project implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @NotNull
     @Size(min = 1, max = 255)
@@ -47,46 +53,53 @@ public class Project implements Serializable {
     private String issueTrackerUrl;
 
     @NotNull
-    @Size(min = 1, max = 45)
-    @Column(name = "issue_tracker_system")
-    private String issueTrackerSystem;
+    @Column(name = "issue_tracker")
+    @ManyToOne
+    private IssueTracker issueTracker;
 
     @NotNull
     @Size(min = 1, max = 1024)
     @Column(name = "version_control_url")
     private String versionControlUrl;
 
+    @NotNull
+    @Column(name = "version_control")
+    @ManyToOne
+    private VersionControl versionControl;
+
     @Column(name = "last_commit_analysed")
     private Integer lastCommitAnalysed;
 
     @Size(max = 45)
     @Column(name = "last_its_update")
-    private String lastItsUpdate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastItsUpdate;
 
     @Size(max = 45)
     @Column(name = "last_vcs_update")
-    private String lastVcsUpdate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastVcsUpdate;
 
     public Project() {
     }
 
-    public Project(Integer id) {
+    public Project(Long id) {
         this.id = id;
     }
 
-    public Project(Integer id, String projectName, String issueTrackerUrl, String issueTrackerSystem, String versionControlUrl) {
+    public Project(Long id, String projectName, String issueTrackerUrl, IssueTracker issueTrackerSystem, String versionControlUrl) {
         this.id = id;
         this.projectName = projectName;
         this.issueTrackerUrl = issueTrackerUrl;
-        this.issueTrackerSystem = issueTrackerSystem;
+        this.issueTracker = issueTrackerSystem;
         this.versionControlUrl = versionControlUrl;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -106,12 +119,12 @@ public class Project implements Serializable {
         this.issueTrackerUrl = issueTrackerUrl;
     }
 
-    public String getIssueTrackerSystem() {
-        return issueTrackerSystem;
+    public IssueTracker getIssueTracker() {
+        return issueTracker;
     }
 
-    public void setIssueTrackerSystem(String issueTrackerSystem) {
-        this.issueTrackerSystem = issueTrackerSystem;
+    public void setIssueTracker(IssueTracker issueTracker) {
+        this.issueTracker = issueTracker;
     }
 
     public String getVersionControlUrl() {
@@ -122,6 +135,14 @@ public class Project implements Serializable {
         this.versionControlUrl = versionControlUrl;
     }
 
+    public VersionControl getVersionControl() {
+        return versionControl;
+    }
+
+    public void setVersionControl(VersionControl versionControl) {
+        this.versionControl = versionControl;
+    }
+
     public Integer getLastCommitAnalysed() {
         return lastCommitAnalysed;
     }
@@ -130,19 +151,19 @@ public class Project implements Serializable {
         this.lastCommitAnalysed = lastCommitAnalysed;
     }
 
-    public String getLastItsUpdate() {
+    public Date getLastItsUpdate() {
         return lastItsUpdate;
     }
 
-    public void setLastItsUpdate(String lastItsUpdate) {
+    public void setLastItsUpdate(Date lastItsUpdate) {
         this.lastItsUpdate = lastItsUpdate;
     }
 
-    public String getLastVcsUpdate() {
+    public Date getLastVcsUpdate() {
         return lastVcsUpdate;
     }
 
-    public void setLastVcsUpdate(String lastVcsUpdate) {
+    public void setLastVcsUpdate(Date lastVcsUpdate) {
         this.lastVcsUpdate = lastVcsUpdate;
     }
 
@@ -168,7 +189,7 @@ public class Project implements Serializable {
 
     @Override
     public String toString() {
-        return "Project{" + "id=" + id + ", projectName=" + projectName + ", issueTrackerUrl=" + issueTrackerUrl + ", issueTrackerSystem=" + issueTrackerSystem + ", versionControlUrl=" + versionControlUrl + ", lastCommitAnalysed=" + lastCommitAnalysed + ", lastItsUpdate=" + lastItsUpdate + ", lastVcsUpdate=" + lastVcsUpdate + '}';
+        return "Project{" + "id=" + id + ", projectName=" + projectName + ", issueTrackerUrl=" + issueTrackerUrl + ", issueTrackerSystem=" + issueTracker + ", versionControlUrl=" + versionControlUrl + ", lastCommitAnalysed=" + lastCommitAnalysed + ", lastItsUpdate=" + lastItsUpdate + ", lastVcsUpdate=" + lastVcsUpdate + '}';
     }
 
 }

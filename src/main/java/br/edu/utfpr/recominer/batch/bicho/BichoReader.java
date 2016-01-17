@@ -20,7 +20,6 @@ import javax.inject.Named;
 @Named
 public class BichoReader extends AbstractItemReader {
 
-
     @Inject
     private GenericBichoDAO dao;
     
@@ -37,19 +36,13 @@ public class BichoReader extends AbstractItemReader {
     }
 
     @Override
-    public IssueTracker readItem() throws Exception {
+    public Project readItem() throws Exception {
         if (!iterator.hasNext()) {
             return null;
         }
         
         final Project project = iterator.next();
-        final String name = project.getProjectName();
-        final String projectIssueTrackerSystem = project.getIssueTrackerSystem();
-        final String url = project.getIssueTrackerUrl();
-
-        return new IssueTracker(name, url, 20,
-                null, null,
-                IssueTrackerSystem.valueOf(projectIssueTrackerSystem));
+        return project;
     }
 
     private Properties getParameters() {

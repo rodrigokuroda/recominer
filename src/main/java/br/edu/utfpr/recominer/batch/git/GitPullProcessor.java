@@ -1,6 +1,7 @@
 package br.edu.utfpr.recominer.batch.git;
 
-import br.edu.utfpr.recominer.batch.cvsanaly.*;
+import br.edu.utfpr.recominer.batch.aggregator.Project;
+import br.edu.utfpr.recominer.batch.cvsanaly.VersionControl;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import java.io.IOException;
 import java.util.Properties;
@@ -28,13 +29,11 @@ public class GitPullProcessor implements ItemProcessor {
 
     @Override
     public Object processItem(Object item) throws Exception {
-        VersionControlSystem vcs = (VersionControlSystem) item;
+        Project project = (Project) item;
         try {
-            final String url = vcs.getUrl();
-            final String name = vcs.getName();
-
+            final VersionControl versionControl = project.getVersionControl();
             // executing bicho as external process
-            ExternalProcess ep = new ExternalProcess(new GitPullCommand(name, url));
+            ExternalProcess ep = new ExternalProcess(new GitPullCommand(versionControl));
             ep.start();
 
         } catch (InterruptedException | IOException ex) {
@@ -42,7 +41,7 @@ public class GitPullProcessor implements ItemProcessor {
             return BatchStatus.FAILED.toString();
         }
 
-        return BatchStatus.COMPLETED.toString();
+        return project;
     }
 
     private Properties getParameters() {

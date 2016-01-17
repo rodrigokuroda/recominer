@@ -1,7 +1,12 @@
 package br.edu.utfpr.recominer.batch.git;
 
-import br.edu.utfpr.recominer.batch.cvsanaly.*;
+import br.edu.utfpr.recominer.batch.aggregator.Project;
+import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import java.util.Iterator;
+import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.batch.api.chunk.AbstractItemReader;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
@@ -11,13 +16,26 @@ import javax.inject.Named;
 @Named
 public class GitPullReader extends AbstractItemReader {
 
-    public GitPullReader() {
+    @Inject
+    private GenericBichoDAO dao;
+
+    private Iterator<Project> iterator;
+
+    @PostConstruct
+    public void loadProjects() {
+        // reads all VCS' projects available (database schemas)
+        final List<Project> projects = dao.selectAll(Project.class);
+        iterator = projects.listIterator();
     }
 
     @Override
-    public VersionControlSystem readItem() throws Exception {
-        // TODO read projects to miner in database
-        return new VersionControlSystem("eclipsejdtcore", "https://bugs.eclipse.org/bugs/buglist.cgi?product=JDT", "root", "root");
+    public Project readItem() throws Exception {
+        if (!iterator.hasNext()) {
+            return null;
+        }
+
+        final Project project = iterator.next();
+        return project;
     }
 
 }

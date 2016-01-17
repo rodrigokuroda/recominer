@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.batch.cvsanaly;
 
+import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +25,13 @@ class CvsanalyCommand implements ExternalCommand {
     private static final String CVSANALY_METRICS_NOERR = "--metrics-noerr";
     private static final String CVSANALY_METRICS_EXTENSIONS = "--extensions=CommitsLOCDet,FileTypes";
 
-    private final String name;
-    private final String url;
+    private final Project project;
 
-    public CvsanalyCommand(String name, String url) {
-        this.name = name;
-        this.url = url;
+    public CvsanalyCommand(Project project) {
+        this.project = project;
     }
 
+    @Override
     public String[] getCommand() {
         final List<String> command = new ArrayList<>();
         command.add(PYTHON);
@@ -39,7 +39,7 @@ class CvsanalyCommand implements ExternalCommand {
 
         command.add(CVSANALY_DB_USER);
         command.add(CVSANALY_DB_PASSWORD);
-        command.add(CVSANALY_DB_NAME.replace("${DB_NAME}", name));
+        command.add(CVSANALY_DB_NAME.replace("${DB_NAME}", project.getProjectName().toLowerCase()));
 
         command.add(CVSANALY_DEBUG);
 
@@ -47,7 +47,7 @@ class CvsanalyCommand implements ExternalCommand {
         command.add(CVSANALY_METRICS_NOERR);
         command.add(CVSANALY_METRICS_EXTENSIONS);
 
-        command.add(url);
+        command.add(project.getVersionControlUrl());
 
         return command.toArray(new String[command.size()]);
     }
