@@ -36,14 +36,13 @@ public class GitPullProcessor implements ItemProcessor {
     public Object processItem(Object item) throws Exception {
         Project project = (Project) item;
         try {
-            final VersionControl versionControl = project.getVersionControl();
             final ExternalCommand command;
             
             final String localGitRepositoryPath = getParameters().getProperty("localGitRepositoryPath", System.getProperty("user.dir"));
             if (project.getLastVcsUpdate() != null) {
-                command = new GitPullCommand(versionControl);
+                command = new GitPullCommand(project);
             } else {
-                command = new GitCloneCommand(versionControl, localGitRepositoryPath);
+                command = new GitCloneCommand(project, localGitRepositoryPath);
             }
             // executing bicho as external process
             ExternalProcess ep = new ExternalProcess(command);

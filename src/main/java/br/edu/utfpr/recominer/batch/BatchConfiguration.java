@@ -1,8 +1,11 @@
 package br.edu.utfpr.recominer.batch;
 
+import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,9 +15,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "batch_configuration", schema = "recominer")
-public class BatchConfiguration {
+public class BatchConfiguration implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     
     @Column(name = "configuration_key")

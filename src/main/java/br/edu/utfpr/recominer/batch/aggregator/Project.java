@@ -53,6 +53,9 @@ public class Project implements Serializable {
     @ManyToOne
     @JoinColumn(name = "version_control", referencedColumnName = "id")
     private VersionControl versionControl;
+    
+    @Column(name = "repository_path")
+    private String repositoryPath;
 
     @Column(name = "last_commit_analysed")
     private Integer lastCommitAnalysed;
@@ -128,6 +131,14 @@ public class Project implements Serializable {
 
     public void setVersionControl(VersionControl versionControl) {
         this.versionControl = versionControl;
+    }
+
+    public String getRepositoryPath() {
+        return repositoryPath;
+    }
+
+    public void setRepositoryPath(String repositoryPath) {
+        this.repositoryPath = repositoryPath;
     }
 
     public Integer getLastCommitAnalysed() {

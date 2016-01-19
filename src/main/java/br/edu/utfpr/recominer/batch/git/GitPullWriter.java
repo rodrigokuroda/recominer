@@ -1,6 +1,5 @@
 package br.edu.utfpr.recominer.batch.git;
 
-import br.edu.utfpr.recominer.batch.cvsanaly.*;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.inject.Named;

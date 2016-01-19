@@ -47,7 +47,7 @@ class CvsanalyCommand implements ExternalCommand {
         command.add(CVSANALY_METRICS_NOERR);
         command.add(CVSANALY_METRICS_EXTENSIONS);
 
-        command.add(project.getVersionControlUrl());
+        command.add(project.getRepositoryPath());
 
         return command.toArray(new String[command.size()]);
     }

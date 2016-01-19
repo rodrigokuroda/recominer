@@ -26,12 +26,6 @@ public class VersionControl implements Serializable {
     @Column(name = "id")
     private Long id;
     
-    @Column(name = "repository_path")
-    private String repositoryPath;
-    
-    @Column(name = "url")
-    private String url;
-    
     @Column(name = "username")
     private String username;
     
@@ -47,22 +41,6 @@ public class VersionControl implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getRepositoryPath() {
-        return repositoryPath;
-    }
-
-    public void setRepositoryPath(String repositoryPath) {
-        this.repositoryPath = repositoryPath;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getUsername() {

@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.batch.git;
 
+import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.batch.cvsanaly.VersionControl;
 import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 
@@ -17,15 +18,15 @@ public class GitPullCommand implements ExternalCommand {
     private static final String GIT_PULL = "pull";
     private static final String GIT_PULL_ALL = "--all";
 
-    private final VersionControl versionControl;
+    private final Project project;
 
-    public GitPullCommand(final VersionControl versionControl) {
-        this.versionControl = versionControl;
+    public GitPullCommand(final Project project) {
+        this.project = project;
     }
 
     @Override
     public String[] getCommand() {
-        return new String[]{BASH, GIT, GIT_DIR.replace("${GIT_DIR}", versionControl.getRepositoryPath()), GIT_WORK_TREE.replace("${WORK_TREE}", versionControl.getRepositoryPath()), GIT_PULL, GIT_PULL_ALL};
+        return new String[]{BASH, GIT, GIT_DIR.replace("${GIT_DIR}", project.getRepositoryPath()), GIT_WORK_TREE.replace("${WORK_TREE}", project.getRepositoryPath()), GIT_PULL, GIT_PULL_ALL};
     }
 
 }

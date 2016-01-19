@@ -2,7 +2,23 @@
 <job id="minerJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
     <flow id="minerFlow">
-        <step id="bichoStep" next="minerVersionControl">
+        <step id="gitPullStep" next="cvsanalyStep">
+            <chunk item-count="3">
+                <reader ref="gitPullReader" />
+                <processor ref="gitPullProcessor" />
+                <writer ref="gitPullWriter" />
+            </chunk>
+        </step>
+
+        <step id="cvsanalyStep" next="bichoStep">
+            <chunk item-count="3">
+                <reader ref="cvsanalyReader" />
+                <processor ref="cvsanalyProcessor" />
+                <writer ref="cvsanalyWriter" />
+            </chunk>
+        </step>
+        
+        <step id="bichoStep" next="aggregatorStep">
             <chunk item-count="3">
                 <reader ref="bichoReader" />
                 <processor ref="bichoProcessor" />
@@ -10,23 +26,6 @@
             </chunk>
         </step>
 
-        <flow id="minerVersionControl">
-            <step id="gitUpdateStep" next="cvsanalyStep">
-                <chunk item-count="3">
-                    <reader ref="gitUpdateReader" />
-                    <processor ref="gitUpdateProcessor" />
-                    <writer ref="gitUpdateWriter" />
-                </chunk>
-            </step>
-
-            <step id="cvsanalyStep" next="aggregatorStep">
-                <chunk item-count="3">
-                    <reader ref="cvsanalyReader" />
-                    <processor ref="cvsanalyProcessor" />
-                    <writer ref="cvsanalyWriter" />
-                </chunk>
-            </step>
-        </flow>
 
         <step id="aggregatorStep" >
             <chunk item-count="3">
