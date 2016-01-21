@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
@@ -201,5 +202,16 @@ public class GenericBichoDAO {
             return null;
         }
         return result.get(0);
+    }
+
+    public void executeNativeQuery(String sql, Object[] params) {
+        EntityTransaction et = em.getTransaction();
+        et.begin();
+        final Query nativeQuery = em.createNativeQuery(sql);
+        for (int position = 1; position <= params.length; position++) {
+            nativeQuery.setParameter(position, sql);
+        }
+        nativeQuery.executeUpdate();
+        et.commit();
     }
 }
