@@ -1,7 +1,6 @@
 package br.edu.utfpr.recominer.batch.cvsanaly;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
-import br.edu.utfpr.recominer.dao.GenericDao;
 import java.util.Date;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
@@ -28,13 +27,11 @@ public class CvsanalyWriter extends AbstractItemWriter {
 
     @Override
     public void writeItems(List<Object> items) throws Exception {
-        final GenericDao dao = new GenericDao(em);
-        items.stream().forEach(item -> {
+        for (Object item : items) {
             final Project project = (Project) item;
             project.setLastVcsUpdate(new Date());
-            dao.edit(project);
-        });
-        
+            em.merge(project);
+        }
     }
     
 }
