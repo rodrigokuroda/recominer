@@ -1,7 +1,6 @@
 package br.edu.utfpr.recominer.batch.git;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
-import br.edu.utfpr.recominer.batch.cvsanaly.VersionControl;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
@@ -12,6 +11,7 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.BatchStatus;
 import javax.batch.runtime.context.JobContext;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rodrigo T. Kuroda
  */
 @Named
+@Dependent
 public class GitPullProcessor implements ItemProcessor {
 
     private static final Logger LOGGER = LogManager.getLogger();

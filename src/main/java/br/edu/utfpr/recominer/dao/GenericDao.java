@@ -1,38 +1,46 @@
 package br.edu.utfpr.recominer.dao;
 
-import br.edu.utfpr.recominer.model.InterfaceEntity;
 import br.edu.utfpr.recominer.util.Util;
 import java.io.Serializable;
 import java.util.List;
-import javax.ejb.Stateless;
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-@Stateless
+@Named
+@Dependent
 public class GenericDao implements Serializable {
 
-    @PersistenceContext(unitName = "postgresql")
+    @Inject
     private EntityManager em;
 
+    public GenericDao() {
+    }
+
+    public GenericDao(EntityManager em) {
+        this.em = em;
+    }
+    
     public EntityManager getEntityManager() {
         return em;
     }
 
-    public void insert(InterfaceEntity entity) {
+    public void insert(Object entity) {
         getEntityManager().persist(entity);
         getEntityManager().flush();
     }
 
-    public void edit(InterfaceEntity entity) {
+    public void edit(Object entity) {
         getEntityManager().merge(entity);
         getEntityManager().flush();
     }
 
-    public void remove(InterfaceEntity entity) {
+    public void remove(Object entity) {
         getEntityManager().remove(getEntityManager().merge(entity));
     }
 

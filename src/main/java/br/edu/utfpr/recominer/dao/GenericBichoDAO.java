@@ -2,6 +2,7 @@ package br.edu.utfpr.recominer.dao;
 
 import br.edu.utfpr.recominer.util.Util;
 import java.util.List;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -12,9 +13,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 @Named
+@Dependent
 public class GenericBichoDAO {
 
-    @Inject
+    @Inject @Mysql
     private EntityManager em;
 
     public GenericBichoDAO() {

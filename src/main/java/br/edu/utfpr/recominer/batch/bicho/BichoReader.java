@@ -1,35 +1,41 @@
 package br.edu.utfpr.recominer.batch.bicho;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
-import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import br.edu.utfpr.recominer.dao.GenericDao;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
-import javax.annotation.PostConstruct;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
  * @author Rodrigo T. Kuroda
  */
 @Named
+@Dependent
 public class BichoReader extends AbstractItemReader {
 
-    @Inject
-    private GenericBichoDAO dao;
+    @PersistenceContext(unitName = "postgresql")
+    private EntityManager em;
     
     @Inject
     private JobContext jobContext;
-    
+
     private Iterator<Project> iterator;
-    
-    @PostConstruct
-    public void loadProjects() {
+
+    @Override
+    public void open(Serializable checkpoint) throws Exception {
+        final GenericDao dao = new GenericDao(em);
+        
         // reads all VCS' projects available (database schemas)
         final List<Project> projects = dao.selectAll(Project.class);
         iterator = projects.listIterator();

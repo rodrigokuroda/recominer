@@ -1,6 +1,6 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
-import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.model.Commit;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -9,8 +9,11 @@ import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  * Reads the commits and associates with a correspondent issue.
@@ -18,13 +21,16 @@ import javax.inject.Named;
  * @author Rodrigo T. Kuroda
  */
 @Named
+@Dependent
 public class AggregatorReader extends AbstractItemReader {
 
     @Inject
     private JobContext jobContext;
 
-    @Inject
-    private GenericBichoDAO dao;
+    @PersistenceContext(unitName = "postgresql")
+    private EntityManager em;
+    
+    private GenericDao dao;
 
     private Iterator<Commit> iterator;
 
@@ -34,6 +40,8 @@ public class AggregatorReader extends AbstractItemReader {
         final String project = parameters.getProperty("project");
         final String lastCommitAnalysed = parameters.getProperty("lastCommitAnalysed");
 
+        dao = new GenericDao(em);
+        
         if (lastCommitAnalysed == null) {
             // reads all commits
             iterator = dao.selectWithParams("SELECT c FROM Commit c",

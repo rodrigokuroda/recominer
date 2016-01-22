@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.batch.api.chunk.ItemProcessor;
+import javax.batch.runtime.context.JobContext;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
@@ -25,12 +27,16 @@ import org.apache.logging.log4j.Logger;
  * @author Rodrigo T. Kuroda
  */
 @Named
+@Dependent
 public class AggregatorProcessor implements ItemProcessor {
 
     private static final Logger log = LogManager.getLogger();
 
     @Inject
     private GenericBichoDAO dao;
+    
+    @Inject
+    private JobContext jobContext;
 
     @Override
     public Object processItem(Object item) throws Exception {
