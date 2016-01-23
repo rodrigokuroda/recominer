@@ -1,36 +1,38 @@
 package br.edu.utfpr.recominer.batch.bicho;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
-import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import br.edu.utfpr.recominer.dao.GenericDao;
 import java.util.Date;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
-import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManagerFactory;
 
 /**
  *
  * @author Rodrigo T. Kuroda
  */
 @Named
-@Dependent
 public class BichoWriter extends AbstractItemWriter {
 
     @Inject
-    private GenericBichoDAO dao;
+    private EntityManagerFactory factory;
     
     @Inject
     private JobContext jobContext;
+
+    private GenericDao dao;
     
     @Override
-    public void writeItems(final List<Object> items) throws Exception {
-        items.stream().forEach(item -> {
+    public void writeItems(List<Object> items) throws Exception {
+        dao = new GenericDao(factory.createEntityManager());
+        for (Object item : items) {
             final Project project = (Project) item;
             project.setLastItsUpdate(new Date());
             dao.edit(project);
-        });
+        }
     }
 
 }

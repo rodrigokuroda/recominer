@@ -19,10 +19,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,7 +37,7 @@ public class BichoMetricViewBean implements Serializable {
     private final String FOR_DELETE = "metricForDelete";
     private final String LIST = "metricList";
 
-    @EJB
+    @Inject
     private GenericDao dao;
 
     /**

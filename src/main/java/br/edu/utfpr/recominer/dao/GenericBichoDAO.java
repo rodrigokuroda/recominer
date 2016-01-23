@@ -1,6 +1,7 @@
 package br.edu.utfpr.recominer.dao;
 
 import br.edu.utfpr.recominer.util.Util;
+import java.io.Serializable;
 import java.util.List;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
@@ -14,7 +15,7 @@ import javax.persistence.criteria.Root;
 
 @Named
 @Dependent
-public class GenericBichoDAO {
+public class GenericBichoDAO implements Serializable {
 
     @Inject @Mysql
     private EntityManager em;

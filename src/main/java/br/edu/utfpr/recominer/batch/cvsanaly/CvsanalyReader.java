@@ -10,7 +10,6 @@ import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
-import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -21,7 +20,6 @@ import javax.persistence.PersistenceContext;
  * @author Rodrigo T. Kuroda
  */
 @Named
-@Dependent
 public class CvsanalyReader extends AbstractItemReader {
 
     @PersistenceContext(unitName = "postgresql")

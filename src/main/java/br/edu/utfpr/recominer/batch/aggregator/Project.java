@@ -60,12 +60,10 @@ public class Project implements Serializable {
     @Column(name = "last_commit_analysed")
     private Integer lastCommitAnalysed;
 
-    @Size(max = 45)
     @Column(name = "last_its_update")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastItsUpdate;
 
-    @Size(max = 45)
     @Column(name = "last_vcs_update")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastVcsUpdate;

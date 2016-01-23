@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.runtime.context.JobContext;
-import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -18,7 +17,6 @@ import javax.persistence.PersistenceContext;
  * @author Rodrigo T. Kuroda
  */
 @Named
-@Dependent
 public class GitPullReader extends AbstractItemReader {
 
     @PersistenceContext(unitName = "postgresql")

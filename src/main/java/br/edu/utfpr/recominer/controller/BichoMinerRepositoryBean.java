@@ -4,15 +4,15 @@ import br.edu.utfpr.recominer.dao.BichoDAO;
 import br.edu.utfpr.recominer.dao.GenericBichoDAO;
 import java.io.Serializable;
 import java.util.List;
-import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 @Named
 @SessionScoped
 public class BichoMinerRepositoryBean implements Serializable {
 
-    @EJB
+    @Inject
     private GenericBichoDAO dao;
 
     public List<String> getAllRepositories() {

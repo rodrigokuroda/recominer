@@ -37,7 +37,7 @@ public class GenericDao implements Serializable {
 
     public void edit(Object entity) {
         getEntityManager().merge(entity);
-        getEntityManager().flush();
+//        getEntityManager().flush();
     }
 
     public void remove(Object entity) {
@@ -211,4 +211,13 @@ public class GenericDao implements Serializable {
         }
         return result.get(0);
     }
+
+    public void executeNativeQuery(String sql, Object[] params) {
+        final Query nativeQuery = em.createNativeQuery(sql);
+        for (int position = 1; position <= params.length; position++) {
+            nativeQuery.setParameter(position, sql);
+        }
+        nativeQuery.executeUpdate();
+    }
+    
 }

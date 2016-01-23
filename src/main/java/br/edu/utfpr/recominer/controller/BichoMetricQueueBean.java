@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
@@ -44,9 +44,9 @@ public class BichoMetricQueueBean implements Serializable {
     private final List<Map<Object, Object>> paramsQueue;
     private final ExecutorService threadPool;
 
-    @EJB
+    @Inject
     private GenericDao dao;
-    @EJB
+    @Inject
     private GenericBichoDAO bichoDao;
     private EntityMatrix matrix;
     private String matrixId;

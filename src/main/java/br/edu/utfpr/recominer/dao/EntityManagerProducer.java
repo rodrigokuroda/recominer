@@ -1,8 +1,8 @@
 package br.edu.utfpr.recominer.dao;
 
 import java.util.Properties;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Disposes;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -17,39 +17,69 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
  * @author Rodrigo T. Kuroda
  */
 @Named
+@ApplicationScoped
 public class EntityManagerProducer {
 
     @PersistenceUnit(unitName = "mysql")
+    @Produces
+    @Mysql
     private EntityManagerFactory mysqlFactory;
     
     @PersistenceUnit(unitName = "postgresql")
+    @Produces
+    @Default
+    @Postgresql
     private EntityManagerFactory postgresqlFactory;
 
-    @RequestScoped
     @Produces
     @Mysql
     public EntityManager createMysqlEntityManager() {
         return mysqlFactory.createEntityManager();
     }
     
-    @RequestScoped
     @Produces
+    @Postgresql
+    @Default
     public EntityManager createPostgresqlEntityManager() {
         return postgresqlFactory.createEntityManager();
     }
 
-    public EntityManager createEntityManager(String schema) {
-        Properties properties = new Properties();
+//    @Produces
+//    @Mysql
+//    public EntityManagerFactory createMysqlEntityManagerFactory(final InjectionPoint injectionPoint) {
+//        final Mysql annotation = injectionPoint.getAnnotated().getAnnotation(Mysql.class);
+//        final String schema = annotation.schema();
+//        
+//        final Properties properties = new Properties();
+//        properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, schema);
+//        return Persistence.createEntityManagerFactory("mysql", properties);
+//    }
+    
+    public EntityManagerFactory createMysqlEntityManagerFactory(final String schema) {
+        final Properties properties = new Properties();
+        properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, schema);
+        return Persistence.createEntityManagerFactory("mysql", properties);
+    }
+    
+    public EntityManager createMysqlEntityManager(final String schema) {
+        final Properties properties = new Properties();
         properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, schema);
         return Persistence.createEntityManagerFactory("mysql")
                 .createEntityManager(properties);
     }
-
-    public void closeEntityManager(@Disposes EntityManager manager) {
-        if (manager.isOpen()) {
-            manager.flush();
-            manager.close();
-        }
-    }
+//
+//    public void closePostgresqlEntityManager(@Disposes @Postgresql final EntityManager manager) {
+//        if (manager.isOpen()) {
+//            manager.flush();
+//            manager.close();
+//        }
+//    }
+//
+//    public void closeMysqlEntityManager(@Disposes @Mysql final EntityManager manager) {
+//        if (manager.isOpen()) {
+//            manager.flush();
+//            manager.close();
+//        }
+//    }
 
 }

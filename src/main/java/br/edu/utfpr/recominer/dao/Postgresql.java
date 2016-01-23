@@ -13,6 +13,5 @@ import javax.inject.Qualifier;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Qualifier
-public @interface Mysql {
-    String schema() default ""; 
+public @interface Postgresql {
 }

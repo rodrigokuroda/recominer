@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import javax.ejb.EJB;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.lang3.StringUtils;
 
@@ -31,7 +31,7 @@ public class BichoMatrixViewBean implements Serializable {
     private final String FOR_DELETE = "matrixForDelete";
     private final String LIST = "listMatrices";
 
-    @EJB
+    @Inject
     private GenericDao dao;
 
     /**

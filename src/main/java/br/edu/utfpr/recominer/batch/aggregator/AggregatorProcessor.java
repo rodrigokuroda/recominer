@@ -1,7 +1,8 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
 import br.edu.utfpr.recominer.comparator.VersionComparator;
-import br.edu.utfpr.recominer.dao.GenericBichoDAO;
+import br.edu.utfpr.recominer.dao.GenericDao;
+import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.model.Version;
 import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.util.ArrayList;
@@ -11,29 +12,31 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.runtime.context.JobContext;
-import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 /**
  *
  * @author Rodrigo T. Kuroda
  */
 @Named
-@Dependent
 public class AggregatorProcessor implements ItemProcessor {
 
     private static final Logger log = LogManager.getLogger();
-
+    
     @Inject
-    private GenericBichoDAO dao;
+    @Mysql
+    private EntityManagerFactory factory;
     
     @Inject
     private JobContext jobContext;
@@ -42,14 +45,17 @@ public class AggregatorProcessor implements ItemProcessor {
     public Object processItem(Object item) throws Exception {
         Project project = (Project) item;
         String projectName = project.getProjectName().toLowerCase();
-
-        System.out.println("Processing: " + item);
+        
+        final Properties properties = new Properties();
+        properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName + "_vcs");
+        GenericDao dao = new GenericDao(factory.createEntityManager(properties));
+        
         final List<Scmlog> commits = dao.selectAll(Scmlog.class);
-
+        
         int totalPatternOccurrences = 0;
         int totalPatternRelatedWithAnIssue = 0;
 
-        boolean isIssuesFromBugzilla = isIssuesFromBugzilla(project);
+        boolean isIssuesFromBugzilla = isIssuesFromBugzilla(project, dao);
 
         final String selectIssueIdAndFixVersions;
         final String issueReferencePattern;
@@ -75,8 +81,8 @@ public class AggregatorProcessor implements ItemProcessor {
         final Pattern regex = Pattern.compile(issueReferencePattern, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
         final Pattern regexNumber = Pattern.compile("\\d+");
 
-        final Map<Long, List<String>> fixedIssuesIdFixVersion = new HashMap<>();
-        final Set<Long> fixedIssuesSet = new HashSet<>();
+        final Map<Integer, List<String>> fixedIssuesIdFixVersion = new HashMap<>();
+        final Set<Integer> fixedIssuesSet = new HashSet<>();
 
         int totalCommitsWithOccurrences = 0;
 
@@ -107,10 +113,10 @@ public class AggregatorProcessor implements ItemProcessor {
                 matcherCount++;
 
                 final Object[] issueIdAndFixVersions = (Object[]) dao.selectNativeOneWithParams(selectIssueIdAndFixVersions, new Object[]{issueKey.toUpperCase()});
-                Long issueId = (Long) issueIdAndFixVersions[0];
-                String fixVersions = (String) issueIdAndFixVersions[1];
 
-                if (issueId != null) {
+                if (issueIdAndFixVersions != null) {
+                    Integer issueId = (Integer) issueIdAndFixVersions[0];
+                    String fixVersions = (String) issueIdAndFixVersions[1];
 
                     // adiciona as versões da issue corrigida
                     fixedIssuesIdFixVersion.put(issueId, Arrays.asList(fixVersions.replace(" ", "").split(",")));
@@ -139,8 +145,8 @@ public class AggregatorProcessor implements ItemProcessor {
         int countIssuesWithFixVersion = 0;
 
         Set<Version> distincMinorVersion = new HashSet<>();
-        for (Map.Entry<Long, List<String>> entrySet : fixedIssuesIdFixVersion.entrySet()) {
-            Long issueId = entrySet.getKey();
+        for (Map.Entry<Integer, List<String>> entrySet : fixedIssuesIdFixVersion.entrySet()) {
+            Integer issueId = entrySet.getKey();
             List<String> versions = entrySet.getValue();
 
             if (versions.isEmpty() || versions.get(0).isEmpty()) {
@@ -195,7 +201,7 @@ public class AggregatorProcessor implements ItemProcessor {
         return null;
     }
 
-    private boolean isIssuesFromBugzilla(Project project) {
+    private boolean isIssuesFromBugzilla(Project project, GenericDao dao) {
         final Object isIssuesFromJira = dao.selectNativeOneWithParams("SELECT 1 "
                 + "FROM information_schema.tables "
                 + "WHERE table_schema = ? "
