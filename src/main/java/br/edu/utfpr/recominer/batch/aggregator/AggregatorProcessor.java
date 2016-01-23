@@ -1,10 +1,12 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
+import br.edu.utfpr.recominer.batch.bicho.IssueTrackerSystem;
 import br.edu.utfpr.recominer.comparator.VersionComparator;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.model.Version;
 import br.edu.utfpr.recominer.model.svn.Scmlog;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +36,8 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 public class AggregatorProcessor implements ItemProcessor {
 
     private static final Logger log = LogManager.getLogger();
+    private static final String SQL_DELIMITER = ";";
+    private static final String SCRIPT_NAME = "preprocessing.sql";
     
     @Inject
     @Mysql
@@ -49,13 +54,16 @@ public class AggregatorProcessor implements ItemProcessor {
         final Properties properties = new Properties();
         properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName + "_vcs");
         GenericDao dao = new GenericDao(factory.createEntityManager(properties));
+
+        InputStream script = this.getClass().getClassLoader().getResourceAsStream(SCRIPT_NAME);
+        executeSqlScript(project, dao, script);
         
         final List<Scmlog> commits = dao.selectAll(Scmlog.class);
         
         int totalPatternOccurrences = 0;
         int totalPatternRelatedWithAnIssue = 0;
 
-        boolean isIssuesFromBugzilla = isIssuesFromBugzilla(project, dao);
+        boolean isIssuesFromBugzilla = isIssuesFromBugzilla(project);
 
         final String selectIssueIdAndFixVersions;
         final String issueReferencePattern;
@@ -201,14 +209,23 @@ public class AggregatorProcessor implements ItemProcessor {
         return null;
     }
 
-    private boolean isIssuesFromBugzilla(Project project, GenericDao dao) {
-        final Object isIssuesFromJira = dao.selectNativeOneWithParams("SELECT 1 "
-                + "FROM information_schema.tables "
-                + "WHERE table_schema = ? "
-                + "    AND table_name = 'issues_ext_bugzilla' "
-                + "LIMIT 1", new Object[]{project.getProjectName().toLowerCase() + "_issues"});
-        boolean isIssuesFromBugzilla = isIssuesFromJira != null;
-        return isIssuesFromBugzilla;
+    private void executeSqlScript(Project project, GenericDao dao, InputStream inputFile) {
+        // Create SQL scanner
+        final Scanner scanner = new Scanner(inputFile).useDelimiter(SQL_DELIMITER);
+
+        final String databaseName = project.getProjectName().toLowerCase();
+        // Loop through the SQL file statements
+        while (scanner.hasNext()) {
+
+            // Get statement from file
+            final String rawStatement = scanner.next() + SQL_DELIMITER;
+            // Execute statement
+            dao.executeNativeQuery(rawStatement.replace("{0}", databaseName.split("_")[0]), new Object[0]);
+        }
+    }
+
+    private boolean isIssuesFromBugzilla(Project project) {
+        return project.getIssueTracker().getSystem() == IssueTrackerSystem.BUGZILLA;
     }
 
     private String replaceUrl(String text) {
