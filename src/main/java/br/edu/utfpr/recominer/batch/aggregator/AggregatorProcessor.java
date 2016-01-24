@@ -37,7 +37,8 @@ public class AggregatorProcessor implements ItemProcessor {
 
     private static final Logger log = LogManager.getLogger();
     private static final String SQL_DELIMITER = ";";
-    private static final String SCRIPT_NAME = "preprocessing.sql";
+    private static final String RECOMINER_TABLES_SCRIPT_NAME = "recominer_tables.sql";
+    private static final String PREPROCESSING_SCRIPT_NAME = "preprocessing.sql";
     
     @Inject
     @Mysql
@@ -54,9 +55,8 @@ public class AggregatorProcessor implements ItemProcessor {
         final Properties properties = new Properties();
         properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName + "_vcs");
         GenericDao dao = new GenericDao(factory.createEntityManager(properties));
-
-        InputStream script = this.getClass().getClassLoader().getResourceAsStream(SCRIPT_NAME);
-        executeSqlScript(project, dao, script);
+        
+        executeSqlScript(project, dao, RECOMINER_TABLES_SCRIPT_NAME);
         
         final List<Scmlog> commits = dao.selectAll(Scmlog.class);
         
@@ -198,6 +198,8 @@ public class AggregatorProcessor implements ItemProcessor {
             }
         }
 
+        executeSqlScript(project, dao, PREPROCESSING_SCRIPT_NAME);
+
         log.info("\n\n"
                 + commits.size() + " of " + totalCommits + " (total) commits has less than or equal to 20 files\n"
                 + totalCommitsWithOccurrences + " of " + commits.size() + " commits has at least one occurrence of pattern \"" + issueReferencePattern + "\"\n\n"
@@ -206,21 +208,31 @@ public class AggregatorProcessor implements ItemProcessor {
                 + fixedIssuesSet.size() + " of " + totalIssues + " (total) issues was fixed\n"
                 + countIssuesWithFixVersion + " of " + fixedIssuesSet.size() + " issues has 'fix version'\n\n"
         );
-        return null;
+        return project;
     }
 
-    private void executeSqlScript(Project project, GenericDao dao, InputStream inputFile) {
+    private void executeSqlScript(Project project, GenericDao dao, String resourceFileName) {
+        InputStream script = this.getClass().getClassLoader().getResourceAsStream(resourceFileName);
+        
         // Create SQL scanner
-        final Scanner scanner = new Scanner(inputFile).useDelimiter(SQL_DELIMITER);
+        final Scanner scanner = new Scanner(script).useDelimiter(SQL_DELIMITER);
 
-        final String databaseName = project.getProjectName().toLowerCase();
+        final String projectName = project.getProjectName().toLowerCase();
         // Loop through the SQL file statements
         while (scanner.hasNext()) {
 
             // Get statement from file
             final String rawStatement = scanner.next() + SQL_DELIMITER;
             // Execute statement
-            dao.executeNativeQuery(rawStatement.replace("{0}", databaseName.split("_")[0]), new Object[0]);
+            try {
+                dao.executeNativeQuery(rawStatement.replace("{0}", projectName), new Object[0]);
+            } catch (Exception e) {
+                if (e.getMessage().contains("Duplicate column name")) {
+                    log.warn(e.getMessage());
+                } else {
+                    throw e;
+                }
+            }
         }
     }
 

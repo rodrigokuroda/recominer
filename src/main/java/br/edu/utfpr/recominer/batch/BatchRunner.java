@@ -27,7 +27,7 @@ public class BatchRunner {
     @Inject
     private EntityManagerFactory factory;
 
-    @Schedule(second = "0", minute = "0", hour = "*/1", persistent = false)
+    @Schedule(second = "50", minute = "07", hour = "*/1", persistent = false)
     public void startBichoJob() {
         JobOperator jobOperator = BatchRuntime.getJobOperator();
         
