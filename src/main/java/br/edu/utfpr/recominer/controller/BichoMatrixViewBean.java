@@ -72,7 +72,7 @@ public class BichoMatrixViewBean implements Serializable {
         dao.clearCache(true);
         List<EntityMatrix> matrices = null;
         try {
-            matrices = dao.executeNamedQuery("Matrix.findAllTheLatest");
+            matrices = dao.executeNamedQuery("Matrix.findAllTheLatest", EntityMatrix.class);
         } catch (Exception ex) {
             ex.printStackTrace();
             matrices = new ArrayList<>();

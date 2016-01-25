@@ -60,7 +60,7 @@
     <class>br.edu.utfpr.recominer.model.issue.Tracker</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
-      <property name="eclipselink.read-only" value="true"/>
+      <!--<property name="eclipselink.read-only" value="true"/>-->
       <!--  Optimization #9 - statement caching -->
       <!--  Optimization #5 - Read Only -->
       <property name="eclipselink.jdbc.cache-statements" value="true"/>

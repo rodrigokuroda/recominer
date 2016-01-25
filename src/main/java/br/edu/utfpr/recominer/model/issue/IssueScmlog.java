@@ -44,19 +44,20 @@ public class IssueScmlog implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "scmlog_id")
-    private Integer scmlogId;
-
     @ManyToOne
     @JoinColumn(name = "issue_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Issue issue;
+
+    @ManyToOne
+    @JoinColumn(name = "scmlog_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Scmlog scmlog;
 
     public IssueScmlog() {
     }
 
     public IssueScmlog(Scmlog scmlog, Issue issue) {
         setIssue(issue);
-        setScmlogId(scmlog.getId());
+        setScmlog(scmlog);
     }
 
     public Integer getId() {
@@ -67,14 +68,6 @@ public class IssueScmlog implements Serializable {
         this.id = id;
     }
 
-    public Integer getScmlogId() {
-        return scmlogId;
-    }
-
-    public void setScmlogId(Integer scmlogId) {
-        this.scmlogId = scmlogId;
-    }
-
     public Issue getIssue() {
         return issue;
     }
@@ -83,10 +76,18 @@ public class IssueScmlog implements Serializable {
         this.issue = issue;
     }
 
+    public Scmlog getScmlog() {
+        return scmlog;
+    }
+
+    public void setScmlog(Scmlog scmlog) {
+        this.scmlog = scmlog;
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 13 * hash + Objects.hashCode(this.scmlogId);
+        hash = 13 * hash + Objects.hashCode(this.scmlog);
         hash = 13 * hash + Objects.hashCode(this.issue);
         return hash;
     }
@@ -100,7 +101,7 @@ public class IssueScmlog implements Serializable {
             return false;
         }
         final IssueScmlog other = (IssueScmlog) obj;
-        if (!Objects.equals(this.scmlogId, other.scmlogId)) {
+        if (!Objects.equals(this.scmlog, other.scmlog)) {
             return false;
         }
         if (!Objects.equals(this.issue, other.issue)) {

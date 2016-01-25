@@ -57,8 +57,9 @@ public class Project implements Serializable {
     @Column(name = "repository_path")
     private String repositoryPath;
 
-    @Column(name = "last_commit_analysed")
-    private Integer lastCommitAnalysed;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_commit_date_analyzed")
+    private Date lastCommitDateAnalyzed;
 
     @Column(name = "last_its_update")
     @Temporal(TemporalType.TIMESTAMP)
@@ -139,12 +140,12 @@ public class Project implements Serializable {
         this.repositoryPath = repositoryPath;
     }
 
-    public Integer getLastCommitAnalysed() {
-        return lastCommitAnalysed;
+    public Date getLastCommitDateAnalyzed() {
+        return lastCommitDateAnalyzed;
     }
 
-    public void setLastCommitAnalysed(Integer lastCommitAnalysed) {
-        this.lastCommitAnalysed = lastCommitAnalysed;
+    public void setLastCommitDateAnalyzed(Date lastCommitDateAnalyzed) {
+        this.lastCommitDateAnalyzed = lastCommitDateAnalyzed;
     }
 
     public Date getLastItsUpdate() {
@@ -185,7 +186,7 @@ public class Project implements Serializable {
 
     @Override
     public String toString() {
-        return "Project{" + "id=" + id + ", projectName=" + projectName + ", issueTrackerUrl=" + issueTrackerUrl + ", issueTrackerSystem=" + issueTracker + ", versionControlUrl=" + versionControlUrl + ", lastCommitAnalysed=" + lastCommitAnalysed + ", lastItsUpdate=" + lastItsUpdate + ", lastVcsUpdate=" + lastVcsUpdate + '}';
+        return "Project{" + "id=" + id + ", projectName=" + projectName + ", issueTrackerUrl=" + issueTrackerUrl + ", issueTrackerSystem=" + issueTracker + ", versionControlUrl=" + versionControlUrl + ", lastCommitAnalysed=" + lastCommitDateAnalyzed + ", lastItsUpdate=" + lastItsUpdate + ", lastVcsUpdate=" + lastVcsUpdate + '}';
     }
 
 }

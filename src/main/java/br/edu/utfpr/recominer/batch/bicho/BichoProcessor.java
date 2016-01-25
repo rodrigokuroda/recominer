@@ -28,11 +28,11 @@ public class BichoProcessor implements ItemProcessor {
     public Object processItem(Object item) throws Exception {
         Project project = (Project) item;
         EntityManager em = factory.createEntityManager();
-        em.createNativeQuery("CREATE SCHEMA IF NOT EXISTS " + project.getProjectName().toLowerCase() + "_issues").executeUpdate();
+        em.createNativeQuery("CREATE SCHEMA IF NOT EXISTS " + project.getProjectName().toLowerCase() + "_issues CHARACTER SET utf8 COLLATE utf8_general_ci").executeUpdate();
 
         // executing bicho as external process
         ExternalProcess ep = new ExternalProcess(new BichoCommand(project));
-        //ep.start();
+        ep.start();
 
         return project;
     }

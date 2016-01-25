@@ -44,30 +44,14 @@ public class GenericDao implements Serializable {
         getEntityManager().remove(getEntityManager().merge(entity));
     }
 
-    public <T> T findByID(Long id, Class classe) {
-        return (T) getEntityManager().find(classe, id);
+    public <T> T findByID(Long id, Class clazz) {
+        return (T) getEntityManager().find(clazz, id);
     }
 
-    public <T> T findByID(String strId, Class classe) {
-        try {
-            Long lId = Util.tratarStringParaLong(strId);
-            Object obj = findByID(lId, classe);
-            return (T) obj;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-    public <T> T findByID(String strId, String strClasse) {
-        try {
-            Class cClass = Class.forName(strClasse);
-            Object obj = findByID(strId, cClass);
-            return (T) obj;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return null;
+    public <T> T findByID(String strId, Class clazz) {
+        Long lId = Util.tratarStringParaLong(strId);
+        Object obj = findByID(lId, clazz);
+        return (T) obj;
     }
 
     public <T> List<T> selectAll(Class<T> clazz) {
@@ -76,29 +60,33 @@ public class GenericDao implements Serializable {
         return getEntityManager().createQuery(cq).getResultList();
     }
 
-    public List selectBy(int[] intervalo, Class classe) {
-        CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
-        cq.select(cq.from(classe));
-        Query q = getEntityManager().createQuery(cq);
+    public <T> List<T> selectBy(int[] intervalo, Class<T> clazz) {
+        CriteriaQuery<T> cq = getEntityManager().getCriteriaBuilder().createQuery(clazz);
+        cq.select(cq.from(clazz));
+        TypedQuery<T> q = getEntityManager().createQuery(cq);
         q.setMaxResults(intervalo[1] - intervalo[0]);
         q.setFirstResult(intervalo[0]);
         return q.getResultList();
     }
 
-    public int count(Class classe) {
+    public int count(Class clazz) {
         CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
-        Root rt = cq.from(classe);
+        Root rt = cq.from(clazz);
         cq.select(getEntityManager().getCriteriaBuilder().count(rt));
         Query q = getEntityManager().createQuery(cq);
         return ((Long) q.getSingleResult()).intValue();
     }
 
-    public List executeNamedQueryWithParams(String namedQuery, String[] parametros, Object[] objetos) {
-        return executeNamedQueryWithParams(namedQuery, parametros, objetos, false);
+    public <T> List<T> executeNamedQuery(String namedQuery, Class<T> clazz) {
+        return executeNamedQueryWithParams(namedQuery, new String[0], new Object[0], clazz);
+    }
+    
+    public <T> List<T> executeNamedQueryWithParams(String namedQuery, String[] parametros, Object[] objetos, Class<T> clazz) {
+        return executeNamedQueryWithParams(namedQuery, parametros, objetos, clazz, false);
     }
 
-    public List executeNamedQueryWithParams(String namedQuery, String[] parametros, Object[] objetos, boolean singleResult) {
-        Query query = getEntityManager().createNamedQuery(namedQuery);
+    public <T> List<T> executeNamedQueryWithParams(String namedQuery, String[] parametros, Object[] objetos, Class<T> clazz, boolean singleResult) {
+        TypedQuery<T> query = getEntityManager().createNamedQuery(namedQuery, clazz);
         if (singleResult) {
             query.setFirstResult(0);
         }
@@ -110,12 +98,7 @@ public class GenericDao implements Serializable {
             Object parametro = objetos[i];
             query.setParameter(atributo, parametro);
         }
-        List list = query.getResultList();
-        return list;
-    }
-
-    public List executeNamedQuery(String namedQuery) {
-        List list = getEntityManager().createNamedQuery(namedQuery).getResultList();
+        List<T> list = query.getResultList();
         return list;
     }
 

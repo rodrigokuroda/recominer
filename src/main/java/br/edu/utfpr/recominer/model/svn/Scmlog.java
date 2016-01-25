@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -23,6 +25,9 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 @Table(name = "scmlog")
 @Multitenant(value = MultitenantType.TABLE_PER_TENANT, includeCriteria = true)
 @TenantTableDiscriminator(type = TenantTableDiscriminatorType.SCHEMA, contextProperty = PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT)
+@NamedQueries({
+    @NamedQuery(name = "ScmlogAfterDate", query = "SELECT s FROM Scmlog s WHERE s.date > :date ORDER BY s.date ASC")
+})
 public class Scmlog implements Serializable {
 
     private static final long serialVersionUID = 1L;

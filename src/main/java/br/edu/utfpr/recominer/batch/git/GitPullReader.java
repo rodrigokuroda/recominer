@@ -9,8 +9,7 @@ import javax.batch.api.chunk.AbstractItemReader;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.EntityManagerFactory;
 
 /**
  *
@@ -19,8 +18,8 @@ import javax.persistence.PersistenceContext;
 @Named
 public class GitPullReader extends AbstractItemReader {
 
-    @PersistenceContext(unitName = "postgresql")
-    private EntityManager em;
+    @Inject
+    private EntityManagerFactory factory;
     
     @Inject
     private JobContext jobContext;
@@ -29,7 +28,7 @@ public class GitPullReader extends AbstractItemReader {
 
     @Override
     public void open(Serializable checkpoint) throws Exception {
-        final GenericDao dao = new GenericDao(em);
+        final GenericDao dao = new GenericDao(factory.createEntityManager());
         
         // reads all VCS' projects available (database schemas)
         final List<Project> projects = dao.selectAll(Project.class);

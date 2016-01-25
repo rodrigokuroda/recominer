@@ -75,7 +75,7 @@ public class BichoMetricViewBean implements Serializable {
 
     public void reloadList() {
         dao.clearCache(true);
-        List<EntityMetric> metrics = dao.executeNamedQuery("Metric.findAllTheLatest");
+        List<EntityMetric> metrics = dao.executeNamedQuery("Metric.findAllTheLatest", EntityMetric.class);
         JsfUtil.addAttributeInSession(LIST, metrics);
     }
 
@@ -226,7 +226,7 @@ public class BichoMetricViewBean implements Serializable {
             Set<String> files = new HashSet<>();
 
             dao.clearCache(true);
-            List<EntityMatrix> matrices = dao.executeNamedQuery("Matrix.findAllTheLatest");
+            List<EntityMatrix> matrices = dao.executeNamedQuery("Matrix.findAllTheLatest", EntityMatrix.class);
 
             List<String> topFiles = new ArrayList<>();
             for (EntityMatrix matrix : matrices) {
