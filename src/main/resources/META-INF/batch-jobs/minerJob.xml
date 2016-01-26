@@ -3,36 +3,41 @@
      xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
     <flow id="minerFlow">
         <step id="gitPullStep" next="cvsanalyStep">
-            <chunk item-count="3">
+            <chunk item-count="1" checkpoint-policy="custom">
                 <reader ref="gitPullReader" />
                 <processor ref="gitPullProcessor" />
                 <writer ref="gitPullWriter" />
+                <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
         </step>
 
-        <step id="cvsanalyStep" next="bichoStep">
-            <chunk item-count="3">
+        <step id="cvsanalyStep" next="bichoStep" allow-start-if-complete="gitPullStep">
+            <chunk item-count="1" checkpoint-policy="custom">
                 <reader ref="cvsanalyReader" />
                 <processor ref="cvsanalyProcessor" />
                 <writer ref="cvsanalyWriter" />
+                <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
         </step>
         
-        <step id="bichoStep" next="aggregatorStep">
-            <chunk item-count="3">
+        <step id="bichoStep" next="aggregatorStep" allow-start-if-complete="cvsanalyStep">
+            <chunk item-count="1" checkpoint-policy="custom">
                 <reader ref="bichoReader" />
                 <processor ref="bichoProcessor" />
                 <writer ref="bichoWriter" />
+                <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
         </step>
 
 
-        <step id="aggregatorStep" >
-            <chunk item-count="3">
+        <step id="aggregatorStep" allow-start-if-complete="bichoStep">
+            <chunk item-count="1" checkpoint-policy="custom">
                 <reader ref="aggregatorReader" />
                 <processor ref="aggregatorProcessor" />
                 <writer ref="aggregatorWriter" />
+                <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
         </step>
+        
     </flow>
 </job>

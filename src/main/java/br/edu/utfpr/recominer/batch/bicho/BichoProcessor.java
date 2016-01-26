@@ -32,7 +32,7 @@ public class BichoProcessor implements ItemProcessor {
 
         // executing bicho as external process
         ExternalProcess ep = new ExternalProcess(new BichoCommand(project));
-        ep.start();
+        //ep.start();
 
         return project;
     }

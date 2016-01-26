@@ -32,6 +32,7 @@ public class AggregatorReader extends AbstractItemReader {
     public void open(Serializable checkpoint) throws Exception {
         final GenericDao dao = new GenericDao(factory.createEntityManager());
         iterator = dao.selectAll(Project.class).iterator();
+        System.out.println("AggregatorWriter.open " + checkpoint);
     }
 
     @Override
@@ -47,5 +48,10 @@ public class AggregatorReader extends AbstractItemReader {
     private Properties getParameters() {
         JobOperator operator = BatchRuntime.getJobOperator();
         return operator.getParameters(jobContext.getExecutionId());
+    }
+    
+    @Override
+    public void close() throws Exception {
+        System.out.println("AggregatorWriter.close");
     }
 }

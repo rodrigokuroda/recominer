@@ -5,6 +5,8 @@ import br.edu.utfpr.recominer.comparator.VersionComparator;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.model.Version;
+import br.edu.utfpr.recominer.model.issue.Issue;
+import br.edu.utfpr.recominer.model.issue.IssueScmlog;
 import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -59,10 +61,15 @@ public class AggregatorProcessor implements ItemProcessor {
         
         executeSqlScript(project, dao, RECOMINER_TABLES_SCRIPT_NAME);
         
-        final List<Scmlog> commitsToAnalyze = dao.executeNamedQueryWithParams("ScmlogAfterDate", 
+        final List<Scmlog> commitsToAnalyze;
+        if (project.getLastCommitDateAnalyzed() != null) {
+            commitsToAnalyze = dao.executeNamedQueryWithParams("ScmlogAfterDate", 
                 new String[]{"date"}, 
                 new Object[]{project.getLastCommitDateAnalyzed()}, 
                 Scmlog.class);
+        } else {
+            commitsToAnalyze = dao.executeNamedQuery("AllScmlog", Scmlog.class);
+        }
         
         if (!commitsToAnalyze.isEmpty()) {
 
@@ -97,6 +104,7 @@ public class AggregatorProcessor implements ItemProcessor {
 
             final Map<Integer, List<String>> fixedIssuesIdFixVersion = new HashMap<>();
             final Set<Integer> fixedIssuesSet = new HashSet<>();
+            final Map<IssueScmlog, IssueScmlog> issueAndCommitLinked = new HashMap<>();
 
             int totalCommitsWithOccurrences = 0;
 
@@ -137,9 +145,14 @@ public class AggregatorProcessor implements ItemProcessor {
                         // adiciona a issue corrigida
                         fixedIssuesSet.add(issueId);
                         
-                        dao.executeNativeQuery("INSERT INTO " + projectName
-                                + "_issues.issues_scmlog (issue_id, scmlog_id) VALUES (?, ?)", new Object[]{issueId, commit.getId()});
-                        totalPatternRelatedWithAnIssue++;
+                        final IssueScmlog issueScmlog = new IssueScmlog(commit, new Issue(issueId));
+                        
+                        if (!issueAndCommitLinked.containsKey(issueScmlog)) {
+                            issueAndCommitLinked.put(issueScmlog, issueScmlog);
+                            dao.executeNativeQuery("INSERT INTO " + projectName
+                                    + "_issues.issues_scmlog (issue_id, scmlog_id) VALUES (?, ?)", new Object[]{issueId, commit.getId()});
+                            totalPatternRelatedWithAnIssue++;
+                        }
                     }
                 }
                 if (matcherCount > 0) {
@@ -196,7 +209,7 @@ public class AggregatorProcessor implements ItemProcessor {
                 }
             }
 
-            executeSqlScript(project, dao, PREPROCESSING_SCRIPT_NAME);
+            //executeSqlScript(project, dao, PREPROCESSING_SCRIPT_NAME);
 
             log.info("\n\n"
                     + commitsToAnalyze.size() + " of " + totalCommits + " (total) commits has less than or equal to 20 files\n"

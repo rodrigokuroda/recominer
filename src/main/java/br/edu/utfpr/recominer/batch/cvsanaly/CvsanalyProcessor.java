@@ -33,7 +33,7 @@ public class CvsanalyProcessor implements ItemProcessor {
 
         // executing bicho as external process
         ExternalProcess ep = new ExternalProcess(new CvsanalyCommand(project));
-        ep.start();
+        //ep.start();
 
         return project;
     }

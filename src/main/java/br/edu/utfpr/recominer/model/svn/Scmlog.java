@@ -26,6 +26,7 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 @Multitenant(value = MultitenantType.TABLE_PER_TENANT, includeCriteria = true)
 @TenantTableDiscriminator(type = TenantTableDiscriminatorType.SCHEMA, contextProperty = PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT)
 @NamedQueries({
+    @NamedQuery(name = "AllScmlog", query = "SELECT s FROM Scmlog s ORDER BY s.date ASC"),
     @NamedQuery(name = "ScmlogAfterDate", query = "SELECT s FROM Scmlog s WHERE s.date > :date ORDER BY s.date ASC")
 })
 public class Scmlog implements Serializable {
