@@ -1,18 +1,13 @@
 package br.edu.utfpr.recominer.model.issue;
 
-import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import org.eclipse.persistence.annotations.Multitenant;
@@ -44,18 +39,20 @@ public class IssueScmlog implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "issue_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Issue issue;
+//    @ManyToOne
+//    @JoinColumn(name = "issue_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @Column(name = "issue_id")
+    private Integer issue;
 
-    @ManyToOne
-    @JoinColumn(name = "scmlog_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Scmlog scmlog;
+//    @ManyToOne
+//    @JoinColumn(name = "scmlog_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @Column(name = "scmlog_id")
+    private Integer scmlog;
 
     public IssueScmlog() {
     }
 
-    public IssueScmlog(Scmlog scmlog, Issue issue) {
+    public IssueScmlog(Integer scmlog, Integer issue) {
         setIssue(issue);
         setScmlog(scmlog);
     }
@@ -68,19 +65,19 @@ public class IssueScmlog implements Serializable {
         this.id = id;
     }
 
-    public Issue getIssue() {
+    public Integer getIssue() {
         return issue;
     }
 
-    public void setIssue(Issue issue) {
+    public void setIssue(Integer issue) {
         this.issue = issue;
     }
 
-    public Scmlog getScmlog() {
+    public Integer getScmlog() {
         return scmlog;
     }
 
-    public void setScmlog(Scmlog scmlog) {
+    public void setScmlog(Integer scmlog) {
         this.scmlog = scmlog;
     }
 

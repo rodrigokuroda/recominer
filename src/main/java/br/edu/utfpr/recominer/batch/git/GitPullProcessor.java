@@ -1,7 +1,6 @@
 package br.edu.utfpr.recominer.batch.git;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
-import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import java.io.IOException;
@@ -28,9 +27,6 @@ public class GitPullProcessor implements ItemProcessor {
     @Inject
     private JobContext jobContext;
     
-    @Inject
-    private GenericDao dao;
-
     @Override
     public Object processItem(Object item) throws Exception {
         Project project = (Project) item;

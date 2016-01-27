@@ -25,9 +25,7 @@ public class AggregatorWriter extends AbstractItemWriter {
     @Override
     public void writeItems(List<Object> items) throws Exception {
         final GenericDao dao = new GenericDao(factory.createEntityManager());
-        
-        // TODO update status in database
-        items.stream().forEach(System.out::println);
+        items.stream().forEach(dao::edit);
     }
 
     @Override

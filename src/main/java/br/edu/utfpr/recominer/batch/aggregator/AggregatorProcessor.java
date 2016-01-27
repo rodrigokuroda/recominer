@@ -5,7 +5,6 @@ import br.edu.utfpr.recominer.comparator.VersionComparator;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.model.Version;
-import br.edu.utfpr.recominer.model.issue.Issue;
 import br.edu.utfpr.recominer.model.issue.IssueScmlog;
 import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.io.InputStream;
@@ -59,6 +58,11 @@ public class AggregatorProcessor implements ItemProcessor {
         properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName + "_vcs");
         GenericDao dao = new GenericDao(factory.createEntityManager(properties));
         
+        
+        final Properties propertiesIssues = new Properties();
+        propertiesIssues.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName + "_issues");
+        GenericDao daoIssues = new GenericDao(factory.createEntityManager(propertiesIssues));
+        
         executeSqlScript(project, dao, RECOMINER_TABLES_SCRIPT_NAME);
         
         final List<Scmlog> commitsToAnalyze;
@@ -105,6 +109,8 @@ public class AggregatorProcessor implements ItemProcessor {
             final Map<Integer, List<String>> fixedIssuesIdFixVersion = new HashMap<>();
             final Set<Integer> fixedIssuesSet = new HashSet<>();
             final Map<IssueScmlog, IssueScmlog> issueAndCommitLinked = new HashMap<>();
+            
+            daoIssues.selectAll(IssueScmlog.class).forEach(is -> issueAndCommitLinked.put(is, is));
 
             int totalCommitsWithOccurrences = 0;
 
@@ -145,7 +151,7 @@ public class AggregatorProcessor implements ItemProcessor {
                         // adiciona a issue corrigida
                         fixedIssuesSet.add(issueId);
                         
-                        final IssueScmlog issueScmlog = new IssueScmlog(commit, new Issue(issueId));
+                        final IssueScmlog issueScmlog = new IssueScmlog(commit.getId(), issueId);
                         
                         if (!issueAndCommitLinked.containsKey(issueScmlog)) {
                             issueAndCommitLinked.put(issueScmlog, issueScmlog);
@@ -168,7 +174,21 @@ public class AggregatorProcessor implements ItemProcessor {
 
             int countIssuesWithFixVersion = 0;
 
-            Set<Version> distincMinorVersion = new HashSet<>();
+            
+            List<Object[]> issuesFixVersion = daoIssues.selectNativeWithParams("SELECT issue_id, fix_version FROM " + projectName + "_issues.issues_fix_version", new Object[0]);
+            final Set<Version> distincMinorVersion = new HashSet<>();
+            final Map<Integer, Set<Version>> versionsInDb = new HashMap<>();
+            issuesFixVersion.forEach(o -> {
+                final Integer issueIdFromDb = (Integer) o[0];
+                final Version issueFixVersionFromDb = new Version((String) o[1]);
+                if (versionsInDb.containsKey(issueIdFromDb)) {
+                    versionsInDb.get(issueIdFromDb).add(issueFixVersionFromDb);
+                } else { 
+                    Set<Version> set = new HashSet<>();
+                    set.add(issueFixVersionFromDb);
+                    versionsInDb.put(issueIdFromDb, set);
+                }
+                    });
             for (Map.Entry<Integer, List<String>> entrySet : fixedIssuesIdFixVersion.entrySet()) {
                 Integer issueId = entrySet.getKey();
                 List<String> versions = entrySet.getValue();
@@ -178,11 +198,18 @@ public class AggregatorProcessor implements ItemProcessor {
                 } else {
     //                log.info("Issue " + issueId + " is fixed in " + versions.size() + " versions.");
 
+                    if (versionsInDb.containsKey(issueId)) {
+                        Set<Version> versionsFromDbForIssue = versionsInDb.get(issueId);
+                        versions.removeAll(versionsFromDbForIssue);
+                        continue;
+                    } else {
+                        versionsInDb.put(issueId, new HashSet<>());
+                    }
                     for (String version : versions) {
                         String minorVersion = getMinorVersion(version);
 //                        String majorVersion = getMajorVersion(version);
 
-                        distincMinorVersion.add(new Version(minorVersion));
+                        versionsInDb.get(issueId).add(new Version(minorVersion));
 
                         dao.executeNativeQuery(issueFixVersionInsert, new Object[]{issueId, version, minorVersion, minorVersion});
                     }
@@ -209,7 +236,7 @@ public class AggregatorProcessor implements ItemProcessor {
                 }
             }
 
-            //executeSqlScript(project, dao, PREPROCESSING_SCRIPT_NAME);
+            executeSqlScript(project, dao, PREPROCESSING_SCRIPT_NAME);
 
             log.info("\n\n"
                     + commitsToAnalyze.size() + " of " + totalCommits + " (total) commits has less than or equal to 20 files\n"
@@ -243,7 +270,7 @@ public class AggregatorProcessor implements ItemProcessor {
             try {
                 dao.executeNativeQuery(rawStatement.replace("{0}", projectName), new Object[0]);
             } catch (Exception e) {
-                if (e.getMessage().contains("Duplicate column name")) {
+                if (e.getMessage().contains("Duplicate column name") || e.getMessage().contains("Duplicate entry")) {
                     log.warn(e.getMessage());
                 } else {
                     throw e;

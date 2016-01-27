@@ -1,19 +1,14 @@
 package br.edu.utfpr.recominer.model.issue;
 
-import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -71,15 +66,10 @@ public class Issue implements Serializable {
     @Column(name = "assigned_to")
     private int assignedTo;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "issue", orphanRemoval = true)
-    private Set<IssueScmlog> scmlogs;
-
     public Issue() {
-        scmlogs = new HashSet<>();
     }
 
     public Issue(Integer id) {
-        this();
         this.id = id;
     }
 
@@ -190,18 +180,6 @@ public class Issue implements Serializable {
 
     public void setAssignedTo(int assignedTo) {
         this.assignedTo = assignedTo;
-    }
-
-    public Set<IssueScmlog> getScmlogs() {
-        return scmlogs;
-    }
-
-    public void setScmlogs(Set<IssueScmlog> scmlogs) {
-        this.scmlogs = scmlogs;
-    }
-
-    public void addScmlog(Scmlog scmlog) {
-        scmlogs.add(new IssueScmlog(scmlog, this));
     }
 
     @Override
