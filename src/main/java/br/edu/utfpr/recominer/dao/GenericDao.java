@@ -166,19 +166,6 @@ public class GenericDao implements Serializable {
         return query.getResultList();
     }
 
-    public void clearCache(boolean evictAll) {
-//        try {
-//            if (evictAll) {
-//                em.getEntityManagerFactory().getCache().evictAll();
-//            }
-//            em.clear();
-//            System.gc();
-//            System.out.println("######### CLEARED THE CACHE #########");
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-    }
-
     public <T> T selectOneWithParams(String select, String[] params, Object[] objects) {
         List<T> result = selectWithParams(select, params, objects);
         if (result == null || result.isEmpty()) {

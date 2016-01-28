@@ -285,13 +285,11 @@ public class BichoMatrixQueueBean implements Serializable {
                                 // saving in jgitminer database
                                 genericDao.insert(entityMatrix);
                                 out.printLog("");
-                                genericDao.clearCache(true);
                             }
                             out.printLog("Salvamento dos dados concluído!");
 
                             message = "Geração da matriz finalizada.";
                         } catch (Exception ex) {
-                            ex.printStackTrace();
                             StringWriter errors = new StringWriter();
                             ex.printStackTrace(new PrintWriter(errors));
                             message = "Geração da rede abortada, erro: " + errors.toString();

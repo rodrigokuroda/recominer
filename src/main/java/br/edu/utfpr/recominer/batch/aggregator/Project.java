@@ -61,6 +61,10 @@ public class Project implements Serializable {
     @Column(name = "last_commit_date_analyzed")
     private Date lastCommitDateAnalyzed;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_issue_update_analyzed")
+    private Date lastIssueUpdateAnalyzed;
+
     @Column(name = "last_its_update")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastItsUpdate;
@@ -146,6 +150,14 @@ public class Project implements Serializable {
 
     public void setLastCommitDateAnalyzed(Date lastCommitDateAnalyzed) {
         this.lastCommitDateAnalyzed = lastCommitDateAnalyzed;
+    }
+
+    public Date getLastIssueUpdateAnalyzed() {
+        return lastIssueUpdateAnalyzed;
+    }
+
+    public void setLastIssueUpdateAnalyzed(Date lastIssueUpdateAnalyzed) {
+        this.lastIssueUpdateAnalyzed = lastIssueUpdateAnalyzed;
     }
 
     public Date getLastItsUpdate() {

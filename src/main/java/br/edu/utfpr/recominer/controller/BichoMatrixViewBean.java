@@ -69,12 +69,10 @@ public class BichoMatrixViewBean implements Serializable {
     }
 
     public void reloadList() {
-        dao.clearCache(true);
         List<EntityMatrix> matrices = null;
         try {
             matrices = dao.executeNamedQuery("Matrix.findAllTheLatest", EntityMatrix.class);
         } catch (Exception ex) {
-            ex.printStackTrace();
             matrices = new ArrayList<>();
         } finally {
             JsfUtil.addAttributeInSession(LIST, matrices);
