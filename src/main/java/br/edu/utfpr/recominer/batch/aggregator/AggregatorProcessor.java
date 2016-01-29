@@ -300,7 +300,8 @@ public class AggregatorProcessor implements ItemProcessor {
                     final String replace = rawStatement
                             .replace("{0}", projectName)
                             .replace("{WHERE_SCMLOG}", whereScmlog)
-                            .replace("{WHERE_ISSUE}", whereIssue);
+                            .replace("{WHERE_ISSUE}", whereIssue)
+                            .replace("{ISSUE_TRACKER_SYSTEM}", project.getIssueTracker().getSystem().toString().toUpperCase());
 
                     dao.executeNativeQuery(replace + SQL_DELIMITER, params.toArray());
                 } catch (Exception e) {
