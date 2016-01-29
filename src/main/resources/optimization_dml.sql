@@ -64,11 +64,11 @@ i.reopened_times =
 i.updated_on = 
 (SELECT MAX(iu.update_date) FROM 
     (SELECT MAX(ch.changed_on) AS update_date, ch.issue_id AS issue_id
-       FROM changes ch
+       FROM {0}_issues.changes ch
       GROUP BY ch.issue_id 
     UNION ALL 
      SELECT MAX(co.submitted_on) AS update_date, co.issue_id AS issue_id
-       FROM comments co	
+       FROM {0}_issues.comments co	
       GROUP BY co.issue_id) issue_updates iu
  WHERE iu.issue_id = i.id)
 
