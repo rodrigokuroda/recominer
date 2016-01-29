@@ -62,15 +62,11 @@ i.reopened_times =
     AND c.issue_id = i.id)
 
 i.updated_on = 
-(SELECT MAX(iu.update_date) FROM 
-    (SELECT MAX(ch.changed_on) AS update_date, ch.issue_id AS issue_id
-       FROM {0}_issues.changes ch
-      GROUP BY ch.issue_id 
-    UNION ALL 
-     SELECT MAX(co.submitted_on) AS update_date, co.issue_id AS issue_id
-       FROM {0}_issues.comments co	
-      GROUP BY co.issue_id) issue_updates iu
- WHERE iu.issue_id = i.id)
+(CASE {ISSUE_TRACKER_SYSTEM}
+    WHEN 'JIRA' THEN (SELECT MAX(ext.update_date) FROM {0}_issues.issue_ext_jira ext WHERE ext.issue_id = i.id)
+    WHEN 'GITHUB' THEN (SELECT MAX(ext.update_date) FROM {0}_issues.issue_ext_github ext WHERE ext.issue_id = i.id)
+    WHEN 'BUGZILLA' THEN (SELECT MAX(ext.update_date) FROM {0}_issues.issue_ext_bugzilla ext WHERE ext.issue_id = i.id)
+END)
 
  WHERE 1 = 1 
  {WHERE_ISSUE};
