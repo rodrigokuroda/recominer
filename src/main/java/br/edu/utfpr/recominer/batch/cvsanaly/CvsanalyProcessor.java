@@ -31,9 +31,8 @@ public class CvsanalyProcessor implements ItemProcessor {
                 .createNativeQuery("CREATE SCHEMA IF NOT EXISTS " + project.getProjectName().toLowerCase() + "_vcs CHARACTER SET utf8 COLLATE utf8_general_ci")
                 .executeUpdate();
 
-        // executing bicho as external process
         ExternalProcess ep = new ExternalProcess(new CvsanalyCommand(project));
-        //ep.start();
+        ep.start();
 
         return project;
     }
