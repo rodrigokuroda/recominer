@@ -60,14 +60,15 @@ i.reopened_times =
   WHERE c.new_value = "Reopened"
     AND c.field = "Status"
     AND c.issue_id = i.id)
+ WHERE 1 = 1 
+ {WHERE_ISSUE}
+;
 
+UPDATE {0}_issues.issues i SET
 i.updated_on = 
-(CASE {ISSUE_TRACKER_SYSTEM}
-    WHEN 'JIRA' THEN (SELECT MAX(ext.update_date) FROM {0}_issues.issue_ext_jira ext WHERE ext.issue_id = i.id)
-    WHEN 'GITHUB' THEN (SELECT MAX(ext.update_date) FROM {0}_issues.issue_ext_github ext WHERE ext.issue_id = i.id)
-    WHEN 'BUGZILLA' THEN (SELECT MAX(ext.update_date) FROM {0}_issues.issue_ext_bugzilla ext WHERE ext.issue_id = i.id)
-END)
-
+(SELECT MAX(ext.updated) 
+   FROM {0}_issues.issues_ext_jira ext 
+  WHERE ext.issue_id = i.id)
  WHERE 1 = 1 
  {WHERE_ISSUE};
 

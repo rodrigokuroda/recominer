@@ -82,7 +82,7 @@ public class AggregatorProcessor implements ItemProcessor {
             }
             executeSqlScript(project, dao, OPTIMIZATION_DML_SCRIPT_NAME);
 
-            java.sql.Date lastIssueUpdate = (java.sql.Date) dao.selectNativeOneWithParams("SELECT MAX(updated_on) FROM " + projectName + "_issues.issues", new Object[0]);
+            java.sql.Timestamp lastIssueUpdate = (java.sql.Timestamp) dao.selectNativeOneWithParams("SELECT MAX(updated_on) FROM " + projectName + "_issues.issues", new Object[0]);
             // setting date of last commit analyzed
             project.setLastCommitDateAnalyzed(commitsToAnalyze.get(commitsToAnalyze.size() - 1).getDate());
             project.setLastIssueUpdateAnalyzed(lastIssueUpdate);
@@ -104,14 +104,14 @@ public class AggregatorProcessor implements ItemProcessor {
         final String whereIssue;
         final List<Object> params = new ArrayList<>();
         if (project.getLastCommitDateAnalyzed() != null) {
-            whereScmlog = "s.date > ?";
+            whereScmlog = "AND s.date > ?";
             params.add(project.getLastCommitDateAnalyzed());
         } else {
             whereScmlog = "";
         }
 
         if (project.getLastIssueUpdateAnalyzed() != null) {
-            whereIssue = "i.updated_on > ?";
+            whereIssue = "AND i.updated_on > ?";
             params.add(project.getLastIssueUpdateAnalyzed());
         } else {
             whereIssue = "";
