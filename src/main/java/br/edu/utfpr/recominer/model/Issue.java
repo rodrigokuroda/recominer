@@ -13,6 +13,12 @@ public class Issue implements Comparable<Issue> {
     private final String type;
     private final Date fixDate;
 
+    public Issue(Integer id) {
+        this.id = id;
+        this.type = null;
+        this.fixDate = null;
+    }
+
     public Issue(Integer id, String type) {
         this.id = id;
         this.type = type;

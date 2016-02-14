@@ -73,6 +73,10 @@ public class Project implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastVcsUpdate;
 
+    @Column(name = "last_issue_update_analyzed_for_cochange")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastIssueUpdateAnalyzedForCochange;
+
     public Project() {
     }
 
@@ -174,6 +178,14 @@ public class Project implements Serializable {
 
     public void setLastVcsUpdate(Date lastVcsUpdate) {
         this.lastVcsUpdate = lastVcsUpdate;
+    }
+
+    public Date getLastIssueUpdateAnalyzedForCochange() {
+        return lastIssueUpdateAnalyzedForCochange;
+    }
+
+    public void setLastIssueUpdateAnalyzedForCochange(Date lastIssueUpdateAnalyzedForCochange) {
+        this.lastIssueUpdateAnalyzedForCochange = lastIssueUpdateAnalyzedForCochange;
     }
 
     @Override

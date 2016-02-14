@@ -8,6 +8,7 @@ import java.util.Objects;
  */
 public class FilePair {
 
+    private Integer id;
     private final File file1;
     private final File file2;
 
@@ -19,6 +20,14 @@ public class FilePair {
     public FilePair(File file1, File file2) {
         this.file1 = file1;
         this.file2 = file2;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public File getFile1() {

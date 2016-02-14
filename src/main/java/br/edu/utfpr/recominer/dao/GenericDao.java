@@ -3,6 +3,7 @@ package br.edu.utfpr.recominer.dao;
 import br.edu.utfpr.recominer.util.Util;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -166,6 +167,20 @@ public class GenericDao implements Serializable {
         return query.getResultList();
     }
 
+    public List selectNativeWithParams(String select, Map<String, Object> params) {
+        Query query = em.createNativeQuery(select);
+
+        if (params != null) {
+            for (Map.Entry<String, Object> param : params.entrySet()) {
+                String name = param.getKey();
+                Object value = param.getValue();
+                query.setParameter(name, value);
+            }
+        }
+
+        return query.getResultList();
+    }
+
     public <T> T selectOneWithParams(String select, String[] params, Object[] objects) {
         List<T> result = selectWithParams(select, params, objects);
         if (result == null || result.isEmpty()) {
@@ -176,6 +191,14 @@ public class GenericDao implements Serializable {
 
     public <T> T selectNativeOneWithParams(String select, Object[] objects) {
         List<T> result = selectNativeWithParams(select, objects);
+        if (result == null || result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+    public <T> T selectNativeOneWithParams(String select, Map<String, Object> params) {
+        List<T> result = selectNativeWithParams(select, params);
         if (result == null || result.isEmpty()) {
             return null;
         }

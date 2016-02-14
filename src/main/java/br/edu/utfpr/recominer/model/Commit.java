@@ -20,6 +20,14 @@ public class Commit {
     private final Issue issue;
     private final Set<File> files;
 
+    public Commit(Integer id) {
+        this.id = id;
+        this.committer = null;
+        this.commitDate = null;
+        this.files = new HashSet<>();
+        this.issue = null;
+    }
+
     public Commit(Integer id, Committer commiter, Date commitDate) {
         this.id = id;
         this.committer = commiter;

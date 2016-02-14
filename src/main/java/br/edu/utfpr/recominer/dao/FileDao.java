@@ -19,12 +19,13 @@ import java.util.Map;
 import java.util.Set;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
+import static br.edu.utfpr.recominer.dao.QueryUtils.filterByIssues;
 
 /**
  *
  * @author Rodrigo T. Kuroda
  */
-public class BichoFileDAO {
+public class FileDao {
 
     private final String repository;
 
@@ -104,15 +105,15 @@ public class BichoFileDAO {
     private final String SELECT_COMMIT_AND_FILES_BY_FILENAME_AND_ISSUE;
     private final String FILTER_BY_ISSUE_ID;
 
-    private final GenericBichoDAO dao;
+    private final GenericDao dao;
     private final String BEGIN_SUM_ADD_AND_DEL_LINES;
     private final String END_SUM_ADD_AND_DEL_LINES;
 
-    public BichoFileDAO(GenericBichoDAO dao, String repository, Integer maxFilePerCommit) {
+    public FileDao(GenericDao dao, String repository, Integer maxFilePerCommit) {
         this(dao, repository, maxFilePerCommit, 0);
     }
 
-    public BichoFileDAO(GenericBichoDAO dao, String repository, Integer maxFilePerCommit, int numberOfLastIssues) {
+    public FileDao(GenericDao dao, String repository, Integer maxFilePerCommit, int numberOfLastIssues) {
         this.dao = dao;
         this.repository = repository;
 

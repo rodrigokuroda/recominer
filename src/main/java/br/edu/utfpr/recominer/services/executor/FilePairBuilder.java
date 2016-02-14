@@ -10,15 +10,10 @@ import java.util.List;
  * @author Rodrigo T. Kuroda
  */
 public class FilePairBuilder {
-    private final List<File> commitedFiles;
 
-    public FilePairBuilder(List<File> commitedFiles) {
-        this.commitedFiles = commitedFiles;
-    }
-
-    public final List<FilePair> pairFiles() {
+    public static final List<FilePair> pairFiles(final List<File> commitedFiles) {
         final int size = commitedFiles.size();
-        List<FilePair> pairs = new ArrayList<>();
+        final List<FilePair> pairs = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             for (int j = i + 1; j < size; j++) {
                 File file1 = commitedFiles.get(i);

@@ -31,7 +31,6 @@ public class IssueTracker implements Serializable {
     private Long id;
 
     @NotNull
-    @Size(min = 1, max = 45)
     @Column(name = "system")
     @Enumerated(EnumType.STRING)
     private IssueTrackerSystem system;

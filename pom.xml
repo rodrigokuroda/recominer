@@ -31,19 +31,16 @@
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
             <version>2.6.2</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
             <version>2.6.2</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>7.0</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Servlet API -->
@@ -51,7 +48,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Batch API -->
@@ -59,7 +55,6 @@
             <groupId>javax.batch</groupId>
             <artifactId>javax.batch-api</artifactId>
             <version>1.0.1</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- JSF -->
@@ -67,7 +62,6 @@
             <groupId>org.glassfish</groupId>
             <artifactId>javax.faces</artifactId>
             <version>2.2.12</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.faces</groupId>
@@ -450,6 +444,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.10</version>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>1.3.2.RELEASE</version>
             </plugin>
         </plugins>
         <pluginManagement>
