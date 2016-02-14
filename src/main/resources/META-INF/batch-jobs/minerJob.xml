@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job id="minerJob" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/jobXML_1_0.xsd" version="1.0">
-    <flow id="minerFlow">
+    <flow id="minerFlow" next="cochangeFlow">
         <step id="gitPullStep" next="cvsanalyStep">
             <chunk item-count="1" checkpoint-policy="custom">
                 <reader ref="gitPullReader" />
@@ -35,6 +35,18 @@
                 <reader ref="aggregatorReader" />
                 <processor ref="aggregatorProcessor" />
                 <writer ref="aggregatorWriter" />
+                <checkpoint-algorithm ref="recominerCheckPoint" />
+            </chunk>
+        </step>
+        
+    </flow>
+    
+    <flow id="cochangeFlow">
+        <step id="cochangeIdentificationStep">
+            <chunk item-count="1" checkpoint-policy="custom">
+                <reader ref="cochangeIdentifierReader" />
+                <processor ref="cochangeIdentifierProcessor" />
+                <writer ref="cochangeIdentifierWriter" />
                 <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
         </step>

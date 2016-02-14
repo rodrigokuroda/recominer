@@ -4,6 +4,7 @@ import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.FileDao;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
+import br.edu.utfpr.recominer.dao.QueryUtils;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.Issue;
@@ -17,6 +18,7 @@ import java.util.Set;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
@@ -24,6 +26,7 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
  *
  * @author Rodrigo T. Kuroda
  */
+@Named
 public class CochangeIdentifierProcessor implements ItemProcessor {
 
     @Inject
@@ -42,9 +45,18 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         final GenericDao genericDao = new GenericDao(factory.createEntityManager());
         final FileDao fileDao = new FileDao(genericDao, project.getProjectName(), 20);
         final CochangeIdentifier identifier = new CochangeIdentifier(fileDao);
+        final String projectName = project.getProjectName();
 
-        final List<Object[]> rawIssuesAndCommits = dao.selectNativeWithParams("SELECT issue_id, scmlog_id FROM issues_scmlog WHERE updated_on > ?", new Object[]{project.getLastIssueUpdateAnalyzedForCochange()});
-
+        final List<Object[]> rawIssuesAndCommits;
+        if (project.getLastIssueUpdateAnalyzedForCochange() != null) {
+            rawIssuesAndCommits = dao.selectNativeWithParams(
+                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog WHERE updated_on > ?", projectName), 
+                    new Object[]{project.getLastIssueUpdateAnalyzedForCochange()});
+        } else {
+            rawIssuesAndCommits = dao.selectNativeWithParams(
+                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog", projectName), 
+                    new Object[0]);
+        }
         final Map<Issue, List<Commit>> issuesAndCommits = new HashMap<>();
         for (Object[] rawIssueAndCommit : rawIssuesAndCommits) {
             final Issue issue = new Issue((Integer) rawIssueAndCommit[0]);
@@ -75,29 +87,37 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
             }
         }
 
+        final String selectCochangeId = QueryUtils.getQueryForDatabase(
+                "SELECT id FROM {0}.file_pairs "
+                + "WHERE (file1_path = ? AND file2_path = ?) "
+                + "OR (file2_path = ? AND file1_path = ?)", projectName);
+        final String insertCochange = QueryUtils.getQueryForDatabase(
+                "INSERT INTO {0}.file_pairs (file1_path, file2_path, file1_id, file2_id) "
+                        + "VALUES (?, ?, ?, ?)", projectName);
+        final Map<FilePair, FilePair> cochangesWithId = new HashMap<>();
         for (FilePair filePair : allDistinctCochangeIdentified) {
-            final Map<String, Object> params = new HashMap<>();
             final String file1 = filePair.getFile1().getFileName();
-            params.put("file1", file1);
             final String file2 = filePair.getFile2().getFileName();
-            params.put("file2", file2);
-            Integer pairFileId = dao.selectNativeOneWithParams("SELECT id FROM file_pairs WHERE (file1_path = :file1 AND file2_path = :file2) OR (file2_path = :file1 AND file1_path = :file2)",
-                    params);
+            final Object[] paramsForSelectCochangeId = new Object[]{file1, file2, file1, file2};
+            
+            Integer pairFileId = dao.selectNativeOneWithParams(selectCochangeId, paramsForSelectCochangeId);
             if (pairFileId == null) {
-                dao.executeNativeQuery("INSERT INTO file_pairs (file1_path, file2_path, file1_id, file2_id) VALUES (?, ?, ?, ?)",
-                        new Object[]{file1, file2});
-                pairFileId = dao.selectNativeOneWithParams("SELECT id FROM file_pairs WHERE (file1_path = :file1 AND file2_path = :file2) OR (file2_path = :file1 AND file1_path = :file2)", params);
+                dao.executeNativeQuery(insertCochange, new Object[]{file1, file2});
+                pairFileId = dao.selectNativeOneWithParams(selectCochangeId, paramsForSelectCochangeId);
             }
 
             filePair.setId(pairFileId);
+            cochangesWithId.put(filePair, filePair);
         }
-
+        
+        final String insertCochangeRelatedToIssue = 
+                QueryUtils.getQueryForDatabase("INSERT INTO {0}.file_pair_issue (file_pair_id, issue_id) VALUES (?, ?)", projectName);
         for (Map.Entry<Issue, Set<FilePair>> entry : distinctCochangePerIssue.entrySet()) {
             Issue issue = entry.getKey();
             Set<FilePair> cochanges = entry.getValue();
 
             for (FilePair cochange : cochanges) {
-                dao.executeNativeQuery("INSERT INTO file_pair_issue (file_pair_id, issue_id) VALUES (?, ?)", new Object[]{cochange.getId(), issue.getId()});
+                dao.executeNativeQuery(insertCochangeRelatedToIssue, new Object[]{cochangesWithId.get(cochange).getId(), issue.getId()});
             }
         }
 

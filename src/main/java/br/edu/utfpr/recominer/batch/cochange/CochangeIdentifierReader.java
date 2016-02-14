@@ -11,12 +11,14 @@ import javax.batch.operations.JobOperator;
 import javax.batch.runtime.BatchRuntime;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 
 /**
  *
  * @author Rodrigo T. Kuroda
  */
+@Named
 public class CochangeIdentifierReader extends AbstractItemReader {
 
     @Inject
