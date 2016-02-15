@@ -50,13 +50,14 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         final List<Object[]> rawIssuesAndCommits;
         if (project.getLastIssueUpdateAnalyzedForCochange() != null) {
             rawIssuesAndCommits = dao.selectNativeWithParams(
-                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog WHERE updated_on > ?", projectName), 
+                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog i2s JOIN {0}_issues.issues i ON i.id = i2s.issue_id WHERE updated_on > ? ORDER BY updated_on ASC", projectName), 
                     new Object[]{project.getLastIssueUpdateAnalyzedForCochange()});
         } else {
             rawIssuesAndCommits = dao.selectNativeWithParams(
-                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog", projectName), 
+                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog i2s JOIN {0}_issues.issues i ON i.id = i2s.issue_id ORDER BY updated_on ASC", projectName), 
                     new Object[0]);
         }
+        
         final Map<Issue, List<Commit>> issuesAndCommits = new HashMap<>();
         for (Object[] rawIssueAndCommit : rawIssuesAndCommits) {
             final Issue issue = new Issue((Integer) rawIssueAndCommit[0]);
@@ -120,6 +121,12 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
                 dao.executeNativeQuery(insertCochangeRelatedToIssue, new Object[]{cochangesWithId.get(cochange).getId(), issue.getId()});
             }
         }
+        
+        final String selectLastIssueUpdateDate = QueryUtils.getQueryForDatabase("SELECT MAX(updated_on) FROM {0}_issues.issues WHERE id = ?", projectName);
+        final Integer lastIssueUpdatedAnalyzed = (Integer) rawIssuesAndCommits.get(rawIssuesAndCommits.size() -1)[0];
+        java.sql.Timestamp lastIssueUpdate = (java.sql.Timestamp) dao.selectNativeOneWithParams(selectLastIssueUpdateDate, new Object[]{lastIssueUpdatedAnalyzed});
+        // setting date of last commit analyzed
+        project.setLastIssueUpdateAnalyzedForCochange(lastIssueUpdate);
 
         return project;
     }
