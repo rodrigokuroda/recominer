@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
-import static br.edu.utfpr.recominer.dao.QueryUtils.filterByIssues;
 
 /**
  *
@@ -929,14 +928,15 @@ public class FileDao {
         return files;
     }
 
-    public List<File> selectCommitFiles(Integer commitId) {
+    public List<File> selectCommitFiles(Commit commit) {
         List<Object[]> rawFilesPath
-                = dao.selectNativeWithParams(SELECT_FILES_PATH_BY_COMMIT_ID, new Object[]{commitId});
+                = dao.selectNativeWithParams(SELECT_FILES_PATH_BY_COMMIT_ID, new Object[]{commit.getId()});
 
         List<File> files = new ArrayList<>();
         for (Object[] row : rawFilesPath) {
-            File filePath = new File((Integer) row[0], (String) row[1]);
-            files.add(filePath);
+            File file = new File((Integer) row[0], (String) row[1]);
+            file.addCommit(commit);
+            files.add(file);
         }
 
         return files;

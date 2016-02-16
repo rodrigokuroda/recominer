@@ -1,6 +1,8 @@
 package br.edu.utfpr.recominer.model;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  *
@@ -10,10 +12,12 @@ public class File {
 
     private final Integer id;
     private final String fileName;
+    private final Set<Commit> commits;
 
     public File(final Integer id, final String fileName) {
         this.id = id;
         this.fileName = fileName;
+        this.commits = new HashSet<>();
     }
 
     @Deprecated
@@ -27,6 +31,14 @@ public class File {
 
     public String getFileName() {
         return fileName;
+    }
+    
+    public void addCommit(Commit commit) {
+        this.commits.add(commit);
+    }
+    
+    public Set<Commit> getCommits() {
+        return commits;
     }
 
     @Override

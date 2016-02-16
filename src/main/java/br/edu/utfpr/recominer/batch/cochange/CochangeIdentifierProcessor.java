@@ -76,7 +76,7 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         for (Map.Entry<Issue, List<Commit>> entry : issuesAndCommits.entrySet()) {
             final Issue issue = entry.getKey();
             final List<Commit> commits = entry.getValue();
-            final List<FilePair> cochangesIdentified = identifier.identifyFor(issue, commits);
+            final Set<FilePair> cochangesIdentified = identifier.identifyFor(issue, commits);
 
             allDistinctCochangeIdentified.addAll(cochangesIdentified);
             if (distinctCochangePerIssue.containsKey(issue)) {
@@ -103,7 +103,7 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
             
             Integer pairFileId = dao.selectNativeOneWithParams(selectCochangeId, paramsForSelectCochangeId);
             if (pairFileId == null) {
-                dao.executeNativeQuery(insertCochange, new Object[]{file1, file2});
+                dao.executeNativeQuery(insertCochange, new Object[]{file1, file2, filePair.getFile1().getId(), filePair.getFile2().getId()});
                 pairFileId = dao.selectNativeOneWithParams(selectCochangeId, paramsForSelectCochangeId);
             }
 
@@ -113,21 +113,29 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         
         final String insertCochangeRelatedToIssue = 
                 QueryUtils.getQueryForDatabase("INSERT INTO {0}.file_pair_issue (file_pair_id, issue_id) VALUES (?, ?)", projectName);
+        
+        final String insertCochangeRelatedToIssueAndCommit = 
+                QueryUtils.getQueryForDatabase("INSERT INTO {0}.file_pair_issue_commit (file_pair_id, issue_id, commit_id) VALUES (?, ?, ?)", projectName);
+        
         for (Map.Entry<Issue, Set<FilePair>> entry : distinctCochangePerIssue.entrySet()) {
             Issue issue = entry.getKey();
             Set<FilePair> cochanges = entry.getValue();
 
             for (FilePair cochange : cochanges) {
                 dao.executeNativeQuery(insertCochangeRelatedToIssue, new Object[]{cochangesWithId.get(cochange).getId(), issue.getId()});
+                for (Commit commit : cochange.getCommits()) {
+                    dao.executeNativeQuery(insertCochangeRelatedToIssueAndCommit, new Object[]{cochangesWithId.get(cochange).getId(), issue.getId(), commit.getId()});
+                }
             }
         }
         
-        final String selectLastIssueUpdateDate = QueryUtils.getQueryForDatabase("SELECT MAX(updated_on) FROM {0}_issues.issues WHERE id = ?", projectName);
-        final Integer lastIssueUpdatedAnalyzed = (Integer) rawIssuesAndCommits.get(rawIssuesAndCommits.size() -1)[0];
-        java.sql.Timestamp lastIssueUpdate = (java.sql.Timestamp) dao.selectNativeOneWithParams(selectLastIssueUpdateDate, new Object[]{lastIssueUpdatedAnalyzed});
-        // setting date of last commit analyzed
-        project.setLastIssueUpdateAnalyzedForCochange(lastIssueUpdate);
-
+        if (!rawIssuesAndCommits.isEmpty()) { 
+            final String selectLastIssueUpdateDate = QueryUtils.getQueryForDatabase("SELECT MAX(updated_on) FROM {0}_issues.issues WHERE id = ?", projectName);
+            final Integer lastIssueUpdatedAnalyzed = (Integer) rawIssuesAndCommits.get(rawIssuesAndCommits.size() -1)[0];
+            java.sql.Timestamp lastIssueUpdate = (java.sql.Timestamp) dao.selectNativeOneWithParams(selectLastIssueUpdateDate, new Object[]{lastIssueUpdatedAnalyzed});
+            // setting date of last commit analyzed
+            project.setLastIssueUpdateAnalyzedForCochange(lastIssueUpdate);
+        }
         return project;
     }
 }

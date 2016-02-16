@@ -9,6 +9,8 @@ import br.edu.utfpr.recominer.services.executor.FilePairBuilder;
 import br.edu.utfpr.recominer.services.matrix.Statistics;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 public class CochangeIdentifier {
 
     private static final List<FilePair> EMPTY_ARRAY_LIST = Collections.unmodifiableList(new ArrayList<>(0));
+    private static final Set<FilePair> EMPTY_SET = Collections.unmodifiableSet(new HashSet<>(0));
 
     private final Logger log = LogManager.getLogger();
     private final Statistics statistics;
@@ -33,30 +36,30 @@ public class CochangeIdentifier {
         this.dao = dao;
     }
 
-    public List<FilePair> identifyFor(final Issue issue, final List<Commit> commits) {
+    public Set<FilePair> identifyFor(final Issue issue, final List<Commit> commits) {
         log.debug("Issue #" + issue);
         //log.debug(count++ + " of the " + issuesConsideredCommits.size());
         log.debug(commits.size() + " commits references the issue");
-        final List<File> commitedFiles = filterAndAggregateAllFileOfIssue(commits, statistics);
+        final Set<File> commitedFiles = filterAndAggregateAllFileOfIssue(commits, statistics);
 
         // empty
         if (commitedFiles.isEmpty()) {
             log.info("No file commited for issue #" + issue);
             statistics.getExcludedCommits().addAll(commits);
             statistics.getExcludedIssues().add(issue);
-            return EMPTY_ARRAY_LIST;
+            return EMPTY_SET;
         } else if (commitedFiles.size() == 1) {
             log.info("Only one file commited in one commit for issue #" + issue);
             statistics.getExcludedCommits().addAll(commits);
             statistics.getExcludedIssues().add(issue);
-            return EMPTY_ARRAY_LIST;
+            return EMPTY_SET;
         } else {
             final Map<String, Long> collected = commitedFiles.stream().collect(Collectors.groupingBy(c -> c.getFileName(), Collectors.counting()));
             if (collected.size() == 1) {
                 log.info("One file only commited in many commits for issue #" + issue);
                 statistics.getExcludedCommits().addAll(commits);
                 statistics.getExcludedIssues().add(issue);
-                return EMPTY_ARRAY_LIST;
+                return EMPTY_SET;
             }
         }
         log.debug("Number of files commited and related with issue: " + commitedFiles.size());
@@ -64,7 +67,7 @@ public class CochangeIdentifier {
         return FilePairBuilder.pairFiles(commitedFiles);
     }
 
-    protected List<File> filterAndAggregateAllFileOfIssue(List<Commit> commits, Statistics statistics) {
+    protected Set<File> filterAndAggregateAllFileOfIssue(List<Commit> commits, Statistics statistics) {
         final Set<String> allFiles = statistics.getAllFiles();
         final Set<String> allTestJavaFiles = statistics.getAllTestJavaFiles();
         final Set<String> allFilteredFiles = statistics.getAllFilteredFiles();
@@ -72,10 +75,10 @@ public class CochangeIdentifier {
         final Set<String> allXmlFiles = statistics.getAllXmlFiles();
 
         // monta os pares com os arquivos de todos os commits da issue
-        final List<File> commitedFiles = new ArrayList<>();
+        final Map<File, File> commitedFiles = new HashMap<>();
         for (Commit commit : commits) {
             // select name of commited files
-            final List<File> files = dao.selectCommitFiles(commit.getId());
+            final List<File> files = dao.selectCommitFiles(commit);
             log.info(files.size() + " files in commit #" + commit.getId());
             for (File file : files) {
                 allFiles.add(file.getFileName());
@@ -90,10 +93,14 @@ public class CochangeIdentifier {
                     } else if (file.getFileName().endsWith(".xml")) {
                         allXmlFiles.add(file.getFileName());
                     }
-                    commitedFiles.add(file);
+                    if (commitedFiles.containsKey(file)) {
+                        commitedFiles.get(file).addCommit(commit);
+                    } else {
+                        commitedFiles.put(file, file);
+                    }
                 }
             }
         }
-        return commitedFiles;
+        return commitedFiles.keySet();
     }
 }

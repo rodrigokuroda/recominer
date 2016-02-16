@@ -1,6 +1,8 @@
 package br.edu.utfpr.recominer.model;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  *
@@ -36,6 +38,12 @@ public class FilePair {
 
     public File getFile2() {
         return file2;
+    }
+    
+    public Set<Commit> getCommits() {
+        final Set<Commit> intersectionCommitsFromFile1AndFile2 = new HashSet<>(file1.getCommits());
+        intersectionCommitsFromFile1AndFile2.retainAll(file2.getCommits());
+        return intersectionCommitsFromFile1AndFile2;
     }
 
     @Override

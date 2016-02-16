@@ -2,7 +2,6 @@ package br.edu.utfpr.recominer.batch.cochange;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.GenericDao;
-import java.util.Date;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
@@ -30,7 +29,6 @@ public class CochangeIdentifierWriter extends AbstractItemWriter {
         dao = new GenericDao(factory.createEntityManager());
         for (Object item : items) {
             final Project project = (Project) item;
-            project.setLastIssueUpdateAnalyzedForCochange(new Date());
             dao.edit(project);
         }
     }
