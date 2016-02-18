@@ -14,12 +14,18 @@ public class FilePair {
     private final File file1;
     private final File file2;
 
-    public FilePair(String file1, String file2) {
+    public FilePair(final String file1, final String file2) {
         this.file1 = new File(file1);
         this.file2 = new File(file2);
     }
 
-    public FilePair(File file1, File file2) {
+    public FilePair(final File file1, final File file2) {
+        this.file1 = file1;
+        this.file2 = file2;
+    }
+
+    public FilePair(final Integer id, final File file1, final File file2) {
+        this.id = id;
         this.file1 = file1;
         this.file2 = file2;
     }

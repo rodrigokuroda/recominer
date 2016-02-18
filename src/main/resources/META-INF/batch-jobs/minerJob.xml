@@ -49,6 +49,12 @@
                 <writer ref="cochangeIdentifierWriter" />
                 <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
+            <chunk item-count="1" checkpoint-policy="custom">
+                <reader ref="aprioriReader" />
+                <processor ref="aprioriProcessor" />
+                <writer ref="aprioriWriter" />
+                <checkpoint-algorithm ref="recominerCheckPoint" />
+            </chunk>
         </step>
         
     </flow>

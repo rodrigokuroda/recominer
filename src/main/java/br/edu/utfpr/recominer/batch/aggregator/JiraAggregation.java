@@ -80,6 +80,8 @@ public class JiraAggregation {
 
                     final IssueScmlog issueScmlog = new IssueScmlog(commit.getId(), issueId);
 
+                    // data cleaning: commits must have committed between
+                    // issues' submit date and fixed date
                     if (!issueAndCommitAssociated.contains(issueScmlog)
                             && !commit.getDate().after(fixedOn)
                             && !commit.getDate().before(submittedOn)) {
