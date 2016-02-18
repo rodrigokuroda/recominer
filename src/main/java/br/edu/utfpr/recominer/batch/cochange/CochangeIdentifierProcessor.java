@@ -47,14 +47,24 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         final CochangeIdentifier identifier = new CochangeIdentifier(fileDao);
         final String projectName = project.getProjectName();
 
+        // Select all issues' (previously cleaned) commits that should have been
+        // commited between issue submit date and issue fix date.
+        final String selectIssuesAndCommits
+                = "SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog i2s "
+                + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
+                + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
+                + " WHERE i.fixed_date IS NOT NULL"
+                + "   AND s.date <= i.fixed_date "
+                + "   AND s.date >= i.submitted_on ";
+
         final List<Object[]> rawIssuesAndCommits;
         if (project.getLastIssueUpdateAnalyzedForCochange() != null) {
             rawIssuesAndCommits = dao.selectNativeWithParams(
-                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog i2s JOIN {0}_issues.issues i ON i.id = i2s.issue_id WHERE updated_on > ? ORDER BY updated_on ASC", projectName), 
+                    QueryUtils.getQueryForDatabase(selectIssuesAndCommits + " AND updated_on > ? ORDER BY updated_on ASC", projectName),
                     new Object[]{project.getLastIssueUpdateAnalyzedForCochange()});
         } else {
             rawIssuesAndCommits = dao.selectNativeWithParams(
-                    QueryUtils.getQueryForDatabase("SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog i2s JOIN {0}_issues.issues i ON i.id = i2s.issue_id ORDER BY updated_on ASC", projectName), 
+                    QueryUtils.getQueryForDatabase(selectIssuesAndCommits + " ORDER BY updated_on ASC", projectName),
                     new Object[0]);
         }
         
