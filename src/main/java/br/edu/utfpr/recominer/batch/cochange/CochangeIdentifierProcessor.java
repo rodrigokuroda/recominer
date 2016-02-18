@@ -53,8 +53,8 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
                 = "SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog i2s "
                 + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
                 + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
-                + " WHERE i.fixed_date IS NOT NULL"
-                + "   AND s.date <= i.fixed_date "
+                + " WHERE i.fixed_on IS NOT NULL"
+                + "   AND s.date <= i.fixed_on "
                 + "   AND s.date >= i.submitted_on ";
 
         final List<Object[]> rawIssuesAndCommits;
