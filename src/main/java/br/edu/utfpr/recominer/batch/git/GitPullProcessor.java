@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 @Named
 public class GitPullProcessor implements ItemProcessor {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private final Logger log = LogManager.getLogger();
 
     @Inject
     private JobContext jobContext;
@@ -44,7 +44,7 @@ public class GitPullProcessor implements ItemProcessor {
             ep.start();
 
         } catch (InterruptedException | IOException ex) {
-            LOGGER.error("An error occurred while executing job.", ex);
+            log.error("An error occurred while executing job.", ex);
             return BatchStatus.FAILED.toString();
         }
 

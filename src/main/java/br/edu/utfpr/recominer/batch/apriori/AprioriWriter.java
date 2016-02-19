@@ -6,12 +6,14 @@ import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 
 /**
  *
  * @author Rodrigo T. Kuroda
  */
+@Named
 public class AprioriWriter extends AbstractItemWriter {
 
     @Inject

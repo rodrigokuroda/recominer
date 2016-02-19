@@ -66,13 +66,18 @@ CREATE TABLE IF NOT EXISTS {0}.file_pairs (
 CREATE TABLE IF NOT EXISTS {0}.file_pair_issue (
     file_pair_id INT(11) NOT NULL,
     issue_id INT(11) NOT NULL,
-    PRIMARY KEY id (file_pair_id, issue_id)
+    PRIMARY KEY id (file_pair_id, issue_id),
+    KEY file_pair_id (file_pair_id),
+    KEY issue_id (issue_id)
 );
 
 CREATE TABLE IF NOT EXISTS {0}.file_pair_issue_commit (
     file_pair_id INT(11) NOT NULL,
     issue_id INT(11) NOT NULL,
     commit_id INT(11) NOT NULL,
-    PRIMARY KEY id (file_pair_id, issue_id, commit_id)
+    PRIMARY KEY id (file_pair_id, issue_id, commit_id),
+    KEY file_pair_id (file_pair_id),
+    KEY issue_id (issue_id),
+    KEY commit_id (commit_id)
 );
 

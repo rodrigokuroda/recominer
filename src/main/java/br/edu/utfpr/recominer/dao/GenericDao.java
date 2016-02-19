@@ -189,7 +189,7 @@ public class GenericDao implements Serializable {
         return result.get(0);
     }
 
-    public <T> T selectNativeOneWithParams(String select, Object[] objects) {
+    public <T> T selectNativeOneWithParams(String select, Object... objects) {
         List<T> result = selectNativeWithParams(select, objects);
         if (result == null || result.isEmpty()) {
             return null;
