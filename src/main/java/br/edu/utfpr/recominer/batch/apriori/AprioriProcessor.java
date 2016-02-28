@@ -8,8 +8,9 @@ import br.edu.utfpr.recominer.dao.QueryUtils;
 import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.FilePairApriori;
-import java.io.FileWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.runtime.context.JobContext;
@@ -57,16 +58,22 @@ public class AprioriProcessor implements ItemProcessor {
 
         final String countIssuesOfFileSql
                 = QueryUtils.getQueryForDatabase("SELECT COUNT(DISTINCT(i2s.issue_id))"
-                        + "  FROM avro.commits com"
-                        + "  JOIN avro_issues.issues_scmlog i2s ON i2s.scmlog_id = com.commit_id"
-                        + "  JOIN avro.file_pair_issue fpi ON fpi.issue_id = i2s.issue_id"
+                        + "  FROM {0}.commits com"
+                        + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.scmlog_id = com.commit_id"
+                        + "  JOIN {0}.file_pair_issue fpi ON fpi.issue_id = i2s.issue_id"
                         + " WHERE com.file_path = ?"
-                        + "   AND EXISTS (SELECT 1 FROM avro_issues.issues_fix_version ifv WHERE ifv.issue_id = i2s.issue_id)", projectName);
+                        + "   AND EXISTS (SELECT 1 FROM {0}_issues.issues_fix_version ifv WHERE ifv.issue_id = i2s.issue_id)", projectName);
         
         log.debug("Total pair file to calculate apriori: " + rawPairFiles.size());
-        
-        final FileWriter fw = new FileWriter(new java.io.File("/home/kuroda/Desktop/test.csv"));
-        fw.append(FilePairApriori.getToStringHeader()).append("\r\n");
+
+        final String insertApriori
+                = QueryUtils.getQueryForDatabase(
+                        "INSERT INTO {0}.file_pair_apriori "
+                        + " (file_pair_id, file_pair_issues, file1_support, file2_support, file_pair_support, file1_confidence, file2_confidence) "
+                        + " VALUES "
+                        + " (?, ?, ?, ?, ?, ?, ?)", projectName);
+
+        final Map<String, Long> fileIssues = new HashMap<>();
         for (Object[] rawFilePair : rawPairFiles) {
             final Integer id = (Integer) rawFilePair[0];
             final File file1 = new File((Integer) rawFilePair[1], (String) rawFilePair[2]);
@@ -76,18 +83,34 @@ public class AprioriProcessor implements ItemProcessor {
 
             final Long filePairIssue = (Long) rawFilePair[5];
 
-            Long file1Issues = dao.selectNativeOneWithParams(countIssuesOfFileSql, filePair.getFile1().getFileName());
-            Long file2Issues = dao.selectNativeOneWithParams(countIssuesOfFileSql, filePair.getFile2().getFileName());
+            final Long file1Issues;
+            if (fileIssues.containsKey(file1.getFileName())) {
+                file1Issues = fileIssues.get(file1.getFileName());
+            } else {
+                file1Issues = dao.selectNativeOneWithParams(countIssuesOfFileSql, file1.getFileName());
+                fileIssues.put(filePair.getFile1().getFileName(), file1Issues);
+            }
 
-            FilePairApriori apriori = new FilePairApriori(filePair, file1Issues, file2Issues,
+            final Long file2Issues;
+            if (fileIssues.containsKey(file2.getFileName())) {
+                file2Issues = fileIssues.get(file2.getFileName());
+            } else {
+                file2Issues = dao.selectNativeOneWithParams(countIssuesOfFileSql, file2.getFileName());
+                fileIssues.put(file2.getFileName(), file1Issues);
+            }
+            final FilePairApriori apriori = new FilePairApriori(filePair, file1Issues, file2Issues,
                     filePairIssue, totalIssuesConsidered);
 
+            dao.executeNativeQuery(insertApriori, new Object[]{
+                filePair.getId(),
+                filePairIssue,
+                apriori.getSupportFile(),
+                apriori.getSupportFile2(),
+                apriori.getSupportFilePair(),
+                apriori.getConfidence(),
+                apriori.getConfidence2()});
             log.debug(apriori.toString());
-            fw.append(apriori.toString()).append("\r\n");
-
         }
-        fw.flush();
-        fw.close();
 
         return project;
     }

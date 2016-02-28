@@ -6,6 +6,7 @@ import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.dao.QueryUtils;
 import br.edu.utfpr.recominer.model.Commit;
+import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.Issue;
 import java.util.ArrayList;
@@ -81,12 +82,15 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
             }
         }
 
+        final Set<File> allDistinctFiles = new HashSet<>();
         final Set<FilePair> allDistinctCochangeIdentified = new HashSet<>();
         final Map<Issue, Set<FilePair>> distinctCochangePerIssue = new HashMap<>();
         for (Map.Entry<Issue, List<Commit>> entry : issuesAndCommits.entrySet()) {
             final Issue issue = entry.getKey();
             final List<Commit> commits = entry.getValue();
-            final Set<FilePair> cochangesIdentified = identifier.identifyFor(issue, commits);
+            final Set<File> commitedFiles = identifier.filterAndAggregateAllFileOfIssue(commits);
+            allDistinctFiles.addAll(commitedFiles);
+            final Set<FilePair> cochangesIdentified = identifier.identifyFor(issue, commits, commitedFiles);
 
             allDistinctCochangeIdentified.addAll(cochangesIdentified);
             if (distinctCochangePerIssue.containsKey(issue)) {

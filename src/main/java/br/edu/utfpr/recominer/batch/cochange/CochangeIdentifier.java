@@ -36,11 +36,8 @@ public class CochangeIdentifier {
         this.dao = dao;
     }
 
-    public Set<FilePair> identifyFor(final Issue issue, final List<Commit> commits) {
+    public Set<FilePair> identifyFor(final Issue issue, final List<Commit> commits, final Set<File> commitedFiles) {
         log.debug("Issue #" + issue);
-        //log.debug(count++ + " of the " + issuesConsideredCommits.size());
-        log.debug(commits.size() + " commits references the issue");
-        final Set<File> commitedFiles = filterAndAggregateAllFileOfIssue(commits, statistics);
 
         // empty
         if (commitedFiles.isEmpty()) {
@@ -67,7 +64,8 @@ public class CochangeIdentifier {
         return FilePairBuilder.pairFiles(commitedFiles);
     }
 
-    protected Set<File> filterAndAggregateAllFileOfIssue(List<Commit> commits, Statistics statistics) {
+    public Set<File> filterAndAggregateAllFileOfIssue(final List<Commit> commits) {
+        log.debug(commits.size() + " commits references the issue");
         final Set<String> allFiles = statistics.getAllFiles();
         final Set<String> allTestJavaFiles = statistics.getAllTestJavaFiles();
         final Set<String> allFilteredFiles = statistics.getAllFilteredFiles();
