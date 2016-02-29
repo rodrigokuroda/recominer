@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS {0}.file_pairs (
     file2_id INT(11),
     file1_path VARCHAR(4096) NOT NULL,
     file2_path VARCHAR(4096) NOT NULL,
+    updated_on DATETIME,
     PRIMARY KEY id (id),
     KEY file1_id (file1_id),
     KEY file2_id (file2_id)
@@ -81,3 +82,21 @@ CREATE TABLE IF NOT EXISTS {0}.file_pair_issue_commit (
     KEY commit_id (commit_id)
 );
 
+CREATE TABLE IF NOT EXISTS {0}.file_apriori (
+    file_id INTEGER NOT NULL,
+    file_issues INTEGER NOT NULL,
+    updated_on DATETIME,
+    PRIMARY KEY id (file_id)
+);
+
+CREATE TABLE IF NOT EXISTS {0}.file_pair_apriori (
+    file_pair_id INTEGER NOT NULL,
+    file_pair_issues INTEGER NOT NULL,
+    file1_support DOUBLE NOT NULL,
+    file2_support DOUBLE NOT NULL,
+    file_pair_support DOUBLE NOT NULL,
+    file1_confidence DOUBLE NOT NULL,
+    file2_confidence DOUBLE NOT NULL,
+    updated_on DATETIME,
+    PRIMARY KEY id (file_pair_id)
+);

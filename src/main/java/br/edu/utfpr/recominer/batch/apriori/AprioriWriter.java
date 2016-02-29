@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.batch.apriori;
 
+import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.GenericDao;
-import br.edu.utfpr.recominer.model.FilePair;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
@@ -28,9 +28,10 @@ public class AprioriWriter extends AbstractItemWriter {
     public void writeItems(List<Object> items) throws Exception {
         dao = new GenericDao(factory.createEntityManager());
         for (Object item : items) {
-            final FilePair filePair = (FilePair) item;
-            dao.executeNativeQuery("INSERT INTO file_pair_apriori (file_pair_id, issue_id) VALUES (?, ?)",
-                    new Object[]{filePair.getFile1().getId(), filePair.getFile1().getId(), filePair.getFile1().getFileName(), filePair.getFile2().getFileName()});
+            final Project project = (Project) item;
+            dao.executeNativeQuery(
+                    "UPDATE recominer.project SET last_apriori_update = ? WHERE id = ?",
+                    new Object[]{project.getLastAprioriUpdate(), project.getId()});
         }
     }
 
