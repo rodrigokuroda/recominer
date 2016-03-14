@@ -1,17 +1,16 @@
 package br.edu.utfpr.recominer.model;
 
 import br.edu.utfpr.recominer.metric.committer.CommitterFileMetrics;
+import br.edu.utfpr.recominer.metric.file.FileMetrics;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
  *
  * @author douglas
  */
-public class FileIssueMetrics extends FileMetrics {
+public class ContextualMetrics {
 
     public static final String HEADER
             = "file1;file2;"
@@ -20,71 +19,58 @@ public class FileIssueMetrics extends FileMetrics {
             + NetworkMetrics.HEADER
             + CommitMetrics.HEADER
             + CommitterFileMetrics.HEADER
-            // metricas de commit
-            + "pv_isMajorContributor;" // committer é principal colaborador do arquivo
-            + "pv_ownerExperience;" // experiencia do owner na versao anterior
-            + "sameOwnership;" // 1 = ownership da release é igual ao da release anterior
-//            + "committers;" // committers na release
-            + "pv_totalCommitters;" // committers desde o começo ate a data final da relese
-//            + "commits;" // commits do par de arquivos na release
-            + "pv_totalCommits;" // todos commits do arquivo
-            + "addedLines;deletedLines;changedLines;" // do arquivo, no commit de uma issue corrigida
-            + "fileAge;" // idade do arquivo na versão em dias na versao em analise
-            + "pv_totalFileAge;" // idade do arquivo em dias desde o primeiro commit
-//            + "futureDefects;" // numero de defeitos do primeiro arquivo na proxima versao
-            //            + "futureIssues;" // numero de issues do arquivo na proxima versao
+            + FileMetrics.HEADER
             + "isFilePairChanged;" // o par mudou nesse commit? 0 = não, 1 = sim
             //+ "changedAfterReopened" // index (1a reabertura, 2a, 3a e assim sucessivamente) onde o arquivo B foi alterado após a issue ter sido reaberta
             ;
 
-    public static final Map<String, Integer> headerIndexes;
-    public static final Integer futureDefectsIndex;
-
-    static {
-        String[] headerNames = HEADER.split(";");
-        headerIndexes = new LinkedHashMap<>();
-        for (int i = 0; i < headerNames.length; i++) {
-            headerIndexes.put(headerNames[i], i);
-        }
-
-        futureDefectsIndex = headerIndexes.get("futureDefects");
-    }
-
     private final FileIssue fileIssue;
+    private final File file;
     private final String file2;
     private final IssueMetrics issueMetrics;
+    private FilePairApriori filePairApriori;
+    private NetworkMetrics networkMetrics;
+    private CommitMetrics commitMetrics;
+    private CommitterFileMetrics committerFileMetrics;
+    private FileMetrics fileMetrics;
     private int changedAfterReopened;
 
-    public FileIssueMetrics(String file, String file2, IssueMetrics issueMetrics, double... metrics) {
-        super(file, metrics);
-        this.issueMetrics = issueMetrics;
+    private int changed = 0;
+
+    public ContextualMetrics(String file, String file2, IssueMetrics issueMetrics) {
+        this.file = new File(file);
         this.file2 = file2;
+        this.issueMetrics = issueMetrics;
         this.fileIssue = new FileIssue(getFile(), issueMetrics.getIssueNumber());
     }
 
-    public FileIssueMetrics(String file, String file2, Commit commit, IssueMetrics issueMetrics, double... metrics) {
-        super(file, metrics);
-        this.issueMetrics = issueMetrics;
+    public ContextualMetrics(String file, String file2, Commit commit, IssueMetrics issueMetrics) {
+        this.file = new File(file);
         this.file2 = file2;
+        this.issueMetrics = issueMetrics;
         this.fileIssue = new FileIssueCommit(getFile(), issueMetrics.getIssueNumber(), commit);
     }
 
-    public FileIssueMetrics(String file, String file2, Integer issue, double... metrics) {
-        super(file, metrics);
-        this.issueMetrics = new EmptyIssueMetrics();
+    public ContextualMetrics(String file, String file2, Integer issue, double... metrics) {
+        this.file = new File(file);
         this.file2 = file2;
+        this.issueMetrics = new EmptyIssueMetrics();
         this.fileIssue = new FileIssue(getFile(), issue);
     }
 
-    public FileIssueMetrics(String file, String file2, Integer issue, List<Double> metrics) {
-        super(file, metrics);
-        this.issueMetrics = new EmptyIssueMetrics();
+    public ContextualMetrics(String file, String file2, Integer issue, List<Double> metrics) {
+        this.file = new File(file);
         this.file2 = file2;
+        this.issueMetrics = new EmptyIssueMetrics();
         this.fileIssue = new FileIssue(getFile(), issue);
     }
 
     public String getHeader() {
         return HEADER;
+    }
+
+    public File getFile() {
+        return file;
     }
 
     public FileIssue getFileIssue() {
@@ -95,12 +81,64 @@ public class FileIssueMetrics extends FileMetrics {
         return issueMetrics;
     }
 
+    public FilePairApriori getFilePairApriori() {
+        return filePairApriori;
+    }
+
+    public void setFilePairApriori(FilePairApriori filePairApriori) {
+        this.filePairApriori = filePairApriori;
+    }
+
+    public NetworkMetrics getNetworkMetrics() {
+        return networkMetrics;
+    }
+
+    public void setNetworkMetrics(NetworkMetrics networkMetrics) {
+        this.networkMetrics = networkMetrics;
+    }
+
+    public CommitMetrics getCommitMetrics() {
+        return commitMetrics;
+    }
+
+    public void setCommitMetrics(CommitMetrics commitMetrics) {
+        this.commitMetrics = commitMetrics;
+    }
+
+    public CommitterFileMetrics getCommitterFileMetrics() {
+        return committerFileMetrics;
+    }
+
+    public void setCommitterFileMetrics(CommitterFileMetrics committerFileMetrics) {
+        this.committerFileMetrics = committerFileMetrics;
+    }
+
+    public FileMetrics getFileMetrics() {
+        return fileMetrics;
+    }
+
+    public void setFileMetrics(FileMetrics fileMetrics) {
+        this.fileMetrics = fileMetrics;
+    }
+
     public int getChangedAfterReopened() {
         return changedAfterReopened;
     }
 
     public void setFileBChangedAfterReopened(int reopenedIndex) {
         this.changedAfterReopened = reopenedIndex;
+    }
+
+    public void changed() {
+        changed = 1;
+    }
+
+    public void unchanged() {
+        changed = 0;
+    }
+
+    public int getChanged() {
+        return changed;
     }
 
     @Override
@@ -125,9 +163,6 @@ public class FileIssueMetrics extends FileMetrics {
             sb.append(getCommitterFileMetrics());
         }
 
-        for (double m : getMetrics()) {
-            sb.append(m).append(";");
-        }
         sb.append(getChanged());
         //sb.append(";").append(changedAfterReopened);
         return sb.toString();
@@ -145,10 +180,10 @@ public class FileIssueMetrics extends FileMetrics {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FileIssueMetrics)) {
+        if (!(obj instanceof ContextualMetrics)) {
             return false;
         }
-        final FileIssueMetrics other = (FileIssueMetrics) obj;
+        final ContextualMetrics other = (ContextualMetrics) obj;
         return Objects.equals(fileIssue, other.fileIssue);
     }
 }

@@ -67,14 +67,14 @@ public class BichoDAO {
     private final String SELECT_FILES_CHANGED_IN_LAST_N_ISSUES_ORDER_BY_ISSUES_OCCURRENCES;
     private final String INNER_JOIN_LAST_N_ISSUES;
 
-    private final GenericBichoDAO dao;
+    private final JpaDao dao;
     private final String repository;
 
-    public BichoDAO(GenericBichoDAO dao, String repository, Integer maxFilesPerCommit) {
+    public BichoDAO(JpaDao dao, String repository, Integer maxFilesPerCommit) {
         this(dao, repository, maxFilesPerCommit, 0);
     }
 
-    public BichoDAO(GenericBichoDAO dao, String repository, Integer maxFilesPerCommit, int numberOfLastIssues) {
+    public BichoDAO(JpaDao dao, String repository, Integer maxFilesPerCommit, int numberOfLastIssues) {
         this.repository = repository;
         this.dao = dao;
 
@@ -222,7 +222,7 @@ public class BichoDAO {
                 + ORDER_BY_COMMIT_DATE;
 
         SELECT_ISSUES_AND_TYPE
-                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date"
+                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
                         + "  FROM {0}_issues.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
@@ -237,7 +237,7 @@ public class BichoDAO {
                 + ORDER_BY_COMMIT_DATE;
 
         SELECT_ISSUES_AND_TYPE_LAST_N_MONTH
-                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date"
+                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
                         + "  FROM {0}_issues.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
@@ -258,7 +258,7 @@ public class BichoDAO {
                 + ORDER_BY_COMMIT_DATE;
 
         SELECT_ISSUES_AND_TYPE_LAST_N_DAYS
-                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date"
+                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
                         + "  FROM {0}_issues.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
@@ -279,7 +279,7 @@ public class BichoDAO {
                 + ORDER_BY_COMMIT_DATE;
 
         SELECT_ISSUES_AND_TYPE_LAST_N_ISSUES
-                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date"
+                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
                         + "  FROM {0}_issues.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
@@ -296,7 +296,7 @@ public class BichoDAO {
                 + ORDER_BY_COMMIT_DATE;
 
         SELECT_ISSUES_AND_TYPE_BY_FIXED_MAJOR_VERSION
-                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date"
+                = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
                         + "  FROM {0}_issues.issues_scmlog i2s"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         + "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
@@ -362,7 +362,7 @@ public class BichoDAO {
 
         SELECT_COMMIT_AND_FILES_BY_ISSUE
                 = QueryUtils.getQueryForDatabase(
-                        "SELECT DISTINCT com.commit_id, com.file_path, p.id, p.name, p.email, com.date"
+                        "SELECT DISTINCT com.commit_id, com.file_path, p.id, p.name, p.email, com.date. s.rev"
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
@@ -722,20 +722,21 @@ public class BichoDAO {
     }
 
     private Map<Issue, List<Commit>> rawIssuesAndCommitsToMap(List<Object[]> rawIssues) {
-        Map<Issue, List<Commit>> issuesCommits = new LinkedHashMap<>(rawIssues.size());
+        final Map<Issue, List<Commit>> issuesCommits = new LinkedHashMap<>(rawIssues.size());
         for (Object[] issueCommit : rawIssues) {
             Integer issueId = (Integer) issueCommit[0];
             String issueType = (String) issueCommit[1];
             java.sql.Timestamp fixedOn = (java.sql.Timestamp) issueCommit[2];
             Integer commit = (Integer) issueCommit[3];
             Date commitDate = (java.sql.Timestamp) issueCommit[4];
+            String revision = (String) issueCommit[5];
 
             Issue issue = new Issue(issueId, issueType, fixedOn);
             if (issuesCommits.containsKey(issue)) {
-                issuesCommits.get(issue).add(new Commit(commit, null, commitDate));
+                issuesCommits.get(issue).add(new Commit(commit, revision, null, commitDate));
             } else {
                 List<Commit> commits = new ArrayList<>();
-                commits.add(new Commit(commit, null, commitDate));
+                commits.add(new Commit(commit, revision, null, commitDate));
                 issuesCommits.put(issue, commits);
             }
         }
@@ -851,10 +852,11 @@ public class BichoDAO {
             String committerName = (String) row[3];
             String committerEmail = (String) row[4];
             java.sql.Timestamp commitDate = (java.sql.Timestamp) row[5];
+            String revision = (String) row[6];
 
             Committer committer = new Committer(committerId, committerName, committerEmail);
 
-            Commit commit = new Commit(commitId, committer, new Date(commitDate.getTime()));
+            Commit commit = new Commit(commitId, revision, committer, new Date(commitDate.getTime()));
 
             if (commits.containsKey(commit)) {
                 commits.get(commit).getFiles().add(new File(fileName));
@@ -938,8 +940,8 @@ public class BichoDAO {
     }
 
     public Map<Issue, List<Commit>> selectIssuesAndCommitsWhereFileChanged(int numberOfLastIssues, String filePath) {
-        Map<Issue, List<Commit>> issuesCommits = new LinkedHashMap<>();
-        List<Object[]> result
+        final Map<Issue, List<Commit>> issuesCommits = new LinkedHashMap<>();
+        final List<Object[]> result
                 = dao.selectNativeWithParams(SELECT_LASTS_N_ISSUES_FIXED_IN_RELEASE_BY_FILENAME, new Object[]{numberOfLastIssues, filePath});
 
         result.stream().forEach((row) -> {
@@ -947,12 +949,15 @@ public class BichoDAO {
             final String issueType = (String) row[1];
             final Integer commitId = (Integer) row[2];
             final java.sql.Timestamp issueDate = (java.sql.Timestamp) row[3];
+            final String revision = (String) row[4];
+
             final Issue issue = new Issue(issueId, issueType);
-            final Commit commit = new Commit(commitId, null, issueDate);
+            final Commit commit = new Commit(commitId, revision, null, issueDate);
+
             if (issuesCommits.containsKey(issue)) {
                 issuesCommits.get(issue).add(commit);
             } else {
-                List<Commit> commits = new ArrayList<>();
+                final List<Commit> commits = new ArrayList<>();
                 commits.add(commit);
                 issuesCommits.put(issue, commits);
             }

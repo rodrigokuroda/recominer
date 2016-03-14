@@ -14,7 +14,7 @@ import br.edu.utfpr.recominer.model.CodeChurn;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.CommitMetrics;
 import br.edu.utfpr.recominer.model.File;
-import br.edu.utfpr.recominer.model.FileIssueMetrics;
+import br.edu.utfpr.recominer.model.ContextualMetrics;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.Issue;
 import br.edu.utfpr.recominer.model.IssueCommitFile;
@@ -35,6 +35,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 
 /**
  *
@@ -124,7 +131,7 @@ public class BichoPairFileMetricsServices extends AbstractBichoMetricServices {
             if (++progressFilePair % 100 == 0 || progressFilePair == totalFilePair) {
                 System.out.println(progressFilePair + "/" + totalFilePair);
             }
-            final Set<FileIssueMetrics> allFileChanges = new LinkedHashSet<>();
+            final Set<ContextualMetrics> allFileChanges = new LinkedHashSet<>();
 
             // par analisado
             final String filename = filePair.getFile1().getFileName(); // arquivo principal
@@ -152,7 +159,7 @@ public class BichoPairFileMetricsServices extends AbstractBichoMetricServices {
                     final Committer committer = commitInIssue.getCommitter();
 
                     // metricas do arquivo com maior confiança, somente
-                    final FileIssueMetrics fileIssueMetrics = new FileIssueMetrics(filename, filename2, commitInIssue, issueMetrics);
+                    final ContextualMetrics fileIssueMetrics = new ContextualMetrics(filename, filename2, commitInIssue, issueMetrics);
 
                     if (!commitInIssue.getFiles().contains(file)) {
                         continue;
@@ -288,7 +295,7 @@ public class BichoPairFileMetricsServices extends AbstractBichoMetricServices {
 
             // one file per file pair
             EntityMetric metrics = new EntityMetric();
-                    metrics.setNodes(objectsToNodes(allFileChanges, FileIssueMetrics.HEADER));
+                    metrics.setNodes(objectsToNodes(allFileChanges, ContextualMetrics.HEADER));
                     metrics.getParams().put("rank", rank++);
                     metrics.getParams().put("additionalFilename", getAdditionalFilename());
                     saveMetrics(metrics, getClass());
@@ -296,7 +303,7 @@ public class BichoPairFileMetricsServices extends AbstractBichoMetricServices {
 
         // one file for all file pair
 //        EntityMetric metrics = new EntityMetric();
-//        metrics.setNodes(objectsToNodes(allFileChanges, FileIssueMetrics.HEADER));
+//        metrics.setNodes(objectsToNodes(allFileChanges, ContextualMetrics.HEADER));
 //        metrics.getParams().put("rank", rank++);
 //        metrics.getParams().put("additionalFilename", getAdditionalFilename());
 //        saveMetrics(metrics, getClass());

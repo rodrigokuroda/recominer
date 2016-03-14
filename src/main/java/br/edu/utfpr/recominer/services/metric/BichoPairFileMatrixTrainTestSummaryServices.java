@@ -7,7 +7,7 @@ import br.edu.utfpr.recominer.dao.GenericBichoDAO;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.File;
-import br.edu.utfpr.recominer.model.FileIssueMetrics;
+import br.edu.utfpr.recominer.model.ContextualMetrics;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.Project;
 import br.edu.utfpr.recominer.model.ProjectVersionPairFileRankTestTrain;
@@ -22,6 +22,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 
 /**
  *
@@ -81,7 +88,7 @@ public class BichoPairFileMatrixTrainTestSummaryServices extends AbstractBichoMe
 
         int rank = 1;
         for (FilePair filePair : filePairs) {
-            final Set<FileIssueMetrics> allFileChanges = new LinkedHashSet<>();
+            final Set<ContextualMetrics> allFileChanges = new LinkedHashSet<>();
 
             // par analisado
             final File file = filePair.getFile1(); // arquivo principal
@@ -115,7 +122,7 @@ public class BichoPairFileMatrixTrainTestSummaryServices extends AbstractBichoMe
             }
 
             EntityMetric metrics = new EntityMetric();
-            metrics.setNodes(objectsToNodes(allFileChanges, FileIssueMetrics.HEADER));
+            metrics.setNodes(objectsToNodes(allFileChanges, ContextualMetrics.HEADER));
             metrics.getParams().put("rank", rank++);
             metrics.getParams().put("additionalFilename", getAdditionalFilename());
             saveMetrics(metrics, getClass());

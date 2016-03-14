@@ -15,7 +15,7 @@ import br.edu.utfpr.recominer.model.CodeChurn;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.CommitMetrics;
 import br.edu.utfpr.recominer.model.File;
-import br.edu.utfpr.recominer.model.FileIssueMetrics;
+import br.edu.utfpr.recominer.model.ContextualMetrics;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.IssueMetrics;
 import br.edu.utfpr.recominer.model.matrix.EntityMatrix;
@@ -34,6 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 
 /**
  *
@@ -132,7 +139,7 @@ public class BichoPairFileMostChangedPerIssueMetricsByNumberOfIssuesServices ext
 
         int rank = 1;
         for (FilePair filePair : top25) {
-            final Set<FileIssueMetrics> allFileChanges = new LinkedHashSet<>();
+            final Set<ContextualMetrics> allFileChanges = new LinkedHashSet<>();
 
             // par analisado
             final File file = filePair.getFile1();
@@ -160,7 +167,7 @@ public class BichoPairFileMostChangedPerIssueMetricsByNumberOfIssuesServices ext
                     Set<File> filesInCommit = commitInIssue.getFiles();
 
                     // metricas do arquivo com maior confiança, somente
-                    final FileIssueMetrics fileIssueMetrics = new FileIssueMetrics(filename, filename2, commitInIssue, issueMetrics);
+                    final ContextualMetrics fileIssueMetrics = new ContextualMetrics(filename, filename2, commitInIssue, issueMetrics);
 
                     // TODO metrics do commit
                     final CommitMetrics commitMetrics = new CommitMetrics(commitInIssue);
@@ -243,7 +250,7 @@ public class BichoPairFileMostChangedPerIssueMetricsByNumberOfIssuesServices ext
             }
 
             EntityMetric metrics3 = new EntityMetric();
-            metrics3.setNodes(objectsToNodes(allFileChanges, FileIssueMetrics.HEADER));
+            metrics3.setNodes(objectsToNodes(allFileChanges, ContextualMetrics.HEADER));
             metrics3.setAdditionalFilename("rank " + rank++ + " " + getAdditionalFilename());
             saveMetrics(metrics3, getClass());
         }

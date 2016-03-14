@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
+import static br.edu.utfpr.recominer.dao.QueryUtils.filterByIssues;
 
 /**
  *
@@ -397,7 +398,7 @@ public class FileDao {
                         + "       WHERE s2.id = ?)", repository);
 
         SELECT_COMMIT_AND_FILES_BY_FILENAME_AND_ISSUE
-                = QueryUtils.getQueryForDatabase("SELECT DISTINCT com.commit_id, com.file_path, p.id, p.name, p.email, com.date"
+                = QueryUtils.getQueryForDatabase("SELECT DISTINCT com.commit_id, com.file_path, p.id, p.name, p.email, com.date, com.rev"
                         + FROM_TABLE
                         + JOIN_PEOPLE_COMMITER
                         + WHERE, repository)
@@ -1646,10 +1647,11 @@ public class FileDao {
             String committerName = (String) row[3];
             String committerEmail = (String) row[4];
             java.sql.Timestamp commitDate = (java.sql.Timestamp) row[5];
+            String hash = (String) row[6];
 
             Committer committer = new Committer(committerId, committerName, committerEmail);
 
-            Commit commit = new Commit(commitId, committer, new Date(commitDate.getTime()));
+            Commit commit = new Commit(commitId, hash, committer, new Date(commitDate.getTime()));
 
             if (commits.containsKey(commit)) {
                 commits.get(commit).getFiles().add(new File(fileName));

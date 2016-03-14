@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.model;
 
+import br.edu.utfpr.recominer.metric.committer.CommitterFileMetrics;
 import java.util.Objects;
 
 /**
@@ -9,7 +10,8 @@ import java.util.Objects;
  */
 public class CommitMetrics {
 
-    public static final String HEADER = Commit.HEADER;
+    public static final String HEADER = Commit.HEADER
+            + CommitterFileMetrics.HEADER;
 
     private final Commit commit;
 

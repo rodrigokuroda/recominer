@@ -15,7 +15,7 @@ import javax.persistence.criteria.Root;
 
 @Named
 @Dependent
-public class GenericDao implements Serializable {
+public class GenericDao implements Serializable, JpaDao {
 
     @Inject
     private EntityManager em;
@@ -103,7 +103,7 @@ public class GenericDao implements Serializable {
         return list;
     }
 
-    public List selectWithParams(String select, String[] params, Object[] objects) {
+    public List selectWithParams(String select, String[] params, Object... objects) {
         return selectWithParams(select, params, objects, 0, 0);
     }
 
@@ -155,7 +155,8 @@ public class GenericDao implements Serializable {
         return query.getResultList();
     }
 
-    public List selectNativeWithParams(String select, Object[] objects) {
+    @Override
+    public List selectNativeWithParams(String select, Object... objects) {
         Query query = em.createNativeQuery(select);
 
         if (objects != null) {
@@ -181,7 +182,8 @@ public class GenericDao implements Serializable {
         return query.getResultList();
     }
 
-    public <T> T selectOneWithParams(String select, String[] params, Object[] objects) {
+    @Override
+    public <T> T selectOneWithParams(String select, String[] params, Object... objects) {
         List<T> result = selectWithParams(select, params, objects);
         if (result == null || result.isEmpty()) {
             return null;
@@ -189,6 +191,7 @@ public class GenericDao implements Serializable {
         return result.get(0);
     }
 
+    @Override
     public <T> T selectNativeOneWithParams(String select, Object... objects) {
         List<T> result = selectNativeWithParams(select, objects);
         if (result == null || result.isEmpty()) {
@@ -205,7 +208,7 @@ public class GenericDao implements Serializable {
         return result.get(0);
     }
 
-    public int executeNativeQuery(String sql, Object[] params) {
+    public int executeNativeQuery(String sql, Object... params) {
         final Query nativeQuery = em.createNativeQuery(sql);
         for (int position = 1; position <= params.length; position++) {
             nativeQuery.setParameter(position, params[position - 1]);

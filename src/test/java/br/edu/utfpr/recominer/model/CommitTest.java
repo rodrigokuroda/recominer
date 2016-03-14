@@ -1,6 +1,5 @@
 package br.edu.utfpr.recominer.model;
 
-import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.metric.committer.Committer;
 import java.util.Date;
 import static org.junit.Assert.assertFalse;
@@ -26,8 +25,8 @@ public class CommitTest {
 
     @Test
     public void testEquals() {
-        final Commit commit1 = new Commit(1, new Committer(1, "Foo", "Bar"), new Date());
-        final Commit commit2 = new Commit(1, new Committer(2, "Bar", "Foo"), new Date());
+        final Commit commit1 = new Commit(1, "abcdef", new Committer(1, "Foo", "Bar"), new Date());
+        final Commit commit2 = new Commit(1, "abcdef", new Committer(2, "Bar", "Foo"), new Date());
 
         assertTrue(commit1.equals(commit1));
         assertTrue(commit2.equals(commit2));
@@ -37,8 +36,8 @@ public class CommitTest {
 
     @Test
     public void testNotEquals() {
-        final Commit commit1 = new Commit(1, new Committer(1, "Foo", "Bar"), new Date());
-        final Commit commit2 = new Commit(2, new Committer(1, "Foo", "Bar"), new Date());
+        final Commit commit1 = new Commit(1, "abcdef", new Committer(1, "Foo", "Bar"), new Date());
+        final Commit commit2 = new Commit(2, "abcdef", new Committer(1, "Foo", "Bar"), new Date());
 
         assertFalse(commit1.equals(commit2));
         assertFalse(commit2.equals(commit1));

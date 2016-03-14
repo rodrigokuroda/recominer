@@ -90,9 +90,9 @@ public class BichoPairFileDAO {
 
     private final String COUNT_ISSUES_TYPES;
 
-    private final GenericBichoDAO dao;
+    private final JpaDao dao;
 
-    public BichoPairFileDAO(GenericBichoDAO dao, String repository, Integer maxFilePerCommit) {
+    public BichoPairFileDAO(JpaDao dao, String repository, Integer maxFilePerCommit) {
         this.dao = dao;
 
         if (repository == null

@@ -12,9 +12,10 @@ import java.util.Set;
  */
 public class Commit {
 
-    public static final String HEADER = Committer.HEADER + "numFiles;";
+    public static final String HEADER = "revision;numFiles;" + Committer.HEADER;
 
     private final Integer id;
+    private final String revision;
     private final Date commitDate;
     private final Committer committer;
     private final Issue issue;
@@ -22,30 +23,34 @@ public class Commit {
 
     public Commit(Integer id) {
         this.id = id;
+        this.revision = null;
         this.committer = null;
         this.commitDate = null;
         this.files = new HashSet<>();
         this.issue = null;
     }
 
-    public Commit(Integer id, Committer commiter, Date commitDate) {
+    public Commit(Integer id, String revision, Committer commiter, Date commitDate) {
         this.id = id;
         this.committer = commiter;
         this.commitDate = commitDate;
         this.files = new HashSet<>();
         this.issue = null;
+        this.revision = null;
     }
 
-    public Commit(Integer id, Committer commiter, Date commitDate, Set<File> files) {
+    public Commit(Integer id, String revision, Committer commiter, Date commitDate, Set<File> files) {
         this.id = id;
+        this.revision = revision;
         this.committer = commiter;
         this.commitDate = commitDate;
         this.files = files;
         this.issue = null;
     }
 
-    public Commit(Integer id, Committer commiter, Date commitDate, Issue issue, Set<File> files) {
+    public Commit(Integer id, String revision, Committer commiter, Date commitDate, Issue issue, Set<File> files) {
         this.id = id;
+        this.revision = revision;
         this.committer = commiter;
         this.commitDate = commitDate;
         this.files = files;
@@ -54,6 +59,10 @@ public class Commit {
 
     public Integer getId() {
         return id;
+    }
+
+    public String getRevision() {
+        return revision;
     }
 
     public Date getCommitDate() {
@@ -78,7 +87,9 @@ public class Commit {
 
     @Override
     public String toString() {
-        return committer.toString() + getNumberOfFiles() + ";";
+        return revision + ";"
+                + getNumberOfFiles() + ";"
+                + committer.toString();
     }
 
     @Override

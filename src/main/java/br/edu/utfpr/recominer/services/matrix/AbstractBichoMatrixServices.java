@@ -5,8 +5,8 @@ import br.edu.utfpr.recominer.dao.BichoFileDAO;
 import br.edu.utfpr.recominer.dao.BichoPairFileDAO;
 import br.edu.utfpr.recominer.dao.GenericBichoDAO;
 import br.edu.utfpr.recominer.dao.GenericDao;
-import br.edu.utfpr.recominer.metric.associationrule.AssociationRulePerformanceCalculator;
 import br.edu.utfpr.recominer.metric.associationrule.AssociationRuleExtractor;
+import br.edu.utfpr.recominer.metric.associationrule.AssociationRulePerformanceCalculator;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.FilePairApriori;
@@ -133,8 +133,8 @@ public abstract class AbstractBichoMatrixServices extends AbstractBichoServices 
                     filePairOutput.addCommitId(file1.getCommitId());
                     filePairOutput.addCommitId(file2.getCommitId());
                     // TODO refactor, replace CommitId with Commit
-                    final Commit commitFile1 = new Commit(file1.getCommitId(), null, null);
-                    final Commit commitFile2 = new Commit(file2.getCommitId(), null, null);
+                    final Commit commitFile1 = new Commit(file1.getCommitId());
+                    final Commit commitFile2 = new Commit(file2.getCommitId());
                     filePairOutput.addCommit(commitFile1);
                     filePairOutput.addCommit(commitFile2);
 
@@ -188,8 +188,8 @@ public abstract class AbstractBichoMatrixServices extends AbstractBichoServices 
                     filePairOutput.addCommitId(file1.getCommitId());
                     filePairOutput.addCommitId(file2.getCommitId());
                     // TODO refactor, replace CommitId with Commit
-                    final Commit commitFile1 = new Commit(file1.getCommitId(), null, null);
-                    final Commit commitFile2 = new Commit(file2.getCommitId(), null, null);
+                    final Commit commitFile1 = new Commit(file1.getCommitId());
+                    final Commit commitFile2 = new Commit(file2.getCommitId());
                     filePairOutput.addCommit(commitFile1);
                     filePairOutput.addCommit(commitFile2);
 

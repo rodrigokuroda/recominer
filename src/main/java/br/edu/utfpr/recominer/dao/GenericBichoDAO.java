@@ -15,7 +15,7 @@ import javax.persistence.criteria.Root;
 
 @Named
 @Dependent
-public class GenericBichoDAO implements Serializable {
+public class GenericBichoDAO implements Serializable, JpaDao {
 
     @Inject @Mysql
     private EntityManager em;

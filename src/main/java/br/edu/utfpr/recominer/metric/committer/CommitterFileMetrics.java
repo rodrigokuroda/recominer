@@ -12,6 +12,9 @@ public class CommitterFileMetrics {
     public final static String HEADER
             = "pv_ownership;" // baseado no commit
             + "pv_experience;" // baseado no code churn
+            + "pv_isMajorContributor;" // committer é principal colaborador do arquivo
+            + "pv_ownerExperience;" // experiencia do owner na versao anterior
+            + "sameOwnership;" // 1 = ownership da release é igual ao da release anterior
             ;
 
     private final Committer committer;

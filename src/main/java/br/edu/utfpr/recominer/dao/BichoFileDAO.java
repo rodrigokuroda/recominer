@@ -104,15 +104,15 @@ public class BichoFileDAO {
     private final String SELECT_COMMIT_AND_FILES_BY_FILENAME_AND_ISSUE;
     private final String FILTER_BY_ISSUE_ID;
 
-    private final GenericBichoDAO dao;
+    private final JpaDao dao;
     private final String BEGIN_SUM_ADD_AND_DEL_LINES;
     private final String END_SUM_ADD_AND_DEL_LINES;
 
-    public BichoFileDAO(GenericBichoDAO dao, String repository, Integer maxFilePerCommit) {
+    public BichoFileDAO(JpaDao dao, String repository, Integer maxFilePerCommit) {
         this(dao, repository, maxFilePerCommit, 0);
     }
 
-    public BichoFileDAO(GenericBichoDAO dao, String repository, Integer maxFilePerCommit, int numberOfLastIssues) {
+    public BichoFileDAO(JpaDao dao, String repository, Integer maxFilePerCommit, int numberOfLastIssues) {
         this.dao = dao;
         this.repository = repository;
 
@@ -1645,10 +1645,11 @@ public class BichoFileDAO {
             String committerName = (String) row[3];
             String committerEmail = (String) row[4];
             java.sql.Timestamp commitDate = (java.sql.Timestamp) row[5];
+            String revision = (String) row[5];
 
             Committer committer = new Committer(committerId, committerName, committerEmail);
 
-            Commit commit = new Commit(commitId, committer, new Date(commitDate.getTime()));
+            Commit commit = new Commit(commitId, revision, committer, new Date(commitDate.getTime()));
 
             if (commits.containsKey(commit)) {
                 commits.get(commit).getFiles().add(new File(fileName));

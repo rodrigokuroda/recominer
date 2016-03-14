@@ -1,8 +1,12 @@
 package br.edu.utfpr.recominer.metric.committer;
 
-import br.edu.utfpr.recominer.dao.BichoFileDAO;
+import br.edu.utfpr.recominer.batch.calculator.FileMetricDao;
 import br.edu.utfpr.recominer.model.CodeChurn;
 import br.edu.utfpr.recominer.model.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -10,10 +14,17 @@ import br.edu.utfpr.recominer.model.File;
  */
 public class CommitterFileMetricsCalculator {
 
-    private final BichoFileDAO bichoFileDAO;
+    private final FileMetricDao fileDao;
 
-    public CommitterFileMetricsCalculator(BichoFileDAO bichoFileDAO) {
-        this.bichoFileDAO = bichoFileDAO;
+    private final Set<Committer> majorContributorsInPreviousVersion;
+    private final Map<File, Double> ownerExperience;
+    private final Map<Committer, CommitterFileMetrics> committerFileMetricsList;
+
+    public CommitterFileMetricsCalculator(FileMetricDao fileDao) {
+        this.fileDao = fileDao;
+        this.committerFileMetricsList = new HashMap<>();
+        this.ownerExperience = new HashMap<>();
+        this.majorContributorsInPreviousVersion = new HashSet<>();
     }
 
 //    public CommitterFileMetrics calculeForCommit(File file, Commit commit, String fixVersion) {
@@ -40,7 +51,7 @@ public class CommitterFileMetricsCalculator {
 //
 //        return new CommitterFileMetrics(committer, file, ownership, experience);
 //    }
-    public CommitterFileMetrics calculeForVersion(File file, Committer committer, String fixVersion) {
+    public CommitterFileMetrics calculeForVersion(File file, Committer committer) {
         //
         // TODO limitacao: arquivo pelo nome, nao pelo id.
         // Pelo id, podemos considerar os arquivos quando renomeados/movidos.
@@ -48,51 +59,32 @@ public class CommitterFileMetricsCalculator {
         //
         // TODO melhorar usando id do committer
         //
-        final Long committerFileCommits = bichoFileDAO.calculeCommits(file.getFileName(), committer.getName(), fixVersion);
-        final Long fileCommits = bichoFileDAO.calculeCommits(file.getFileName(), fixVersion);
+        final Long committerFileCommits = fileDao.calculeCommits(file, committer);
+        final Long fileCommits = fileDao.calculeCommits(file);
 
         final double ownership = committerFileCommits.doubleValue() / fileCommits.doubleValue();
 
-        final CodeChurn committerFileCodeChurn = bichoFileDAO.sumCodeChurnByFilename(file.getFileName(), committer.getName(), fixVersion);
+        final CodeChurn committerFileCodeChurn = fileDao.calculeCodeChurn(file, committer);
         final Long committerFileChanges = committerFileCodeChurn.getChanges();
 
-        final CodeChurn fileCodeChurn = bichoFileDAO.sumCodeChurnByFilename(file.getFileName(), fixVersion);
+        final CodeChurn fileCodeChurn = fileDao.calculeCodeChurn(file);
         final Long fileChanges = fileCodeChurn.getChanges();
 
         double experience = committerFileChanges.doubleValue() / fileChanges.doubleValue();
 
-        return new CommitterFileMetrics(committer, file, ownership, experience);
-    }
+        if (ownerExperience.containsKey(file)) {
+            ownerExperience.put(file, Math.max(experience, ownerExperience.get(file)));
+        } else {
+            ownerExperience.put(file, experience);
+        }
 
-    public CommitterFileMetrics calculeForVersion(String file, Committer committer, String fixVersion) {
-        return calculeForVersion(new File(file), committer, fixVersion);
-    }
+        final CommitterFileMetrics committerFileMetrics = new CommitterFileMetrics(committer, file, ownership, experience);
 
-    public CommitterFileMetrics calculeForIndex(File file, Committer committer, Integer index, Integer quantity) {
-        //
-        // TODO limitacao: arquivo pelo nome, nao pelo id.
-        // Pelo id, podemos considerar os arquivos quando renomeados/movidos.
-        // Pensar em uma estrategia para lidar com isso.
-        //
-        // TODO melhorar usando id do committer
-        //
-        final Long committerFileCommits = bichoFileDAO.calculeCommits(file.getFileName(), committer.getName(), index, quantity);
-        final Long fileCommits = bichoFileDAO.calculeCommits(file.getFileName(), index, quantity);
+        committerFileMetricsList.put(committer, committerFileMetrics);
+        if (committerFileMetrics.getOwnership() > 0.05) { // maior que 5% = major
+            majorContributorsInPreviousVersion.add(committer);
+        }
 
-        final double ownership = committerFileCommits.doubleValue() / fileCommits.doubleValue();
-
-        final CodeChurn committerFileCodeChurn = bichoFileDAO.sumCodeChurnByFilename(file.getFileName(), committer.getName(), index, quantity);
-        final Long committerFileChanges = committerFileCodeChurn.getChanges();
-
-        final CodeChurn fileCodeChurn = bichoFileDAO.sumCodeChurnByFilename(file.getFileName(), index, quantity);
-        final Long fileChanges = fileCodeChurn.getChanges();
-
-        double experience = committerFileChanges.doubleValue() / fileChanges.doubleValue();
-
-        return new CommitterFileMetrics(committer, file, ownership, experience);
-    }
-
-    public CommitterFileMetrics calculeForIndex(String file, Committer committer, Integer index, Integer quantity) {
-        return calculeForIndex(new File(file), committer, index, quantity);
+        return committerFileMetrics;
     }
 }

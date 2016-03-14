@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.controller;
 
 import br.edu.utfpr.recominer.dao.GenericDao;
-import br.edu.utfpr.recominer.model.FileIssueMetrics;
+import br.edu.utfpr.recominer.model.ContextualMetrics;
 import br.edu.utfpr.recominer.model.matrix.EntityMatrix;
 import br.edu.utfpr.recominer.model.matrix.EntityMatrixNode;
 import br.edu.utfpr.recominer.model.metric.EntityMetric;
@@ -178,7 +178,7 @@ public class BichoMetricViewBean implements Serializable {
                     // skip empty files (i.e. having only the header)
                     continue;
                 } else {
-                    metric.getNodes().set(0, new EntityMetricNode(FileIssueMetrics.HEADER));
+                    metric.getNodes().set(0, new EntityMetricNode(ContextualMetrics.HEADER));
                 }
 
                 String path = createPath(metric);

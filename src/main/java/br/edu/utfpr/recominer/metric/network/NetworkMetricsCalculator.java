@@ -1,18 +1,14 @@
 package br.edu.utfpr.recominer.metric.network;
 
 import br.edu.utfpr.recominer.dao.BichoDAO;
-import br.edu.utfpr.recominer.metric.network.GlobalMeasure;
-import br.edu.utfpr.recominer.metric.network.GlobalMeasureCalculator;
-import br.edu.utfpr.recominer.util.DescriptiveStatisticsHelper;
-import br.edu.utfpr.recominer.model.Commenter;
-import br.edu.utfpr.recominer.metric.network.CommunicationNetworkBuilder;
-import br.edu.utfpr.recominer.metric.network.Network;
 import br.edu.utfpr.recominer.metric.network.centrality.BetweennessCalculator;
 import br.edu.utfpr.recominer.metric.network.centrality.ClosenessCalculator;
 import br.edu.utfpr.recominer.metric.network.centrality.DegreeCalculator;
+import br.edu.utfpr.recominer.model.Commenter;
+import br.edu.utfpr.recominer.model.Issue;
+import br.edu.utfpr.recominer.util.DescriptiveStatisticsHelper;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,9 +26,9 @@ public class NetworkMetricsCalculator {
         networkMetrics = calcule(issueGraph, edgesWeigth, devsCommentters);
     }
 
-    public NetworkMetricsCalculator(Integer issue, BichoDAO bichoDAO) {
+    public NetworkMetricsCalculator(Issue issue, BichoDAO bichoDAO) {
         final CommunicationNetworkBuilder builder = new CommunicationNetworkBuilder(bichoDAO);
-        final Network<String, String> network = builder.buildDirectedWeightedNetwork(issue);
+        final Network<String, String> network = builder.buildDirectedWeightedNetwork(issue.getId());
         networkMetrics = calcule(network.getNetwork(), network.getEdgesWeigth(), new HashSet<>(network.getCommenters()));
     }
 
