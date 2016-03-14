@@ -1,6 +1,8 @@
 package br.edu.utfpr.recominer.batch.calculator;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
+import br.edu.utfpr.recominer.dao.BichoDAO;
+import br.edu.utfpr.recominer.dao.BichoPairFileDAO;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.dao.QueryUtils;
@@ -17,6 +19,7 @@ import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.Issue;
 import br.edu.utfpr.recominer.model.IssueMetrics;
+import br.edu.utfpr.recominer.services.metric.Cacher;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -53,11 +56,11 @@ public class MetricProcessor implements ItemProcessor {
         final GenericDao dao = new GenericDao(factory.createEntityManager(properties));
 
         final int maxFilePerCommit = 20;
-//        final BichoDAO bichoDAO = new BichoDAO(dao, projectName, maxFilePerCommit);
+        final BichoDAO bichoDAO = new BichoDAO(dao, projectName, maxFilePerCommit);
         final FileMetricDao fileDao = new FileMetricInLastIssuesDao(dao, projectName);
-//        final BichoPairFileDAO bichoPairFileDAO = new BichoPairFileDAO(dao, projectName, maxFilePerCommit);
+        final BichoPairFileDAO bichoPairFileDAO = new BichoPairFileDAO(dao, projectName, maxFilePerCommit);
 
-        // final Cacher cacher = new Cacher(fileDao, bichoPairFileDAO);
+        final Cacher cacher = new Cacher(null, bichoPairFileDAO);
 
         final Set<FilePair> filePairs = new LinkedHashSet<>();
         // TODO which issues we will consider for train?
@@ -116,7 +119,7 @@ public class MetricProcessor implements ItemProcessor {
 
                 final IssueMetrics issueMetrics = cacher.calculeIssueMetrics(issue);
 
-                final Set<Commit> issueCommits = dao.selectFilesAndCommitByIssue(issue);
+                final Set<Commit> issueCommits = bichoDAO.selectFilesAndCommitByIssue(issue.getId());
 
                 for (Commit commitInIssue : issueCommits) {
                     final Set<File> filesInCommit = commitInIssue.getFiles();

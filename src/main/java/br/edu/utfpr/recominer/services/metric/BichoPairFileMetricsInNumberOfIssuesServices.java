@@ -22,7 +22,6 @@ import br.edu.utfpr.recominer.model.matrix.EntityMatrix;
 import br.edu.utfpr.recominer.model.matrix.EntityMatrixNode;
 import br.edu.utfpr.recominer.model.metric.EntityMetric;
 import br.edu.utfpr.recominer.services.matrix.BichoPairOfFileGroupingByNumberOfIssuesServices;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 import br.edu.utfpr.recominer.services.util.MatrixUtils;
 import br.edu.utfpr.recominer.util.OutLog;
 import java.util.Arrays;
@@ -32,13 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.BooleanUtils;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 
 /**
@@ -118,7 +110,7 @@ public class BichoPairFileMetricsInNumberOfIssuesServices extends AbstractBichoM
 
         System.out.println("Number of all pull requests: " + issuesSize);
 
-        CommitterFileMetricsCalculator committerFileMetricsCalculator = new CommitterFileMetricsCalculator(bichoFileDAO);
+        CommitterFileMetricsCalculator committerFileMetricsCalculator = new CommitterFileMetricsCalculator(null);
 
         final Set<Committer> majorContributorsInPreviousVersion = new HashSet<>();
         final Map<String, Double> ownerExperienceInPreviousVersionMap = new HashMap<>();
@@ -146,9 +138,9 @@ public class BichoPairFileMetricsInNumberOfIssuesServices extends AbstractBichoM
                 }
                 CommitterFileMetrics committerFileMetrics;
                 if (pastIndex >= 0) {
-                    committerFileMetrics
-                            = committerFileMetricsCalculator.calculeForIndex(
-                                    filename, committer, pastIndex, quantity);
+                    committerFileMetrics = null;
+//                            = committerFileMetricsCalculator.calculeForIndex(
+//                                    filename, committer, pastIndex, quantity);
                 } else {
                     committerFileMetrics = new EmptyCommitterFileMetrics();
                 }
@@ -222,7 +214,7 @@ public class BichoPairFileMetricsInNumberOfIssuesServices extends AbstractBichoM
                     if (!allFileChanges.contains(fileIssueMetrics)) {
                         // pair file network
                         final NetworkMetrics networkMetrics
-                                = new NetworkMetricsCalculator(issue, bichoDAO).getNetworkMetrics();
+                                = new NetworkMetricsCalculator(null, bichoDAO).getNetworkMetrics();
 
                         fileIssueMetrics.setNetworkMetrics(networkMetrics);
 
@@ -256,21 +248,21 @@ public class BichoPairFileMetricsInNumberOfIssuesServices extends AbstractBichoM
                         final int ageTotal = bichoFileDAO.calculeTotalFileAgeInDays(filename, issue);
                         final double ownerExperienceInPreviousVersion = ownerExperienceInPreviousVersionMap.get(filename);
 
-                        fileIssueMetrics.addMetrics(// majorContributors
-                                BooleanUtils.toInteger(majorContributorsInPreviousVersion.contains(commitInIssue.getCommitter())),
-                                // ownerExperience,
-                                ownerExperienceInPreviousVersion == Double.NaN ? 0.0d : ownerExperienceInPreviousVersion,
-                                // sameOwnership
-                                BooleanUtils.toInteger(sameOwnership),
-                                // committers, totalCommitters, commits, totalCommits,
-                                totalCommitters, totalCommits,
-                                // pairFileCodeChurn.getAdditionsNormalized(), pairFileCodeChurn.getDeletionsNormalized(), pairFileCodeChurn.getChanges()
-                                fileCodeChurn.getAdditionsNormalized(), fileCodeChurn.getDeletionsNormalized(), fileCodeChurn.getChanges(),
-                                // ageRelease, ageTotal
-                                ageRelease, ageTotal,
-                                // futureDefects, futureIssues
-                                numberOfFutureDefects, numberOfFutureIssues
-                        );
+//                        fileIssueMetrics.addMetrics(// majorContributors
+//                                BooleanUtils.toInteger(majorContributorsInPreviousVersion.contains(commitInIssue.getCommitter())),
+//                                // ownerExperience,
+//                                ownerExperienceInPreviousVersion == Double.NaN ? 0.0d : ownerExperienceInPreviousVersion,
+//                                // sameOwnership
+//                                BooleanUtils.toInteger(sameOwnership),
+//                                // committers, totalCommitters, commits, totalCommits,
+//                                totalCommitters, totalCommits,
+//                                // pairFileCodeChurn.getAdditionsNormalized(), pairFileCodeChurn.getDeletionsNormalized(), pairFileCodeChurn.getChanges()
+//                                fileCodeChurn.getAdditionsNormalized(), fileCodeChurn.getDeletionsNormalized(), fileCodeChurn.getChanges(),
+//                                // ageRelease, ageTotal
+//                                ageRelease, ageTotal,
+//                                // futureDefects, futureIssues
+//                                numberOfFutureDefects, numberOfFutureIssues
+//                        );
 
                         allFileChanges.add(fileIssueMetrics);
                     }

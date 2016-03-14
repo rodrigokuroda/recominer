@@ -14,8 +14,8 @@ import br.edu.utfpr.recominer.metric.network.NetworkMetricsCalculator;
 import br.edu.utfpr.recominer.model.CodeChurn;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.CommitMetrics;
-import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.ContextualMetrics;
+import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.IssueMetrics;
 import br.edu.utfpr.recominer.model.matrix.EntityMatrix;
@@ -33,14 +33,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.BooleanUtils;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 
 /**
  *
@@ -101,7 +93,7 @@ public class BichoPairFileMetricsInFixVersionServices extends AbstractBichoMetri
 
         final Set<FilePair> filePairs = getFilePairsFromMatrix(matrix.getNodes().get(0), matrixNodes, headerIndexesMap);
 
-        CommitterFileMetricsCalculator committerFileMetricsCalculator = new CommitterFileMetricsCalculator(bichoFileDAO);
+        CommitterFileMetricsCalculator committerFileMetricsCalculator = new CommitterFileMetricsCalculator(null);
 
         final Set<Committer> majorContributorsInPreviousVersion = new HashSet<>();
         final Map<String, Double> ownerExperience = new HashMap<>(filePairs.size());
@@ -118,7 +110,7 @@ public class BichoPairFileMetricsInFixVersionServices extends AbstractBichoMetri
                 if (pastMajorVersion != null) {
                     committerFileMetrics
                             = committerFileMetricsCalculator.calculeForVersion(
-                                    filename, committer, pastMajorVersion);
+                                    null, committer);
                 } else {
                     committerFileMetrics = new EmptyCommitterFileMetrics();
                 }
@@ -194,7 +186,7 @@ public class BichoPairFileMetricsInFixVersionServices extends AbstractBichoMetri
                     if (!allFileChanges.contains(fileIssueMetrics)) {
                         // pair file network
                         final NetworkMetrics networkMetrics
-                                = new NetworkMetricsCalculator(issue, bichoDAO).getNetworkMetrics();
+                                = new NetworkMetricsCalculator(null, bichoDAO).getNetworkMetrics();
 
                         fileIssueMetrics.setNetworkMetrics(networkMetrics);
 
@@ -227,22 +219,22 @@ public class BichoPairFileMetricsInFixVersionServices extends AbstractBichoMetri
                         // pair file cummulative age: from first commit until previous (past) release
                         final int ageTotal = bichoFileDAO.calculeTotalFileAgeInDays(filename, issue, fixVersion);
 
-                        fileIssueMetrics.addMetrics(
-                                // majorContributors
-                                BooleanUtils.toInteger(majorContributorsInPreviousVersion.contains(commitInIssue.getCommitter())),
-                                // ownerExperience,
-                                ownerExperience.get(filename),
-                                // sameOwnership
-                                BooleanUtils.toInteger(sameOwnership),
-                                // committers, totalCommitters, commits, totalCommits,
-                                totalCommitters, totalCommits,
-                                // pairFileCodeChurn.getAdditionsNormalized(), pairFileCodeChurn.getDeletionsNormalized(), pairFileCodeChurn.getChanges()
-                                fileCodeChurn.getAdditionsNormalized(), fileCodeChurn.getDeletionsNormalized(), fileCodeChurn.getChanges(),
-                                // ageRelease, ageTotal
-                                ageRelease, ageTotal,
-                                // futureDefects, futureIssues
-                                futureDefects, futureIssues
-                        );
+//                        fileIssueMetrics.addMetrics(
+//                                // majorContributors
+//                                BooleanUtils.toInteger(majorContributorsInPreviousVersion.contains(commitInIssue.getCommitter())),
+//                                // ownerExperience,
+//                                ownerExperience.get(filename),
+//                                // sameOwnership
+//                                BooleanUtils.toInteger(sameOwnership),
+//                                // committers, totalCommitters, commits, totalCommits,
+//                                totalCommitters, totalCommits,
+//                                // pairFileCodeChurn.getAdditionsNormalized(), pairFileCodeChurn.getDeletionsNormalized(), pairFileCodeChurn.getChanges()
+//                                fileCodeChurn.getAdditionsNormalized(), fileCodeChurn.getDeletionsNormalized(), fileCodeChurn.getChanges(),
+//                                // ageRelease, ageTotal
+//                                ageRelease, ageTotal,
+//                                // futureDefects, futureIssues
+//                                futureDefects, futureIssues
+//                        );
 
                         if (fileIssueMetrics.getChangedAfterReopened() == 1) {
                             System.out.println("changedAfterReopened = " + getRepository() + " " + getVersion() + " rank " + rank + " (" + matrix.toString() + ")");
