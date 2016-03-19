@@ -73,14 +73,14 @@ public class AggregatorProcessor implements ItemProcessor {
 
             daoIssues.selectAll(IssueScmlog.class).forEach(is -> issueAndCommitLinked.put(is, is));
 
-            final JiraAggregation jiraAggregation = new JiraAggregation(dao, project);
-            jiraAggregation.aggregate(commitsToAnalyze);
-
             if (project.getLastCommitDateAnalyzed() == null
                     && project.getLastIssueUpdateAnalyzed() == null) {
                 executeSqlScript(project, dao, OPTIMIZATION_DDL_SCRIPT_NAME);
             }
             executeSqlScript(project, dao, OPTIMIZATION_DML_SCRIPT_NAME);
+
+            final JiraAggregation jiraAggregation = new JiraAggregation(dao, project);
+            jiraAggregation.aggregate(commitsToAnalyze);
 
             java.sql.Timestamp lastIssueUpdate = (java.sql.Timestamp) dao.selectNativeOneWithParams("SELECT MAX(updated_on) FROM " + projectName + "_issues.issues", new Object[0]);
             // setting date of last commit analyzed

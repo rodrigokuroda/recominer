@@ -61,4 +61,15 @@
         </step>
         
     </flow>
+    
+    <!--flow id="metricFlow">
+        <step id="metricsStep" next="metricsCalculationStep">
+            <chunk item-count="1" checkpoint-policy="custom">
+                <reader ref="metricReader" />
+                <processor ref="metricProcessor" />
+                <writer ref="metricWriter" />
+                <checkpoint-algorithm ref="recominerCheckPoint" />
+            </chunk>
+        </step>
+    </flow-->
 </job>

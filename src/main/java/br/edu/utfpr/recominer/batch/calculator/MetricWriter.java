@@ -1,6 +1,5 @@
-package br.edu.utfpr.recominer.batch.apriori;
+package br.edu.utfpr.recominer.batch.calculator;
 
-import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
@@ -14,7 +13,7 @@ import javax.persistence.EntityManagerFactory;
  * @author Rodrigo T. Kuroda
  */
 @Named
-public class AprioriWriter extends AbstractItemWriter {
+public class MetricWriter extends AbstractItemWriter {
 
     @Inject
     private EntityManagerFactory factory;
@@ -26,11 +25,13 @@ public class AprioriWriter extends AbstractItemWriter {
 
     @Override
     public void writeItems(List<Object> items) throws Exception {
-        dao = new GenericDao(factory.createEntityManager());
-        for (Object item : items) {
-            final Project project = (Project) item;
-            dao.edit(item);
-        }
+//        dao = new GenericDao(factory.createEntityManager());
+//        for (Object item : items) {
+//            final Project project = (Project) item;
+//            dao.executeNativeQuery(
+//                    "UPDATE recominer.project SET last_apriori_update = ? WHERE id = ?",
+//                    new Object[]{project.getLastAprioriUpdate(), project.getId()});
+//        }
     }
 
 }

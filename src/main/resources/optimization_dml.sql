@@ -89,3 +89,22 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
    AND s.id NOT IN (SELECT commit_id FROM {0}.commits)
  {WHERE_SCMLOG}
  ORDER BY date ASC;
+
+-- denormalize absolute file path
+INSERT INTO {0}.files (fl_id, file_path, f_id, file_name)
+SELECT fill.id, fill.file_path, fil.id, fil.file_name
+ FROM {0}_vcs.files fil
+ JOIN {0}_vcs.file_links fill ON fill.file_id = fil.id 
+    AND fill.commit_id IN
+    (SELECT afill.commit_id
+       FROM {0}_vcs.file_links afill
+      WHERE afill.file_id = fil.id
+        AND afill.file_path LIKE CONCAT("%", fil.file_name));
+
+-- relationship between file and commit
+INSERT INTO {0}.files_commits (file_id, commit_id, change_type, branch_id, lines_added, lines_removed)
+SELECT distinct fil.id, a.commit_id, a.type, a.branch_id, filcl.added, filcl.removed
+  FROM {0}.files fil
+  JOIN {0}_vcs.actions a ON fil.id = a.file_id
+  JOIN {0}_vcs.commits_files_lines filcl ON filcl.commit = a.commit_id AND filcl.path = fil.file_path
+ ORDER BY a.commit_id;

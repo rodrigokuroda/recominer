@@ -85,7 +85,7 @@ public class AprioriProcessor implements ItemProcessor {
                         "INSERT INTO {0}.file_pair_apriori "
                         + " (file_pair_id, file_pair_issues, file1_issues, file2_issues, file1_support, file2_support, file_pair_support, file1_confidence, file2_confidence, updated_on) "
                         + " VALUES "
-                        + " (?, ?, ?, ? ?, ?, ?, ?, ?, ?)", projectName);
+                        + " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", projectName);
 
         final Date now = new Date();
         final Map<String, Long> fileIssues = new HashMap<>();

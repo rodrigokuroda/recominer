@@ -28,7 +28,7 @@ ALTER TABLE {0}_issues.issues ADD COLUMN fixed_on DATETIME;
 ALTER TABLE {0}_issues.issues ADD COLUMN updated_on DATETIME;
 
 -- Denormalize vcs schema
-CREATE SCHEMA IF NOT EXISTS {0};
+CREATE SCHEMA IF NOT EXISTS {0} CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE IF NOT EXISTS {0}.commits (
     commit_id INT(11), -- scmlog
@@ -50,6 +50,27 @@ CREATE TABLE IF NOT EXISTS {0}.commits (
     KEY action_type (action_type),
     KEY branch_id (branch_id),
     KEY file_id (file_id)
+);
+
+CREATE TABLE IF NOT EXISTS {0}.files (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    fl_id INT(11) NOT NULL,
+    file_path VARCHAR(4096) NOT NULL,
+    f_id INT(11) NOT NULL,
+    file_name VARCHAR(4096) NOT NULL,
+    PRIMARY KEY id (id),
+    KEY f_id (f_id),
+    KEY fl_id (fl_id)
+);
+
+CREATE TABLE IF NOT EXISTS {0}.files_commits (
+    file_id INT(11) NOT NULL,
+    commit_id INT(11) NOT NULL,
+    change_type VARCHAR(1) NOT NULL,
+    branch_id INT(11) NOT NULL,
+    lines_added INT(11) NOT NULL,
+    lines_removed INT(11) NOT NULL,
+    PRIMARY KEY file_commit_id (file_id, commit_id)
 );
 
 CREATE TABLE IF NOT EXISTS {0}.file_pairs (
@@ -99,4 +120,17 @@ CREATE TABLE IF NOT EXISTS {0}.file_pair_apriori (
     file2_confidence DOUBLE NOT NULL,
     updated_on DATETIME,
     PRIMARY KEY id (file_pair_id)
+);
+
+CREATE TABLE IF NOT EXISTS {0}.issue_commit_historical (
+    issue_id INT(11), -- issue
+    commit_id INT(11), -- scmlog
+    date DATETIME, -- scmlog
+    rev VARCHAR(40), -- scmlog
+    num_comments INT(11), 
+    num_commenters INT(11), 
+    num_dev_commenters INT(11), 
+    reopened_times INT(11), 
+    KEY commit_id (commit_id),
+    KEY date (date)
 );

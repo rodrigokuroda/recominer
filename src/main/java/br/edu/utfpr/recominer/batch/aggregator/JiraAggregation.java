@@ -66,10 +66,10 @@ public class JiraAggregation {
 
                 String issueKey = matcher.group().replace(" ", ""); // e.g.: ARIES-1234
 
-                Matcher matcherNumber = regexNumber.matcher(issueKey);
-                if (matcherNumber.find()) {
-                    issueKey = matcherNumber.group(); // e.g.: 1234
-                }
+//                Matcher matcherNumber = regexNumber.matcher(issueKey);
+//                if (matcherNumber.find()) {
+//                    issueKey = matcherNumber.group(); // e.g.: 1234
+//                }
 
                 final Object[] issueIdAndFixVersions = (Object[]) dao.selectNativeOneWithParams(selectIssueIdAndFixVersions, new Object[]{issueKey.toUpperCase()});
 

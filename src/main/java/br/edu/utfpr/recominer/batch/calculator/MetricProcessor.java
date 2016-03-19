@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +37,7 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
  *
  * @author Rodrigo T. Kuroda
  */
+@Named
 public class MetricProcessor implements ItemProcessor {
 
     private final Logger log = LogManager.getLogger();
@@ -66,7 +68,7 @@ public class MetricProcessor implements ItemProcessor {
         // TODO which issues we will consider for train?
         final String selectFilePairs = QueryUtils.getQueryForDatabase(
                 "SELECT file_pair_id, file1_id, file2_id, file1_path, file2_path "
-                + "  FROM {0}.file_pair fp "
+                + "  FROM {0}.file_pairs fp "
                 + "  JOIN {0}.file_pair_apriori fpa ON fpa.file_pair_id = fp.id "
                 + " WHERE (fpa.file1_issues > 1 OR fpa.file2_issues > 1) "
                 + "   AND (fpa.file1_confidence > 0.5 OR fpa.file2_confidence > 0.5) ",
