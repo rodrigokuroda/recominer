@@ -105,6 +105,6 @@ SELECT fill.id, fill.file_path, fil.id, fil.file_name
 INSERT INTO {0}.files_commits (file_id, commit_id, change_type, branch_id, lines_added, lines_removed)
 SELECT distinct fil.id, a.commit_id, a.type, a.branch_id, filcl.added, filcl.removed
   FROM {0}.files fil
-  JOIN {0}_vcs.actions a ON fil.id = a.file_id
+  JOIN {0}_vcs.actions a ON fil.f_id = a.file_id
   JOIN {0}_vcs.commits_files_lines filcl ON filcl.commit = a.commit_id AND filcl.path = fil.file_path
  ORDER BY a.commit_id;

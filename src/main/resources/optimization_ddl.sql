@@ -115,6 +115,8 @@ CREATE TABLE IF NOT EXISTS {0}.file_pair_apriori (
     file_pair_issues INTEGER NOT NULL,
     file1_support DOUBLE NOT NULL,
     file2_support DOUBLE NOT NULL,
+    file1_issues INTEGER NOT NULL,
+    file2_issues INTEGER NOT NULL,
     file_pair_support DOUBLE NOT NULL,
     file1_confidence DOUBLE NOT NULL,
     file2_confidence DOUBLE NOT NULL,
