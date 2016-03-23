@@ -126,20 +126,20 @@ public class FileDao {
             FROM_TABLE
                     = "  FROM {0}_issues.issues i"
                     + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                    + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                    + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                     + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                     // removed because its a one to many relationship, causing duplicated rows, for exameple to sum code churn
-                    // replaced with "AND EXISTS (SELECT 1 FROM {0}_issues.issues_fix_version ifv WHERE ifv.issue_id = i.id)"
-                    //+ "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
+                    // replaced with "AND EXISTS (SELECT 1 FROM {0}.issues_fix_version ifv WHERE ifv.issue_id = i.id)"
+                    //+ "  JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
                     + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id";
         } else {
             FROM_TABLE
                     = "  FROM {0}_issues.issues i"
                     + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                    + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                    + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                     + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                     // removed because its a one to many relationship, causing duplicated rows, for exameple to sum code churn
-                    //+ "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
+                    //+ "  JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
                     + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                     + "  JOIN "
                     + " (SELECT ita.issue_id "
@@ -153,7 +153,7 @@ public class FileDao {
         WHERE = " WHERE com.file_path = ?"
                 + "   AND com.date > i.submitted_on"
                 + "   AND com.date < i.fixed_on"
-                + "   AND EXISTS (SELECT 1 FROM {0}_issues.issues_fix_version ifv WHERE ifv.issue_id = i.id)"
+                + "   AND EXISTS (SELECT 1 FROM {0}.issues_fix_version ifv WHERE ifv.issue_id = i.id)"
                 + FIXED_ISSUES_ONLY;
 
         FILTER_BY_ISSUE
@@ -167,7 +167,7 @@ public class FileDao {
                 = QueryUtils.getQueryForDatabase(
                         " AND i.id IN ("
                         + " SELECT ifv.issue_id "
-                        + "   FROM {0}_issues.issues_fix_version ifv "
+                        + "   FROM {0}.issues_fix_version ifv "
                         + "  WHERE ifv.major_fix_version = ?)", repository);
 
         // avoid join, because has poor performance in this case
@@ -175,13 +175,13 @@ public class FileDao {
                 = QueryUtils.getQueryForDatabase(
                         " AND i.id IN ("
                         + " SELECT ifv.issue_id "
-                        + "   FROM {0}_issues.issues_fix_version ifv "
+                        + "   FROM {0}.issues_fix_version ifv "
                         + "  WHERE ifv.major_fix_version IN ("
                         + "SELECT ifvo.major_fix_version"
-                        + "  FROM {0}_issues.issues_fix_version_order ifvo"
+                        + "  FROM {0}.issues_fix_version_order ifvo"
                         + " WHERE ifvo.version_order <= " // inclusive
                         + "(SELECT MAX(ifvo2.version_order)"
-                        + "   FROM {0}_issues.issues_fix_version_order ifvo2"
+                        + "   FROM {0}.issues_fix_version_order ifvo2"
                         + "  WHERE ifvo2.major_fix_version = ?)))", repository);
 
         // avoid join, because has poor performance in this case
@@ -189,13 +189,13 @@ public class FileDao {
                 = QueryUtils.getQueryForDatabase(
                         " AND i.id IN ("
                         + " SELECT ifv.issue_id "
-                        + "   FROM {0}_issues.issues_fix_version ifv "
+                        + "   FROM {0}.issues_fix_version ifv "
                         + "  WHERE ifv.major_fix_version IN ("
                         + "SELECT ifvo.major_fix_version"
-                        + "  FROM {0}_issues.issues_fix_version_order ifvo"
+                        + "  FROM {0}.issues_fix_version_order ifvo"
                         + " WHERE ifvo.version_order < " // exclusive
                         + "(SELECT MIN(ifvo2.version_order)"
-                        + "   FROM {0}_issues.issues_fix_version_order ifvo2"
+                        + "   FROM {0}.issues_fix_version_order ifvo2"
                         + "  WHERE ifvo2.major_fix_version = ?)))", repository);
 
         FILTER_BY_BEFORE_ISSUE_FIX_DATE_OF_ISSUE_ID
@@ -409,7 +409,7 @@ public class FileDao {
                 + " (SELECT DISTINCT i2.id "
                 + "    FROM {0}_issues.issues i2 "
                 + "    JOIN {0}_issues.changes c2 ON c2.issue_id = i2.id"
-                + "    JOIN {0}_issues.issues_scmlog i2s2 ON i2s2.issue_id = i2.id"
+                + "    JOIN {0}.issues_scmlog i2s2 ON i2s2.issue_id = i2.id"
                 + "    JOIN {0}_vcs.scmlog s2 ON s2.id = i2s2.scmlog_id"
                 + "    JOIN {0}.commits com2 ON com2.commit_id = i2s2.scmlog_id"
                 + "   WHERE i2.fixed_on IS NOT NULL"
@@ -422,7 +422,7 @@ public class FileDao {
                 + "     AND s2.num_files > 0 "
                 + "     AND (com2.file_path LIKE \"%.java\" OR com2.file_path LIKE \"%.xml\") "
                 + "     AND (com2.file_path NOT LIKE \"%Test.java\" OR com2.file_path NOT LIKE \"%_test.java\") "
-                + "     AND EXISTS (SELECT 1 FROM {0}_issues.issues_fix_version ifv2 WHERE ifv2.issue_id = i2.id)"
+                + "     AND EXISTS (SELECT 1 FROM {0}.issues_fix_version ifv2 WHERE ifv2.issue_id = i2.id)"
                 + "   ORDER BY i2.fixed_on "
                 + "   LIMIT ? OFFSET ?) AS i3 ON i3.id = i.id";
 

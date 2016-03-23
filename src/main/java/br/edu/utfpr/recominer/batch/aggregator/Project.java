@@ -29,7 +29,7 @@ public class Project implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @NotNull
     @Size(min = 1, max = 255)
@@ -84,11 +84,11 @@ public class Project implements Serializable {
     public Project() {
     }
 
-    public Project(Long id) {
+    public Project(Integer id) {
         this.id = id;
     }
 
-    public Project(Long id, String projectName, String issueTrackerUrl, IssueTracker issueTrackerSystem, String versionControlUrl) {
+    public Project(Integer id, String projectName, String issueTrackerUrl, IssueTracker issueTrackerSystem, String versionControlUrl) {
         this.id = id;
         this.projectName = projectName;
         this.issueTrackerUrl = issueTrackerUrl;
@@ -96,11 +96,43 @@ public class Project implements Serializable {
         this.versionControlUrl = versionControlUrl;
     }
 
-    public Long getId() {
+    /**
+     * "SELECT id,"
+                    + "    issue_tracker_url,"
+                    + "    last_its_update,"
+                    + "    last_vcs_update,"
+                    + "    project_name,"
+                    + "    repository_path,"
+                    + "    version_control_url,"
+                    + "    issue_tracker,"
+                    + "    version_control,"
+                    + "    last_commit_date_analyzed,"
+                    + "    last_issue_update_analyzed,"
+                    + "    last_issue_update_analyzed_for_cochange,"
+                    + "    last_apriori_update"
+     * @param rawProject 
+     */
+    public Project(Object[] rawProject) {
+        id = (Integer) rawProject[0];
+        issueTrackerUrl = (String) rawProject[1];
+        lastItsUpdate = (Date) rawProject[2];
+        lastVcsUpdate = (Date) rawProject[3];
+        projectName = (String) rawProject[4];
+        repositoryPath = (String) rawProject[5];
+        versionControlUrl = (String) rawProject[6];
+        issueTracker = new IssueTracker((Integer) rawProject[7]);
+        versionControl = new VersionControl((Integer) rawProject[8]);
+        lastCommitDateAnalyzed = (Date) rawProject[9];
+        lastIssueUpdateAnalyzed = (Date) rawProject[10];
+        lastIssueUpdateAnalyzedForCochange = (Date) rawProject[11];
+        lastAprioriUpdate = (Date) rawProject[12];
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -24,7 +24,7 @@ public class VersionControl implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
     
     @Column(name = "username")
     private String username;
@@ -35,11 +35,15 @@ public class VersionControl implements Serializable {
     @OneToMany(mappedBy = "versionControl", cascade = CascadeType.ALL)
     private List<Project> project;
 
-    public Long getId() {
+    public VersionControl(final Integer id) {
+        this.id = id;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

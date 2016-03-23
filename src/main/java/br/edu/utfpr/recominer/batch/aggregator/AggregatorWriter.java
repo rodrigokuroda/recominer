@@ -1,7 +1,9 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
 import br.edu.utfpr.recominer.dao.GenericDao;
+import br.edu.utfpr.recominer.dao.RecominerDao;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
 import javax.batch.runtime.context.JobContext;
@@ -25,7 +27,12 @@ public class AggregatorWriter extends AbstractItemWriter {
     @Override
     public void writeItems(List<Object> items) throws Exception {
         final GenericDao dao = new GenericDao(factory.createEntityManager());
-        items.stream().forEach(dao::edit);
+        final RecominerDao recominerDao = new RecominerDao(dao);
+        for (Object item : items) {
+            final Project project = (Project) item;
+            project.setLastItsUpdate(new Date());
+            recominerDao.updateProjectUpdate(project);
+        }
     }
 
     @Override

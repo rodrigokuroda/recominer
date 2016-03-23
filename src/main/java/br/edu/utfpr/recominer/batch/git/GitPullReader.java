@@ -2,8 +2,8 @@ package br.edu.utfpr.recominer.batch.git;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.GenericDao;
+import br.edu.utfpr.recominer.dao.RecominerDao;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -24,7 +24,7 @@ public class GitPullReader extends AbstractItemReader {
 
     @Inject
     private EntityManagerFactory factory;
-    
+
     @Inject
     private JobContext jobContext;
 
@@ -33,17 +33,11 @@ public class GitPullReader extends AbstractItemReader {
     @Override
     public void open(Serializable checkpoint) throws Exception {
         final GenericDao dao = new GenericDao(factory.createEntityManager());
-        
+        final RecominerDao recominerDao = new RecominerDao(dao);
+
         // reads all VCS' projects available (database schemas)
-        final List<Project> projects;
-        final Object projectIdParameter = getParameters().get("project");
-        if (projectIdParameter != null) {
-            final Long projectId = Long.valueOf(projectIdParameter.toString());
-            projects = new ArrayList<>();
-            projects.add(dao.findByID(projectId, Project.class));
-        } else {
-            projects = dao.selectAll(Project.class);
-        }
+        final Integer projectId = Integer.valueOf(getParameters().get("project").toString());
+        final List<Project> projects = recominerDao.selectProject(projectId);
         
         iterator = projects.listIterator();
     }

@@ -23,26 +23,28 @@ public class EntityManagerProducer {
     @PersistenceUnit(unitName = "mysql")
     @Produces
     @Mysql
+    @Default
     private EntityManagerFactory mysqlFactory;
     
-    @PersistenceUnit(unitName = "postgresql")
-    @Produces
-    @Default
-    @Postgresql
-    private EntityManagerFactory postgresqlFactory;
+//    @PersistenceUnit(unitName = "postgresql")
+//    @Produces
+//    @Default
+//    @Postgresql
+//    private EntityManagerFactory postgresqlFactory;
 
     @Produces
     @Mysql
+    @Default
     public EntityManager createMysqlEntityManager() {
         return mysqlFactory.createEntityManager();
     }
     
-    @Produces
-    @Postgresql
-    @Default
-    public EntityManager createPostgresqlEntityManager() {
-        return postgresqlFactory.createEntityManager();
-    }
+//    @Produces
+//    @Postgresql
+//    @Default
+//    public EntityManager createPostgresqlEntityManager() {
+//        return postgresqlFactory.createEntityManager();
+//    }
 
 //    @Produces
 //    @Mysql

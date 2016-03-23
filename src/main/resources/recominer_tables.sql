@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS {0}_issues.issues_scmlog (
+CREATE TABLE IF NOT EXISTS {0}.issues_scmlog (
     id int(11) NOT NULL AUTO_INCREMENT,
     issue_id int(11) NOT NULL,
     scmlog_id int(11) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS {0}_issues.issues_scmlog (
     KEY scmlog_id (scmlog_id)
 );
 
-CREATE TABLE IF NOT EXISTS {0}_issues.issues_fix_version (
+CREATE TABLE IF NOT EXISTS {0}.issues_fix_version (
     issue_id int(11) NOT NULL,
     fix_version varchar(255) NOT NULL,
     minor_fix_version varchar(255) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS {0}_issues.issues_fix_version (
     KEY major_fix_version (major_fix_version)
 );
 
-CREATE TABLE IF NOT EXISTS {0}_issues.issues_fix_version_order(
+CREATE TABLE IF NOT EXISTS {0}.issues_fix_version_order(
     minor_fix_version varchar(255) NOT NULL,
     major_fix_version varchar(255) NOT NULL,
     version_order int(11) NOT NULL,

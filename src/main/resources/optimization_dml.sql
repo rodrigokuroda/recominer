@@ -85,7 +85,7 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
            AND afill.file_id = fil.id
            AND afill.file_path LIKE CONCAT("%", fil.file_name))
   JOIN {0}_vcs.commits_files_lines filcl ON filcl.commit = s.id AND filcl.path = fill.file_path
- WHERE s.id IN (SELECT scmlog_id FROM {0}_issues.issues_scmlog)
+ WHERE s.id IN (SELECT scmlog_id FROM {0}.issues_scmlog)
    AND s.id NOT IN (SELECT commit_id FROM {0}.commits)
  {WHERE_SCMLOG}
  ORDER BY date ASC;

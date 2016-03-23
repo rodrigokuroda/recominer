@@ -90,7 +90,7 @@ public class BichoUserCommentedSamePairOfFileInDateServices extends AbstractBich
 
         String selectFixedIssues
                 = QueryUtils.getQueryForDatabase("SELECT i.id, s.id"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + " WHERE s.num_files <= " + getMaxFilesPerCommit(), getRepository());

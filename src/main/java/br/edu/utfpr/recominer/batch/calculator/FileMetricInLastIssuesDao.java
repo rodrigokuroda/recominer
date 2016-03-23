@@ -44,7 +44,7 @@ public class FileMetricInLastIssuesDao implements FileMetricDao {
 
         from = "  FROM {0}_issues.issues i"
                 + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                 + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id";
 
         joinPeopleCommitters = "  JOIN {0}_vcs.people p ON p.id = s.committer_id";
@@ -57,7 +57,7 @@ public class FileMetricInLastIssuesDao implements FileMetricDao {
         where = " WHERE com.file_path = ?"
                 + "   AND com.date > i.submitted_on"
                 + "   AND com.date < i.fixed_on"
-                + "   AND EXISTS (SELECT 1 FROM {0}_issues.issues_fix_version ifv WHERE ifv.issue_id = i.id)"
+                + "   AND EXISTS (SELECT 1 FROM {0}.issues_fix_version ifv WHERE ifv.issue_id = i.id)"
                 + fixedIssueOnly;
 
         orderByCommitDate = " ORDER BY com.date ASC";
@@ -89,7 +89,7 @@ public class FileMetricInLastIssuesDao implements FileMetricDao {
                         "SELECT DISTINCT com.commit_id, com.file_path, p.id, p.name, p.email, com.date. s.rev"
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                        + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_vcs.people p ON p.id = com.committer_id"

@@ -52,7 +52,7 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         // Select all issues' (previously cleaned) commits that should have been
         // commited between issue submit date and issue fix date.
         final String selectIssuesAndCommits
-                = "SELECT issue_id, scmlog_id FROM {0}_issues.issues_scmlog i2s "
+                = "SELECT issue_id, scmlog_id FROM {0}.issues_scmlog i2s "
                 + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
                 + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
                 + " WHERE i.fixed_on IS NOT NULL"

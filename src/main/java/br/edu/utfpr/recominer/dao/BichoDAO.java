@@ -97,7 +97,7 @@ public class BichoDAO {
                 = QueryUtils.getQueryForDatabase(
                         " AND i.id IN ("
                         + " SELECT ifv.issue_id "
-                        + "   FROM {0}_issues.issues_fix_version ifv "
+                        + "   FROM {0}.issues_fix_version ifv "
                         + "  WHERE ifv.major_fix_version = ?)", repository);
 
         FILTER_BY_ISSUE_FIX_DATE
@@ -121,7 +121,7 @@ public class BichoDAO {
                 = " ORDER BY com.date ASC";
 
         COUNT_FILES_PER_COMMITS = QueryUtils.getQueryForDatabase("SELECT s.id, s.num_files"
-                + "  FROM {0}_issues.issues_scmlog i2s"
+                + "  FROM {0}.issues_scmlog i2s"
                 + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                 + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                 + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
@@ -137,9 +137,9 @@ public class BichoDAO {
                 + " (SELECT DISTINCT i2.id "
                 + "    FROM {0}_issues.issues i2 "
                 + "    JOIN {0}_issues.changes c2 ON c2.issue_id = i2.id"
-                + "    JOIN {0}_issues.issues_scmlog i2s2 ON i2s2.issue_id = i2.id"
+                + "    JOIN {0}.issues_scmlog i2s2 ON i2s2.issue_id = i2.id"
                 + "    JOIN {0}_vcs.scmlog s2 ON s2.id = i2s2.scmlog_id"
-                + "    JOIN {0}_issues.issues_fix_version ifv2 ON ifv2.issue_id = i2s2.issue_id"
+                + "    JOIN {0}.issues_fix_version ifv2 ON ifv2.issue_id = i2s2.issue_id"
                 + "    JOIN {0}.commits com2 ON com2.commit_id = i2s2.scmlog_id"
                 + "   WHERE i2.fixed_on IS NOT NULL"
                 + "     AND s2.date > i2.submitted_on"
@@ -154,7 +154,7 @@ public class BichoDAO {
 
         SELECT_ALL_FIXED_ISSUES
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
@@ -167,7 +167,7 @@ public class BichoDAO {
 
         COUNT_ALL_FIXED_ISSUES
                 = QueryUtils.getQueryForDatabase("SELECT COUNT(DISTINCT(i.id))"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
@@ -183,7 +183,7 @@ public class BichoDAO {
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT(i.id) "
                         + "    FROM {0}_issues.issues i "
                         + "    JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                        + "    JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "    JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "    JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + ISSUE_BY_LIMIT_OFFSET_ORDER_BY_FIX_DATE
                         + " WHERE s.date > i.submitted_on"
@@ -195,7 +195,7 @@ public class BichoDAO {
 
         SELECT_ISSUES_BY_FIXED_DATE
                 = QueryUtils.getQueryForDatabase("SELECT i.id, s.id"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
@@ -208,7 +208,7 @@ public class BichoDAO {
 
         SELECT_ISSUES_AND_TYPE_BY_FIXED_DATE
                 = QueryUtils.getQueryForDatabase("SELECT i.id, i.type, s.id"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
@@ -223,10 +223,10 @@ public class BichoDAO {
 
         SELECT_ISSUES_AND_TYPE
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
-                        + "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
+                        + "  JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + " WHERE s.date > i.submitted_on"
@@ -238,11 +238,11 @@ public class BichoDAO {
 
         SELECT_ISSUES_AND_TYPE_LAST_N_MONTH
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         // considera apenas as issues com fixed version
-                        + "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
+                        + "  JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + " WHERE s.date > i.submitted_on"
@@ -259,11 +259,11 @@ public class BichoDAO {
 
         SELECT_ISSUES_AND_TYPE_LAST_N_DAYS
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         // considera apenas as issues com fixed version
-                        + "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
+                        + "  JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + " WHERE s.date > i.submitted_on"
@@ -280,11 +280,11 @@ public class BichoDAO {
 
         SELECT_ISSUES_AND_TYPE_LAST_N_ISSUES
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
                         // considera apenas as issues com fixed version
-                        + "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
+                        + "  JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + INNER_JOIN_LAST_N_ISSUES
@@ -297,9 +297,9 @@ public class BichoDAO {
 
         SELECT_ISSUES_AND_TYPE_BY_FIXED_MAJOR_VERSION
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT i.id, i.type, i.fixed_on, s.id, s.date, s.rev"
-                        + "  FROM {0}_issues.issues_scmlog i2s"
+                        + "  FROM {0}.issues_scmlog i2s"
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id"
-                        + "  JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
+                        + "  JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + " WHERE ifv.major_fix_version = ?"
@@ -327,7 +327,7 @@ public class BichoDAO {
         SELECT_FIX_VERSION_ORDERED
                 = QueryUtils.getQueryForDatabase(
                         "SELECT ifvo.major_fix_version"
-                        + " FROM {0}_issues.issues_fix_version_order ifvo"
+                        + " FROM {0}.issues_fix_version_order ifvo"
                         + " ORDER BY ifvo.version_order", repository);
 
         COUNT_ISSUES_TYPES_BEGIN
@@ -346,9 +346,9 @@ public class BichoDAO {
                         "SELECT COUNT(DISTINCT(i.id))"
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                        + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
-                        + "  JOIN {0}_issues.issues_scmlog i2s2 ON i2s2.issue_id = i.id"
+                        + "  JOIN {0}.issues_scmlog i2s2 ON i2s2.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s2 ON s2.id = i2s2.scmlog_id"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}.commits com2 ON com2.commit_id = i2s2.scmlog_id AND com.file_id <> com2.file_id"
@@ -365,7 +365,7 @@ public class BichoDAO {
                         "SELECT DISTINCT com.commit_id, com.file_path, p.id, p.name, p.email, com.date. s.rev"
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                        + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "  JOIN {0}_vcs.people p ON p.id = com.committer_id"
@@ -379,19 +379,19 @@ public class BichoDAO {
         SELECT_PAST_MAJOR_VERSION
                 = QueryUtils.getQueryForDatabase(
                         "SELECT ifvo.major_fix_version"
-                        + "  FROM {0}_issues.issues_fix_version_order ifvo"
+                        + "  FROM {0}.issues_fix_version_order ifvo"
                         + " WHERE ifvo.version_order = "
                         + "((SELECT MIN(ifvo2.version_order)"
-                        + "   FROM {0}_issues.issues_fix_version_order ifvo2"
+                        + "   FROM {0}.issues_fix_version_order ifvo2"
                         + "  WHERE ifvo2.major_fix_version = ?) - 1)", repository);
 
         SELECT_FUTURE_MAJOR_VERSION
                 = QueryUtils.getQueryForDatabase(
                         "SELECT ifvo.major_fix_version"
-                        + "  FROM {0}_issues.issues_fix_version_order ifvo"
+                        + "  FROM {0}.issues_fix_version_order ifvo"
                         + " WHERE ifvo.version_order = "
                         + "((SELECT MAX(ifvo2.version_order)"
-                        + "   FROM {0}_issues.issues_fix_version_order ifvo2"
+                        + "   FROM {0}.issues_fix_version_order ifvo2"
                         + "  WHERE ifvo2.major_fix_version = ?) + 1)", repository);
 
         SELECT_ISSUE_REOPENED_AND_FIXED_DATE
@@ -416,10 +416,10 @@ public class BichoDAO {
                 = QueryUtils.getQueryForDatabase(
                         "SELECT distinct i.id, i.type, s.id, s.date "
                         + " FROM "
-                        + "        {0}_issues.issues_scmlog i2s "
+                        + "        {0}.issues_scmlog i2s "
                         + "    JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id "
                         + "    JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
-                        + "    JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id "
+                        + "    JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id "
                         + "    JOIN {0}_issues.changes c ON c.issue_id = i.id "
                         + "    JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
                         + INNER_JOIN_LAST_N_ISSUES
@@ -437,9 +437,9 @@ public class BichoDAO {
                         + "          SELECT 1 FROM "
                         + "                 {0}_issues.issues i2 "
                         + "            JOIN {0}_issues.changes c2 ON c2.issue_id = i2.id "
-                        + "            JOIN {0}_issues.issues_scmlog i2s2 ON i2s2.issue_id = i2.id "
+                        + "            JOIN {0}.issues_scmlog i2s2 ON i2s2.issue_id = i2.id "
                         + "            JOIN {0}_vcs.scmlog s2 ON s2.id = i2s2.scmlog_id "
-                        + "            JOIN {0}_issues.issues_fix_version ifv2 ON ifv2.issue_id = i2s2.issue_id "
+                        + "            JOIN {0}.issues_fix_version ifv2 ON ifv2.issue_id = i2s2.issue_id "
                         + "            JOIN {0}.commits com2 ON com2.commit_id = i2s2.scmlog_id "
                         + "           WHERE i2.id = i.id "
                         + "             AND com2.file_path = ?)"
@@ -449,10 +449,10 @@ public class BichoDAO {
                 = QueryUtils.getQueryForDatabase(
                         "SELECT  "
                         + "    com.file_path, count(distinct(i.id))"
-                        + "FROM {0}_issues.issues_scmlog i2s "
+                        + "FROM {0}.issues_scmlog i2s "
                         + "    JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id "
                         + "    JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
-                        + "    JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id "
+                        + "    JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i2s.issue_id "
                         + "    JOIN {0}_issues.changes c ON c.issue_id = i.id "
                         + "    JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
                         + "    INNER JOIN "
@@ -461,9 +461,9 @@ public class BichoDAO {
                         + "    FROM "
                         + "        {0}_issues.issues i2 "
                         + "    JOIN {0}_issues.changes c2 ON c2.issue_id = i2.id "
-                        + "    JOIN {0}_issues.issues_scmlog i2s2 ON i2s2.issue_id = i2.id "
+                        + "    JOIN {0}.issues_scmlog i2s2 ON i2s2.issue_id = i2.id "
                         + "    JOIN {0}_vcs.scmlog s2 ON s2.id = i2s2.scmlog_id "
-                        + "    JOIN {0}_issues.issues_fix_version ifv2 ON ifv2.issue_id = i2s2.issue_id "
+                        + "    JOIN {0}.issues_fix_version ifv2 ON ifv2.issue_id = i2s2.issue_id "
                         + "    JOIN {0}.commits com2 ON com2.commit_id = i2s2.scmlog_id "
                         + "    WHERE "
                         + "        i2.fixed_on IS NOT NULL "

@@ -2,6 +2,7 @@ package br.edu.utfpr.recominer.batch.bicho;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.GenericDao;
+import br.edu.utfpr.recominer.dao.RecominerDao;
 import java.util.Date;
 import java.util.List;
 import javax.batch.api.chunk.AbstractItemWriter;
@@ -28,10 +29,11 @@ public class BichoWriter extends AbstractItemWriter {
     @Override
     public void writeItems(List<Object> items) throws Exception {
         dao = new GenericDao(factory.createEntityManager());
+        final RecominerDao recominerDao = new RecominerDao(dao);
         for (Object item : items) {
             final Project project = (Project) item;
             project.setLastItsUpdate(new Date());
-            dao.edit(project);
+            recominerDao.updateProjectUpdate(project);
         }
     }
 

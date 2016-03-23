@@ -136,8 +136,9 @@ public class AggregatorProcessor implements ItemProcessor {
 
                     dao.executeNativeQuery(replace + SQL_DELIMITER, params.toArray());
                 } catch (Exception e) {
-                    if (e.getMessage().contains("Duplicate column name") 
-                            || e.getMessage().contains("Duplicate entry")) {
+                    if (e != null && e.getMessage() != null 
+                            && (e.getMessage().contains("Duplicate column name") 
+                            || e.getMessage().contains("Duplicate entry"))) {
                         log.warn(e.getMessage());
                     } else {
                         throw e;

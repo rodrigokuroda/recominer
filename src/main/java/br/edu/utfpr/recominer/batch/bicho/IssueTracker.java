@@ -28,7 +28,7 @@ public class IssueTracker implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
     @NotNull
     @Column(name = "system")
@@ -54,11 +54,34 @@ public class IssueTracker implements Serializable {
     @OneToMany(mappedBy = "issueTracker", cascade = CascadeType.ALL)
     private List<Project> project;
 
-    public Long getId() {
+    public IssueTracker(final Integer id) {
+        this.id = id;
+    }
+
+    /**
+     * "SELECT"
+                + "    issue_tracker.mining_delay,"
+                + "    issue_tracker.password,"
+                + "    issue_tracker.system,"
+                + "    issue_tracker.token,"
+                + "    issue_tracker.username"
+                + "FROM recominer.issue_tracker"
+                + " WHERE issue_tracker.id = ?";
+     * @param raw 
+     */
+    public IssueTracker(final Object[] raw) {
+        miningDelay = (Integer) raw[0];
+        password = (String) raw[1];
+        system = IssueTrackerSystem.valueOf((String) raw[2]);
+        token = (String) raw[3];
+        username = (String) raw[4];
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

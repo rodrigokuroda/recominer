@@ -73,10 +73,10 @@ public class AprioriProcessor implements ItemProcessor {
         final String countIssuesOfFileSql
                 = QueryUtils.getQueryForDatabase("SELECT COUNT(DISTINCT(i2s.issue_id))"
                         + "  FROM {0}.commits com"
-                        + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.scmlog_id = com.commit_id"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = com.commit_id"
                         + "  JOIN {0}.file_pair_issue fpi ON fpi.issue_id = i2s.issue_id"
                         + " WHERE com.file_path = ?"
-                        + "   AND EXISTS (SELECT 1 FROM {0}_issues.issues_fix_version ifv WHERE ifv.issue_id = i2s.issue_id)", projectName);
+                        + "   AND EXISTS (SELECT 1 FROM {0}.issues_fix_version ifv WHERE ifv.issue_id = i2s.issue_id)", projectName);
         
         log.debug("Total pair file to calculate apriori: " + rawPairFiles.size());
 

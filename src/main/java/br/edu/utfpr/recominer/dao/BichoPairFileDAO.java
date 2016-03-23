@@ -103,9 +103,9 @@ public class BichoPairFileDAO {
         FROM_TABLE
                 = "  FROM {0}_issues.issues i"
                 + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                + "  JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                 + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
-                + "  JOIN {0}_issues.issues_scmlog i2s2 ON i2s2.issue_id = i.id"
+                + "  JOIN {0}.issues_scmlog i2s2 ON i2s2.issue_id = i.id"
                 + "  JOIN {0}_vcs.scmlog s2 ON s2.id = i2s2.scmlog_id"
                 + "  JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                 + "  JOIN {0}.commits com2 ON com2.commit_id = i2s2.scmlog_id AND com.file_id <> com2.file_id";
@@ -130,7 +130,7 @@ public class BichoPairFileDAO {
                 = QueryUtils.getQueryForDatabase(
                         " AND i.id IN ("
                         + " SELECT ifv.issue_id "
-                        + "   FROM {0}_issues.issues_fix_version ifv "
+                        + "   FROM {0}.issues_fix_version ifv "
                         + "  WHERE ifv.major_fix_version = ?)", repository);
 
         // avoid join, because has poor performance in this case
@@ -138,26 +138,26 @@ public class BichoPairFileDAO {
                 = QueryUtils.getQueryForDatabase(
                         " AND i.id IN ("
                         + " SELECT ifv.issue_id "
-                        + "   FROM {0}_issues.issues_fix_version ifv "
+                        + "   FROM {0}.issues_fix_version ifv "
                         + "  WHERE ifv.major_fix_version IN ("
                         + "SELECT ifvo.major_fix_version"
-                        + "  FROM {0}_issues.issues_fix_version_order ifvo"
+                        + "  FROM {0}.issues_fix_version_order ifvo"
                         + " WHERE ifvo.version_order <= " // inclusive
                         + "(SELECT MAX(ifvo2.version_order)"
-                        + "   FROM {0}_issues.issues_fix_version_order ifvo2"
+                        + "   FROM {0}.issues_fix_version_order ifvo2"
                         + "  WHERE ifvo2.major_fix_version = ?)))", repository);
 
         FILTER_BY_BEFORE_ISSUE_FIX_MAJOR_VERSION_EXCLUSIVE
                 = QueryUtils.getQueryForDatabase(
                         " AND i.id IN ("
                         + " SELECT ifv.issue_id "
-                        + "   FROM {0}_issues.issues_fix_version ifv "
+                        + "   FROM {0}.issues_fix_version ifv "
                         + "  WHERE ifv.major_fix_version IN ("
                         + "SELECT ifvo.major_fix_version"
-                        + "  FROM {0}_issues.issues_fix_version_order ifvo"
+                        + "  FROM {0}.issues_fix_version_order ifvo"
                         + " WHERE ifvo.version_order < " // exclusive
                         + "(SELECT MIN(ifvo2.version_order)"
-                        + "   FROM {0}_issues.issues_fix_version_order ifvo2"
+                        + "   FROM {0}.issues_fix_version_order ifvo2"
                         + "  WHERE ifvo2.major_fix_version = ?)))", repository);
 
         FILTER_BY_BEFORE_ISSUE_FIX_DATE
@@ -279,9 +279,9 @@ public class BichoPairFileDAO {
                         + "   AND filcl.commit IN ("
                         + "       SELECT DISTINCT s.id"
                         + "         FROM {0}_issues.issues i"
-                        + "         JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i.id"
+                        + "         JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i.id"
                         + "         JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                        + "         JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "         JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "         JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + "         JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id AND com.file_id <> com2.file_id"
                         + "      WHERE com.date > i.submitted_on"
@@ -300,9 +300,9 @@ public class BichoPairFileDAO {
                         + "   AND filcl.commit IN ("
                         + "       SELECT DISTINCT(s.id)"
                         + "         FROM {0}_issues.issues i"
-                        + "         JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i.id"
+                        + "         JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i.id"
                         + "         JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                        + "         JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "         JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "         JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + "         JOIN {0}.commits com ON com.commit_id = i2s.scmlog_id"
                         + "      WHERE com.date > i.submitted_on"
@@ -321,9 +321,9 @@ public class BichoPairFileDAO {
                         + "   AND com.commit_id IN ("
                         + "       SELECT DISTINCT(s.id)"
                         + "         FROM {0}_issues.issues i"
-                        + "         JOIN {0}_issues.issues_fix_version ifv ON ifv.issue_id = i.id"
+                        + "         JOIN {0}.issues_fix_version ifv ON ifv.issue_id = i.id"
                         + "         JOIN {0}_issues.changes c ON c.issue_id = i.id"
-                        + "         JOIN {0}_issues.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "         JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "         JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                         + "      WHERE s.num_files <= " + maxFilePerCommit
                         + "        AND s.date > i.submitted_on"

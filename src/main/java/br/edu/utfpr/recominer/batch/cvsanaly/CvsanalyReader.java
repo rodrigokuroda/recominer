@@ -2,6 +2,7 @@ package br.edu.utfpr.recominer.batch.cvsanaly;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.GenericDao;
+import br.edu.utfpr.recominer.dao.RecominerDao;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
@@ -32,9 +33,11 @@ public class CvsanalyReader extends AbstractItemReader {
     @Override
     public void open(Serializable checkpoint) throws Exception {
         final GenericDao dao = new GenericDao(factory.createEntityManager());
+        final RecominerDao recominerDao = new RecominerDao(dao);
 
         // reads all VCS' projects available (database schemas)
-        final List<Project> projects = dao.selectAll(Project.class);
+        final Integer projectId = Integer.valueOf(getParameters().get("project").toString());
+        final List<Project> projects = recominerDao.selectProject(projectId);
         iterator = projects.listIterator();
     }
 
