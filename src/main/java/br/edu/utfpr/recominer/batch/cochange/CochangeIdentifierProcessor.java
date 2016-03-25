@@ -105,11 +105,11 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
 
         final String selectCochangeId = QueryUtils.getQueryForDatabase(
                 "SELECT id FROM {0}.file_pairs "
-                + "WHERE (file1_path = ? AND file2_path = ?) "
-                + "OR (file2_path = ? AND file1_path = ?)", projectName);
+                + "WHERE (file1_id = ? AND file2_id = ?) "
+                + "OR (file2_id = ? AND file1_id = ?)", projectName);
         final String insertCochange = QueryUtils.getQueryForDatabase(
-                "INSERT INTO {0}.file_pairs (file1_path, file2_path, file1_id, file2_id, updated_on) "
-                        + "VALUES (?, ?, ?, ?, ?)", projectName);
+                "INSERT INTO {0}.file_pairs (file1_id, file2_id, updated_on) "
+                        + "VALUES (?, ?, ?)", projectName);
         
         final String updateCochange = QueryUtils.getQueryForDatabase(
                 "UPDATE {0}.file_pairs SET updated_on = ? "
@@ -117,13 +117,13 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         final Date now = new Date();
         final Map<FilePair, FilePair> cochangesWithId = new HashMap<>();
         for (FilePair filePair : allDistinctCochangeIdentified) {
-            final String file1 = filePair.getFile1().getFileName();
-            final String file2 = filePair.getFile2().getFileName();
+            final Integer file1 = filePair.getFile1().getId();
+            final Integer file2 = filePair.getFile2().getId();
             final Object[] paramsForSelectCochangeId = new Object[]{file1, file2, file1, file2};
             
             Integer pairFileId = dao.selectNativeOneWithParams(selectCochangeId, paramsForSelectCochangeId);
             if (pairFileId == null) {
-                dao.executeNativeQuery(insertCochange, new Object[]{file1, file2, filePair.getFile1().getId(), filePair.getFile2().getId(), now});
+                dao.executeNativeQuery(insertCochange, new Object[]{file1, file2, now});
                 pairFileId = dao.selectNativeOneWithParams(selectCochangeId, paramsForSelectCochangeId);
             } else {
                 dao.executeNativeQuery(updateCochange, new Object[]{now, pairFileId});

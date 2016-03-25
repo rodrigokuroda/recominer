@@ -73,18 +73,10 @@ i.updated_on =
  {WHERE_ISSUE};
 
 -- Denormalize vcs schema
-INSERT INTO {0}.commits (commit_id, rev, committer_id, date, message, repository_id, action_type, branch_id, file_id, file_path, added_lines, removed_lines)
-SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id, a.type, a.branch_id, fil.id, fill.file_path, filcl.added, filcl.removed
+INSERT INTO {0}.commits (commit_id, rev, committer_id, date, message, repository_id, action_type, branch_id)
+SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id, a.type, a.branch_id
   FROM {0}_vcs.scmlog s
   JOIN {0}_vcs.actions a ON a.commit_id = s.id
-  JOIN {0}_vcs.files fil ON fil.id = a.file_id
-  JOIN {0}_vcs.file_links fill ON fill.file_id = fil.id AND fill.commit_id IN
-       (SELECT afill.commit_id
-          FROM {0}_vcs.file_links afill
-         WHERE afill.commit_id <= s.id
-           AND afill.file_id = fil.id
-           AND afill.file_path LIKE CONCAT("%", fil.file_name))
-  JOIN {0}_vcs.commits_files_lines filcl ON filcl.commit = s.id AND filcl.path = fill.file_path
  WHERE s.id IN (SELECT scmlog_id FROM {0}.issues_scmlog)
    AND s.id NOT IN (SELECT commit_id FROM {0}.commits)
  {WHERE_SCMLOG}
@@ -99,7 +91,8 @@ SELECT fill.id, fill.file_path, fil.id, fil.file_name
     (SELECT afill.commit_id
        FROM {0}_vcs.file_links afill
       WHERE afill.file_id = fil.id
-        AND afill.file_path LIKE CONCAT("%", fil.file_name));
+        AND afill.file_path LIKE CONCAT("%", fil.file_name)
+        {WHERE_SCMLOG});
 
 -- relationship between file and commit
 INSERT INTO {0}.files_commits (file_id, commit_id, change_type, branch_id, lines_added, lines_removed)
@@ -107,4 +100,5 @@ SELECT distinct fil.id, a.commit_id, a.type, a.branch_id, filcl.added, filcl.rem
   FROM {0}.files fil
   JOIN {0}_vcs.actions a ON fil.f_id = a.file_id
   JOIN {0}_vcs.commits_files_lines filcl ON filcl.commit = a.commit_id AND filcl.path = fil.file_path
+ {WHERE_SCMLOG}
  ORDER BY a.commit_id;

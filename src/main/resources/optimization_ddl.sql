@@ -38,18 +38,13 @@ CREATE TABLE IF NOT EXISTS {0}.commits (
     message LONGTEXT, -- scmlog
     repository_id INT(11), -- scmlog, files
     action_type VARCHAR(1), -- actions
-    branch_id INT(11),  -- actions
-    file_id INT(11), -- actions, files
-    file_path VARCHAR(4096), -- file_links
-    added_lines INT(11), -- commits_files_lines
-    removed_lines INT(11), -- commits_files_lines
+    branch_id INT(11), -- actions
     KEY commit_id (commit_id),
     KEY committer_id (committer_id),
     KEY date (date),
     KEY repository_id (repository_id),
     KEY action_type (action_type),
-    KEY branch_id (branch_id),
-    KEY file_id (file_id)
+    KEY branch_id (branch_id)
 );
 
 CREATE TABLE IF NOT EXISTS {0}.files (
@@ -77,8 +72,6 @@ CREATE TABLE IF NOT EXISTS {0}.file_pairs (
     id INT(11) NOT NULL AUTO_INCREMENT,
     file1_id INT(11),
     file2_id INT(11),
-    file1_path VARCHAR(4096) NOT NULL,
-    file2_path VARCHAR(4096) NOT NULL,
     updated_on DATETIME,
     PRIMARY KEY id (id),
     KEY file1_id (file1_id),

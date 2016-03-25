@@ -1,6 +1,7 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
 import br.edu.utfpr.recominer.dao.GenericDao;
+import br.edu.utfpr.recominer.dao.QueryUtils;
 import br.edu.utfpr.recominer.model.issue.IssueScmlog;
 import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.sql.Timestamp;
@@ -36,20 +37,22 @@ public class JiraAggregation {
                 + "\\s*[-]+\\s*\\d+(?=\\.(?!\\w)|-(?![a-zA-Z])|:|\\s|,|]|\\)|\\(|;|_))";
 
         this.selectIssueIdAndFixVersions
-                = "SELECT DISTINCT i.id, i.submitted_on, i.fixed_on"
-                + "  FROM " + projectName + "_issues.issues i"
-                + "  JOIN " + projectName + "_issues.changes c ON c.issue_id = i.id"
-                + "  JOIN " + projectName + "_issues.issues_ext_jira iej ON iej.issue_id = i.id"
+                = QueryUtils.getQueryForDatabase(
+                  "SELECT DISTINCT i.id, i.submitted_on, i.fixed_on"
+                + "  FROM {0}_issues.issues i"
+                + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
+                + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
                 + " WHERE UPPER(iej.issue_key) = ?"
                 + "   AND i.resolution = 'Fixed'"
                 + "   AND c.field = 'Resolution'"
-                + "   AND c.new_value = i.resolution";
+                + "   AND c.new_value = i.resolution", projectName);
 
         this.regex = Pattern.compile(issueReferencePattern, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
         this.insertAssociation
-                = "INSERT INTO " + projectName
-                + "_issues.issues_scmlog (issue_id, scmlog_id) VALUES (?, ?)";
+                = QueryUtils.getQueryForDatabase(
+                        "INSERT INTO {0}.issues_scmlog (issue_id, scmlog_id) VALUES (?, ?)",
+                        projectName);
     }
 
     public void aggregate(Iterable<Scmlog> commits) {

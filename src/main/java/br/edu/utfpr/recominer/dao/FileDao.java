@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
-import static br.edu.utfpr.recominer.dao.QueryUtils.filterByIssues;
 
 /**
  *
@@ -313,10 +312,10 @@ public class FileDao {
 
         SELECT_FILES_PATH_BY_COMMIT_ID
                 = QueryUtils.getQueryForDatabase(
-                        "SELECT com.file_id, com.file_path"
-                        + "  FROM {0}.commits com"
-                        + "  JOIN {0}_vcs.scmlog s ON s.id = com.commit_id"
-                        + " WHERE com.commit_id = ?", repository)
+                        "SELECT f.id, f.file_path"
+                        + "  FROM {0}.files f"
+                        + "  JOIN {0}.files_commits fc ON fc.file_id = f.id"
+                        + " WHERE fc.commit_id = ?", repository)
                 + FILTER_BY_MAX_FILES_IN_COMMIT;
 
         SELECT_COMMITTERS_OF_FILE_BY_DATE
