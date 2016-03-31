@@ -67,6 +67,12 @@ public class Scmlog implements Serializable {
         this.id = id;
     }
 
+    public Scmlog(Integer id, Date date, String message) {
+        this.id = id;
+        this.date = date;
+        this.message = message;
+    }
+
     public Integer getId() {
         return id;
     }

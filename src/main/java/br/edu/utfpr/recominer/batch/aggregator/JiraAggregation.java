@@ -40,12 +40,10 @@ public class JiraAggregation {
                 = QueryUtils.getQueryForDatabase(
                   "SELECT DISTINCT i.id, i.submitted_on, i.fixed_on"
                 + "  FROM {0}_issues.issues i"
-                + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
                 + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
                 + " WHERE UPPER(iej.issue_key) = ?"
-                + "   AND i.resolution = 'Fixed'"
-                + "   AND c.field = 'Resolution'"
-                + "   AND c.new_value = i.resolution", projectName);
+                + "   AND i.resolution = \"Fixed\""
+                + "   AND i.fixed_on IS NOT NULL", projectName);
 
         this.regex = Pattern.compile(issueReferencePattern, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 

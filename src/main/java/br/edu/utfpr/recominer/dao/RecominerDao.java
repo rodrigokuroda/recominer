@@ -85,7 +85,8 @@ public class RecominerDao {
                 project.getLastCommitDateAnalyzed(),
                 project.getLastIssueUpdateAnalyzed(),
                 project.getLastIssueUpdateAnalyzedForCochange(),
-                project.getLastAprioriUpdate()
+                project.getLastAprioriUpdate(),
+                project.getId()
         );
     }
 

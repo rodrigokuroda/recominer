@@ -2,11 +2,9 @@ package br.edu.utfpr.recominer.batch.aggregator;
 
 import br.edu.utfpr.recominer.comparator.VersionComparator;
 import br.edu.utfpr.recominer.dao.GenericDao;
+import br.edu.utfpr.recominer.dao.QueryUtils;
 import br.edu.utfpr.recominer.model.Version;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +20,11 @@ import org.apache.logging.log4j.Logger;
 public class ExtractFixVersion {
 
     private final Logger log = LogManager.getLogger();
-    private final String issueFixVersionInsert;
-    private final String selectFixedVersion;
-    private final String selectIssuesFixVersion;
-    private final String issueFixVersionOrderInsert;
+    private final String insertIssueFixVersion;
+    private final String deleteFixedVersionOrder;
+    private final String selectFixedVersionOrder;
+    private final String selectExistingIssuesRelatedToFixVersion;
+    private final String insertFixedVersionOrder;
     private final String selectIssuesIdAndFixVersions;
 
     private final GenericDao dao;
@@ -36,87 +35,118 @@ public class ExtractFixVersion {
         this.project = project;
         final String projectName = project.getProjectName();
 
-        this.issueFixVersionInsert
-                = "INSERT INTO " + projectName
-                + "_issues.issues_fix_version (issue_id, fix_version, minor_fix_version, major_fix_version) VALUES (?, ?, ?, ?)";
+        this.insertIssueFixVersion
+                = QueryUtils.getQueryForDatabase(
+                        "INSERT INTO "
+                        + "{0}.issues_fix_version (issue_id, fix_version, minor_fix_version, major_fix_version) "
+                        + "VALUES (?, ?, ?, ?)", projectName);
 
-        this.selectFixedVersion
-                = "SELECT minor_fix_version FROM " + projectName
-                + "_issues.issues_fix_version_order";
+        this.selectFixedVersionOrder
+                = QueryUtils.getQueryForDatabase(
+                        "SELECT minor_fix_version "
+                        + "  FROM {0}.issues_fix_version_order", projectName);
 
-        this.selectIssuesFixVersion
-                = "SELECT issue_id, fix_version FROM "
-                + projectName + "_issues.issues_fix_version";
+        this.selectExistingIssuesRelatedToFixVersion
+                = QueryUtils.getQueryForDatabase(
+                        "SELECT issue_id, fix_version "
+                        + "  FROM {0}.issues_fix_version", projectName);
 
-        this.issueFixVersionOrderInsert
-                = "INSERT INTO " + projectName
-                + "_issues.issues_fix_version_order (minor_fix_version, major_fix_version, version_order) VALUES (?, ?, ?)";
+        this.insertFixedVersionOrder
+                = QueryUtils.getQueryForDatabase(
+                        "INSERT INTO "
+                        + "{0}.issues_fix_version_order (minor_fix_version, major_fix_version, version_order) "
+                        + "VALUES (?, ?, ?)", projectName);
 
         this.selectIssuesIdAndFixVersions
-                = "SELECT DISTINCT i.id, iej.fix_version FROM " + projectName + "_issues.issues i"
-                + "  JOIN " + projectName + "_issues.changes c ON c.issue_id = i.id"
-                + "  JOIN " + projectName + "_issues.issues_ext_jira iej ON iej.issue_id = i.id"
-                + " WHERE UPPER(iej.issue_key) = ?"
-                + "   AND i.resolution = 'Fixed'"
-                + "   AND c.field = 'Resolution'"
-                + "   AND c.new_value = i.resolution";;
+                = QueryUtils.getQueryForDatabase(
+                        "SELECT i.id, iej.fix_version "
+                        + "  FROM {0}.issues i"
+                        + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
+                        + " WHERE i.fixed_on IS NOT NULL"
+                        + "   AND i.updated_on > ?", projectName);
+        
+        this.deleteFixedVersionOrder 
+                = QueryUtils.getQueryForDatabase(
+                    "DELETE FROM {0}.issues_fix_version_order", projectName);
     }
 
     public void extract() {
-        List<Object[]> issuesFixVersion = dao.selectNativeWithParams(selectIssuesFixVersion, new Object[0]);
-        final Set<Version> distincMinorVersion = new HashSet<>();
-        final Map<Integer, Set<Version>> versionsInDb = new HashMap<>();
-        issuesFixVersion.forEach(o -> {
-            final Integer issueIdFromDb = (Integer) o[0];
-            final Version issueFixVersionFromDb = new Version((String) o[1]);
-            if (versionsInDb.containsKey(issueIdFromDb)) {
-                versionsInDb.get(issueIdFromDb).add(issueFixVersionFromDb);
-            } else {
-                Set<Version> set = new HashSet<>();
-                set.add(issueFixVersionFromDb);
-                versionsInDb.put(issueIdFromDb, set);
-            }
-        });
-        final List<Object[]> issuesIdAndFixVersions = (List<Object[]>) dao.selectNativeOneWithParams(selectIssuesIdAndFixVersions, new Object[0]);
+        final List<Object[]> existingIssuesRelatedToVersionRaw
+                = dao.selectNativeWithParams(selectExistingIssuesRelatedToFixVersion);
+
+        // group versions by issues
+        final Map<Integer, Set<String>> existingIssuesRelatedToVersion
+                = existingIssuesRelatedToVersionRaw.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                o -> (Integer) o[0],
+                                Collectors.mapping(o -> (String) o[1], Collectors.toSet())));
+
+//        existingIssuesRelatedToVersion.forEach(o -> {
+//            final Integer issueIdFromDb = (Integer) o[0];
+//            final Version issueFixVersionFromDb = new Version((String) o[1]);
+//            if (existingIssuesRelatedToVersion.containsKey(issueIdFromDb)) {
+//                existingIssuesRelatedToVersion.get(issueIdFromDb).add(issueFixVersionFromDb);
+//            } else {
+//                Set<Version> set = new HashSet<>();
+//                set.add(issueFixVersionFromDb);
+//                existingIssuesRelatedToVersion.put(issueIdFromDb, set);
+//            }
+//        });
+        final List<Object[]> issuesIdAndFixVersions
+                = dao.selectNativeOneWithParams(selectIssuesIdAndFixVersions, 
+                        project.getLastIssueUpdateAnalyzedForVersion());
+
+        final Set<String> distincMinorVersion = new HashSet<>();
+        
         for (Object[] raw : issuesIdAndFixVersions) {
-            Integer issueId = (Integer) raw[0];
-            List<String> versions = Arrays.asList(((String) raw[1]).split(","));
+            final Integer issueId = (Integer) raw[0];
+            final List<String> versions = Arrays.asList(((String) raw[1]).split(","));
 
             if (versions.isEmpty() || versions.get(0).isEmpty()) {
                 log.info("Issue " + issueId + " has no fix version.");
             } else {
                 //                log.info("Issue " + issueId + " is fixed in " + versions.size() + " versions.");
 
-                if (versionsInDb.containsKey(issueId)) {
-                    Set<Version> versionsFromDbForIssue = versionsInDb.get(issueId);
+                if (existingIssuesRelatedToVersion.containsKey(issueId)) {
+                    final Set<String> versionsFromDbForIssue = existingIssuesRelatedToVersion.get(issueId);
                     versions.removeAll(versionsFromDbForIssue);
-                    continue;
                 } else {
-                    versionsInDb.put(issueId, new HashSet<>());
+                    existingIssuesRelatedToVersion.put(issueId, new HashSet<>(versions));
                 }
                 for (String version : versions) {
-                    String minorVersion = getMinorVersion(version);
+                    final String minorVersion = getMinorVersion(version);
 //                        String majorVersion = getMajorVersion(version);
 
-                    versionsInDb.get(issueId).add(new Version(minorVersion));
-
-                    dao.executeNativeQuery(issueFixVersionInsert, new Object[]{issueId, version, minorVersion, minorVersion});
+                    existingIssuesRelatedToVersion.get(issueId).add(minorVersion);
+                    distincMinorVersion.add(minorVersion);
+                    dao.executeNativeQuery(insertIssueFixVersion, issueId, version, minorVersion, minorVersion);
                 }
             }
         }
 
-        final List<String> minorVersionsExisting = (List<String>) dao.selectNativeWithParams(
-                selectFixedVersion, new Object[0]);
-        final Set<String> minorVersionsExistingSet = new HashSet<>(minorVersionsExisting);
+        final List<String> existingMinorVersionOrder
+                = (List<String>) dao.selectNativeWithParams(
+                        selectFixedVersionOrder);
+//        final Set<String> existingMinorVersionsSet
+//                = new HashSet<>(existingMinorVersionOrder);
 
-        if (minorVersionsExisting.containsAll(distincMinorVersion.stream().map(v -> v.getVersion()).collect(Collectors.toList()))) {
-            List<Version> minorVersionsOrdered = new ArrayList<>(distincMinorVersion);
-
-            Collections.sort(minorVersionsOrdered, new VersionComparator());
-            final List<Version> versionsToInsert = minorVersionsOrdered.stream().filter(v -> !minorVersionsExistingSet.contains(v.getVersion())).collect(Collectors.toList());
+        if (!existingMinorVersionOrder.containsAll(distincMinorVersion)) {
+            existingMinorVersionOrder.addAll(distincMinorVersion);
+            final List<Version> minorVersionsOrdered
+                    = existingMinorVersionOrder.stream()
+                            .map(Version::new)
+                            .sorted(new VersionComparator())
+                            //.filter(v -> !existingMinorVersionsSet.contains(v.getVersion()))
+                            .collect(Collectors.toList());
+            
             int order = 1;
-            for (Version minorVersion : versionsToInsert) {
-                dao.executeNativeQuery(issueFixVersionOrderInsert, new Object[]{minorVersion.getVersion(), minorVersion.getVersion(), order++});
+            for (Version minorVersion : minorVersionsOrdered) {
+                dao.executeNativeQuery(deleteFixedVersionOrder);
+                dao.executeNativeQuery(insertFixedVersionOrder,
+                        minorVersion.getVersion(),
+                        minorVersion.getVersion(),
+                        order++);
             }
         }
 

@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS {0} CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 CREATE TABLE IF NOT EXISTS {0}.issues_scmlog (
     id int(11) NOT NULL AUTO_INCREMENT,
     issue_id int(11) NOT NULL,

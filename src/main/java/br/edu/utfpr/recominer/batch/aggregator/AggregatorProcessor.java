@@ -3,15 +3,15 @@ package br.edu.utfpr.recominer.batch.aggregator;
 import br.edu.utfpr.recominer.batch.bicho.IssueTrackerSystem;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
-import br.edu.utfpr.recominer.model.issue.IssueScmlog;
+import br.edu.utfpr.recominer.dao.QueryUtils;
 import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import javax.batch.api.chunk.ItemProcessor;
 import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
@@ -44,34 +44,38 @@ public class AggregatorProcessor implements ItemProcessor {
 
     @Override
     public Object processItem(Object item) throws Exception {
-        Project project = (Project) item;
-        String projectName = project.getProjectName().toLowerCase();
+        final Project project = (Project) item;
+        final String projectName = project.getProjectName().toLowerCase();
 
         final Properties properties = new Properties();
         properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName + "_vcs");
-        GenericDao dao = new GenericDao(factory.createEntityManager(properties));
+        final GenericDao dao = new GenericDao(factory.createEntityManager(properties));
 
         final Properties propertiesIssues = new Properties();
         propertiesIssues.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName + "_issues");
-        GenericDao daoIssues = new GenericDao(factory.createEntityManager(propertiesIssues));
+        final GenericDao daoIssues = new GenericDao(factory.createEntityManager(propertiesIssues));
 
         executeSqlScript(project, dao, RECOMINER_TABLES_SCRIPT_NAME);
 
-        final List<Scmlog> commitsToAnalyze;
+        final List<Object[]> rawCommits;
         if (project.getLastCommitDateAnalyzed() != null) {
-            commitsToAnalyze = dao.executeNamedQueryWithParams("ScmlogAfterDate",
-                    new String[]{"date"},
-                    new Object[]{project.getLastCommitDateAnalyzed()},
-                    Scmlog.class);
+            rawCommits = dao.selectNativeWithParams(
+                    QueryUtils.getQueryForDatabase("SELECT id, date, message FROM {0}_vcs.scmlog WHERE date > ?", projectName),
+                    project.getLastCommitDateAnalyzed());
         } else {
-            commitsToAnalyze = dao.executeNamedQuery("AllScmlog", Scmlog.class);
+            rawCommits = dao.selectNativeWithParams(
+                    QueryUtils.getQueryForDatabase("SELECT id, date, message FROM {0}_vcs.scmlog", projectName));
         }
+        final List<Scmlog> commitsToAnalyze = rawCommits
+                .stream().map(raw -> new Scmlog((Integer) raw[0], (Date) raw[1], (String) raw[2]))
+                .collect(Collectors.toList());
 
         if (!commitsToAnalyze.isEmpty()) {
 
-            final Map<IssueScmlog, IssueScmlog> issueAndCommitLinked = new HashMap<>();
-
-            daoIssues.selectAll(IssueScmlog.class).forEach(is -> issueAndCommitLinked.put(is, is));
+//            final Map<IssueScmlog, IssueScmlog> issueAndCommitLinked = new HashMap<>();
+//            
+//            final List<Object[]> rawIssues = daoIssues.selectNativeWithParams("");
+//            rawIssues.forEach(is -> issueAndCommitLinked.put(is, is));
 
             if (project.getLastCommitDateAnalyzed() == null
                     && project.getLastIssueUpdateAnalyzed() == null) {
@@ -82,7 +86,7 @@ public class AggregatorProcessor implements ItemProcessor {
             final JiraAggregation jiraAggregation = new JiraAggregation(dao, project);
             jiraAggregation.aggregate(commitsToAnalyze);
 
-            java.sql.Timestamp lastIssueUpdate = (java.sql.Timestamp) dao.selectNativeOneWithParams("SELECT MAX(updated_on) FROM " + projectName + "_issues.issues", new Object[0]);
+            final java.sql.Timestamp lastIssueUpdate = (java.sql.Timestamp) dao.selectNativeOneWithParams("SELECT MAX(updated_on) FROM " + projectName + "_issues.issues", new Object[0]);
             // setting date of last commit analyzed
             project.setLastCommitDateAnalyzed(commitsToAnalyze.get(commitsToAnalyze.size() - 1).getDate());
             project.setLastIssueUpdateAnalyzed(lastIssueUpdate);
@@ -90,10 +94,10 @@ public class AggregatorProcessor implements ItemProcessor {
 
         return project;
     }
-    
+
     private void executeSqlScript(Project project, GenericDao dao, String resourceFileName) {
         // loads script from resource folder in project
-        InputStream script = this.getClass().getClassLoader().getResourceAsStream(resourceFileName);
+        final InputStream script = this.getClass().getClassLoader().getResourceAsStream(resourceFileName);
 
         // Create SQL scanner
         final Scanner scanner = new Scanner(script).useDelimiter(SQL_DELIMITER);
@@ -116,13 +120,13 @@ public class AggregatorProcessor implements ItemProcessor {
         } else {
             whereIssue = "";
         }
-        
+
         // Loop through the SQL file statements
         while (scanner.hasNext()) {
 
             // Get statement from file
             final String rawStatement = scanner.next();
-            
+
             // Replace all comments SQL command (starts with "--" and ends with 
             // "\n" or ";") to check if is a empty SQL command.
             if (!StringUtils.isBlank(rawStatement.replaceAll("-{2,}.*(\n|;)", ""))) {
@@ -136,8 +140,8 @@ public class AggregatorProcessor implements ItemProcessor {
 
                     dao.executeNativeQuery(replace + SQL_DELIMITER, params.toArray());
                 } catch (Exception e) {
-                    if (e != null && e.getMessage() != null 
-                            && (e.getMessage().contains("Duplicate column name") 
+                    if (e != null && e.getMessage() != null
+                            && (e.getMessage().contains("Duplicate column name")
                             || e.getMessage().contains("Duplicate entry"))) {
                         log.warn(e.getMessage());
                     } else {

@@ -315,8 +315,7 @@ public class FileDao {
                         "SELECT f.id, f.file_path"
                         + "  FROM {0}.files f"
                         + "  JOIN {0}.files_commits fc ON fc.file_id = f.id"
-                        + " WHERE fc.commit_id = ?", repository)
-                + FILTER_BY_MAX_FILES_IN_COMMIT;
+                        + " WHERE fc.commit_id = ?", repository);
 
         SELECT_COMMITTERS_OF_FILE_BY_DATE
                 = QueryUtils.getQueryForDatabase("SELECT DISTINCT p.id, p.name, p.email"

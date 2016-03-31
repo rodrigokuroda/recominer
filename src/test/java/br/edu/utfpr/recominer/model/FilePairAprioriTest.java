@@ -13,7 +13,7 @@ import org.junit.Test;
 public class FilePairAprioriTest {
 
     private FilePairApriori instance;
-    private FilePair filePair = new FilePair("A", "B");
+    private final FilePair filePair = new FilePair(1, new File(1, "A.java"), new File(2, "B.java"));
 
     @Before
     public void setUp() {
@@ -68,12 +68,12 @@ public class FilePairAprioriTest {
 
     @Test
     public void testFileHasGreaterConfidence() {
-        assertEquals("A", instance.getFileWithHighestConfidence().getFileName());
+        assertEquals("A.java", instance.getFileWithHighestConfidence().getFileName());
     }
 
     @Test
     public void testToString() {
-        assertEquals("A;B;2;4;2;4;0.5;1.0;0.5;1.0;0.5;1.0;0.0;0.0;", instance.toString());
+        assertEquals("A.java;B.java;2;4;2;4;0.5;1.0;0.5;1.0;0.5;1.0;0.0;0.0;", instance.toString());
     }
 
     @Test
