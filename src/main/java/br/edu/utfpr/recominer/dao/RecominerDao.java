@@ -2,8 +2,12 @@ package br.edu.utfpr.recominer.dao;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.batch.bicho.IssueTracker;
+import br.edu.utfpr.recominer.model.File;
+import br.edu.utfpr.recominer.model.FilePair;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -52,7 +56,7 @@ public class RecominerDao {
     }
 
     public IssueTracker selectIssueTracker(IssueTracker issueTracker) {
-        final String query 
+        final String query
                 = "SELECT"
                 + "    mining_delay,"
                 + "    password,"
@@ -61,10 +65,10 @@ public class RecominerDao {
                 + "    username"
                 + " FROM recominer.issue_tracker"
                 + " WHERE id = ?";
-        
-        final List<Object[]> its = 
-                dao.selectNativeWithParams(query, issueTracker.getId());
-        
+
+        final List<Object[]> its
+                = dao.selectNativeWithParams(query, issueTracker.getId());
+
         return new IssueTracker(its.get(0));
     }
 
@@ -88,6 +92,42 @@ public class RecominerDao {
                 project.getLastAprioriUpdate(),
                 project.getId()
         );
+    }
+
+    public Set<FilePair> selectFilePair(final Project project) {
+        final String selectFilePairs = QueryUtils.getQueryForDatabase(
+                "SELECT file_pair_id, file1_id, f1.file_path, file2_id, f2.file_path "
+                + "  FROM {0}.file_pairs fp "
+                + "  JOIN {0}.files f1 ON f1.id = pf.file1_id"
+                + "  JOIN {0}.files f2 ON f2.id = pf.file2_id"
+//                + "  JOIN {0}.file_pair_apriori fpa ON fpa.file_pair_id = fp.id "
+//                + " WHERE (fpa.file1_issues > 1 OR fpa.file2_issues > 1) "
+//                + "   AND (fpa.file1_confidence > 0.5 OR fpa.file2_confidence > 0.5) "
+                , project.getProjectName());
+
+        final List<Object[]> rawFilePairs = dao.selectNativeWithParams(selectFilePairs);
+        return pairFileMapper(rawFilePairs);
+    }
+
+    private Set<FilePair> pairFileMapper(final List<Object[]> rawFilePairs) {
+        return rawFilePairs.stream()
+                .map(o -> new FilePair((Integer) o[0],
+                        new File((Integer) o[1], (String) o[2]),
+                        new File((Integer) o[3], (String) o[4])))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<FilePair> selectFilePairInOpenedIssues(Project project) {
+        final String selectFilePairs = QueryUtils.getQueryForDatabase(
+                "SELECT file_pair_id, file1_id, f1.file_path, file2_id, f2.file_path "
+                + "  FROM {0}.file_pairs fp "
+                + "  JOIN {0}.files f1 ON f1.id = pf.file1_id"
+                + "  JOIN {0}.files f2 ON f2.id = pf.file2_id"
+                + "  JOIN {0}.issues_scmlog i2s ON i2s.commit_id = fpi.issue_id"
+                , project.getProjectName());
+
+        final List<Object[]> rawFilePairs = dao.selectNativeWithParams(selectFilePairs);
+        return pairFileMapper(rawFilePairs);
     }
 
 }

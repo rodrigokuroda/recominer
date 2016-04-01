@@ -51,13 +51,23 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
 
         // Select all issues' (previously cleaned) commits that should have been
         // commited between issue submit date and issue fix date.
-        final String selectIssuesAndCommits
+        String selectIssuesAndCommits
                 = "SELECT issue_id, scmlog_id FROM {0}.issues_scmlog i2s "
                 + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
                 + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
-                + " WHERE i.fixed_on IS NOT NULL"
-                + "   AND s.date <= i.fixed_on "
-                + "   AND s.date >= i.submitted_on ";
+                + " WHERE s.date >= i.submitted_on"
+                ;
+        
+        boolean fixedIssueOnly = false;
+        if (fixedIssueOnly) {
+            selectIssuesAndCommits +=
+                  "   AND s.date <= i.fixed_on "
+                + "   AND i.fixed_on IS NOT NULL";
+            
+        } else {
+            selectIssuesAndCommits +=
+                  "   AND (i.fixed_on IS NULL OR s.date <= i.fixed_on) ";
+        }
 
         final List<Object[]> rawIssuesAndCommits;
         if (project.getLastIssueUpdateAnalyzedForCochange() != null) {
@@ -140,8 +150,8 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
                 QueryUtils.getQueryForDatabase("INSERT INTO {0}.file_pair_issue_commit (file_pair_id, issue_id, commit_id) VALUES (?, ?, ?)", projectName);
         
         for (Map.Entry<Issue, Set<FilePair>> entry : distinctCochangePerIssue.entrySet()) {
-            Issue issue = entry.getKey();
-            Set<FilePair> cochanges = entry.getValue();
+            final Issue issue = entry.getKey();
+            final Set<FilePair> cochanges = entry.getValue();
 
             for (FilePair cochange : cochanges) {
                 dao.executeNativeQuery(insertCochangeRelatedToIssue, new Object[]{cochangesWithId.get(cochange).getId(), issue.getId()});

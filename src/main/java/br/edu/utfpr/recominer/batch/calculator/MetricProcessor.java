@@ -5,7 +5,7 @@ import br.edu.utfpr.recominer.dao.BichoDAO;
 import br.edu.utfpr.recominer.dao.BichoPairFileDAO;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
-import br.edu.utfpr.recominer.dao.QueryUtils;
+import br.edu.utfpr.recominer.dao.RecominerDao;
 import br.edu.utfpr.recominer.metric.committer.CommitterFileMetrics;
 import br.edu.utfpr.recominer.metric.committer.CommitterFileMetricsCalculator;
 import br.edu.utfpr.recominer.metric.file.FileMetricCalculator;
@@ -21,7 +21,6 @@ import br.edu.utfpr.recominer.model.Issue;
 import br.edu.utfpr.recominer.model.IssueMetrics;
 import br.edu.utfpr.recominer.services.metric.Cacher;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import javax.batch.api.chunk.ItemProcessor;
@@ -61,20 +60,10 @@ public class MetricProcessor implements ItemProcessor {
         final BichoDAO bichoDAO = new BichoDAO(dao, projectName, maxFilePerCommit);
         final FileMetricDao fileDao = new FileMetricInLastIssuesDao(dao, projectName);
         final BichoPairFileDAO bichoPairFileDAO = new BichoPairFileDAO(dao, projectName, maxFilePerCommit);
-
+        final RecominerDao recominerDao = new RecominerDao(dao);
         final Cacher cacher = new Cacher(null, bichoPairFileDAO);
 
-        final Set<FilePair> filePairs = new LinkedHashSet<>();
-        // TODO which issues we will consider for train?
-        final String selectFilePairs = QueryUtils.getQueryForDatabase(
-                "SELECT file_pair_id, file1_id, file2_id, file1_path, file2_path "
-                + "  FROM {0}.file_pairs fp "
-                + "  JOIN {0}.file_pair_apriori fpa ON fpa.file_pair_id = fp.id "
-                + " WHERE (fpa.file1_issues > 1 OR fpa.file2_issues > 1) "
-                + "   AND (fpa.file1_confidence > 0.5 OR fpa.file2_confidence > 0.5) ",
-                projectName);
-
-        final List<Object[]> rawFilePairs = dao.selectNativeWithParams(selectFilePairs, "", "", "");
+        final Set<FilePair> filePairs = recominerDao.selectFilePairInOpenedIssues(project);
 
         final CommitterFileMetricsCalculator committerFileMetricsCalculator = new CommitterFileMetricsCalculator(fileDao);
 
@@ -157,7 +146,8 @@ public class MetricProcessor implements ItemProcessor {
                     if (!allFileChanges.contains(metrics)) {
                         // pair file network
                         final NetworkMetrics networkMetrics
-                                = new NetworkMetricsCalculator(issue, bichoDAO).getNetworkMetrics();
+                                = new NetworkMetricsCalculator(issue, bichoDAO)
+                                        .getNetworkMetrics();
 
                         metrics.setNetworkMetrics(networkMetrics);
 

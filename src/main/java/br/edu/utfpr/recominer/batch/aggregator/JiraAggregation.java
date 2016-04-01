@@ -18,7 +18,7 @@ public class JiraAggregation {
 
     private final String gitUrlPattern = "(\\s+git-svn-id:\\shttps://svn.apache.org/).*";
     private final String issueReferencePattern;
-    private final String selectIssueIdAndFixVersions;
+    private final String selectIssueByIssueKey;
     private final String insertAssociation;
 
     private final Pattern regexNumber = Pattern.compile("\\d+");
@@ -36,14 +36,16 @@ public class JiraAggregation {
                 = "(?i)(" + projectName.toUpperCase()
                 + "\\s*[-]+\\s*\\d+(?=\\.(?!\\w)|-(?![a-zA-Z])|:|\\s|,|]|\\)|\\(|;|_))";
 
-        this.selectIssueIdAndFixVersions
+        // relating all issues, including that not fixed
+        this.selectIssueByIssueKey
                 = QueryUtils.getQueryForDatabase(
                   "SELECT DISTINCT i.id, i.submitted_on, i.fixed_on"
                 + "  FROM {0}_issues.issues i"
                 + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
                 + " WHERE UPPER(iej.issue_key) = ?"
-                + "   AND i.resolution = \"Fixed\""
-                + "   AND i.fixed_on IS NOT NULL", projectName);
+//                + "   AND i.resolution = \"Fixed\""
+//                + "   AND i.fixed_on IS NOT NULL"
+                        , projectName);
 
         this.regex = Pattern.compile(issueReferencePattern, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
@@ -72,7 +74,7 @@ public class JiraAggregation {
 //                    issueKey = matcherNumber.group(); // e.g.: 1234
 //                }
 
-                final Object[] issueIdAndFixVersions = (Object[]) dao.selectNativeOneWithParams(selectIssueIdAndFixVersions, new Object[]{issueKey.toUpperCase()});
+                final Object[] issueIdAndFixVersions = (Object[]) dao.selectNativeOneWithParams(selectIssueByIssueKey, new Object[]{issueKey.toUpperCase()});
 
                 if (issueIdAndFixVersions != null) {
                     Integer issueId = (Integer) issueIdAndFixVersions[0];
@@ -84,8 +86,8 @@ public class JiraAggregation {
                     // data cleaning: commits must have committed between
                     // issues' submit date and fixed date
                     if (!issueAndCommitAssociated.contains(issueScmlog)
-                            && !commit.getDate().after(fixedOn)
-                            && !commit.getDate().before(submittedOn)) {
+                            && !commit.getDate().before(submittedOn)
+                            && (fixedOn == null || !commit.getDate().after(fixedOn))) {
                         issueAndCommitAssociated.add(issueScmlog);
                         dao.executeNativeQuery(insertAssociation, new Object[]{issueId, commit.getId()});
                     }

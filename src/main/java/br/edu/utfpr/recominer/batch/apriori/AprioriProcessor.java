@@ -47,25 +47,19 @@ public class AprioriProcessor implements ItemProcessor {
         final GenericDao dao = new GenericDao(factory.createEntityManager(properties));
         //final FileDao fileDao = new FileDao(dao, projectName, 20);
 
-        final String selectFilePair;
         final List<Object> params = new ArrayList<>();
-        if (project.getLastAprioriUpdate() == null) {
-            selectFilePair = QueryUtils.getQueryForDatabase(
+        String selectFilePair = QueryUtils.getQueryForDatabase(
                     "SELECT pf.id, f1.id, f1.file_path, f2.id, f2.file_path,"
                     + "     (SELECT COUNT(DISTINCT(pfi.issue_id)) FROM {0}.file_pair_issue pfi WHERE pf.id = pfi.file_pair_id)"
                     + "  FROM {0}.file_pairs pf"
                     + "  JOIN {0}.files f1 ON f1.id = pf.file1_id"
                     + "  JOIN {0}.files f2 ON f2.id = pf.file2_id",
                     projectName);
-        } else {
-            selectFilePair = QueryUtils.getQueryForDatabase(
-                    "SELECT pf.id, f1.id, f1.file_path, f2.id, f2.file_path,"
-                    + "     (SELECT COUNT(DISTINCT(pfi.issue_id)) FROM {0}.file_pair_issue pfi WHERE pf.id = pfi.file_pair_id)"
-                    + "  FROM {0}.file_pairs pf"
-                    + "  JOIN {0}.files f1 ON f1.id = pf.file1_id"
-                    + "  JOIN {0}.files f2 ON f2.id = pf.file2_id"
-                    + " WHERE pf.updated_on > ?",
-                    projectName);
+        
+        // if it has already computed some file pairs,
+        // compute only file pairs that have updated
+        if (project.getLastAprioriUpdate() != null) {
+            selectFilePair += " WHERE pf.updated_on > ?";
             params.add(project.getLastAprioriUpdate());
         }
 
@@ -74,8 +68,9 @@ public class AprioriProcessor implements ItemProcessor {
                 selectFilePair, params.toArray());
 
         final Long totalIssuesConsidered = (Long) dao.selectNativeOneWithParams(
-                QueryUtils.getQueryForDatabase("SELECT COUNT(DISTINCT(pfi.file_pair_id)) FROM {0}.file_pair_issue pfi", projectName),
-                new Object[]{});
+                QueryUtils.getQueryForDatabase(
+                        "SELECT COUNT(DISTINCT(pfi.file_pair_id)) FROM {0}.file_pair_issue pfi",
+                        projectName));
 
         final String countIssuesOfFileSql
                 = QueryUtils.getQueryForDatabase("SELECT COUNT(DISTINCT(i2s.issue_id))"
@@ -102,24 +97,12 @@ public class AprioriProcessor implements ItemProcessor {
 
             final Long filePairIssue = (Long) rawFilePair[5];
 
-            final Long file1Issues;
-            if (fileIssues.containsKey(file1.getId())) {
-                file1Issues = fileIssues.get(file1.getId());
-            } else {
-                file1Issues = dao.selectNativeOneWithParams(countIssuesOfFileSql, file1.getId());
-                fileIssues.put(file1.getId(), file1Issues);
-            }
-
-            final Long file2Issues;
-            if (fileIssues.containsKey(file2.getId())) {
-                file2Issues = fileIssues.get(file2.getId());
-            } else {
-                file2Issues = dao.selectNativeOneWithParams(countIssuesOfFileSql, file2.getId());
-                fileIssues.put(file2.getId(), file1Issues);
-            }
+            final Long file1Issues = countIssuesOfFile(fileIssues, file1, dao, countIssuesOfFileSql);
+            final Long file2Issues = countIssuesOfFile(fileIssues, file2, dao, countIssuesOfFileSql);
 
             final FilePair filePair = new FilePair(id, file1, file2);
-            final FilePairApriori apriori = new FilePairApriori(filePair, file1Issues, file2Issues,
+            final FilePairApriori apriori = new FilePairApriori(
+                    filePair, file1Issues, file2Issues,
                     filePairIssue, totalIssuesConsidered);
 
             dao.executeNativeQuery(insertApriori, new Object[]{
@@ -135,9 +118,21 @@ public class AprioriProcessor implements ItemProcessor {
                 now});
         }
 
+        // update last apriori computation of file pairs
         if (!rawPairFiles.isEmpty()) {
             project.setLastAprioriUpdate(now);
         }
         return project;
+    }
+
+    private Long countIssuesOfFile(final Map<Integer, Long> fileIssues, final File file, final GenericDao dao, final String countIssuesOfFileSql) {
+        final Long numberOfIssues;
+        if (fileIssues.containsKey(file.getId())) {
+            numberOfIssues = fileIssues.get(file.getId());
+        } else {
+            numberOfIssues = dao.selectNativeOneWithParams(countIssuesOfFileSql, file.getId());
+            fileIssues.put(file.getId(), numberOfIssues);
+        }
+        return numberOfIssues;
     }
 }

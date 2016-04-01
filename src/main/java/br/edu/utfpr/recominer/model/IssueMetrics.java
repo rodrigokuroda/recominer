@@ -74,16 +74,24 @@ public class IssueMetrics {
         this.submittedOn = submittedOn;
         this.fixedOn = fixedOn;
 
-        if (submittedOn != null
-                && fixedOn != null) {
-            LocalDate createdAt = new LocalDate(submittedOn.getTime());
-            LocalDate finalDate = new LocalDate(fixedOn.getTime());
-            this.issueAge = Days.daysBetween(createdAt, finalDate).getDays();
-        } else {
-            this.issueAge = -1;
-        }
+        this.issueAge = calculeAge(submittedOn, fixedOn);
 
-        wordiness = WordinessCalculator.calcule(issueBody, comments);
+        this.wordiness = WordinessCalculator.calcule(issueBody, comments);
+    }
+
+    private int calculeAge(Timestamp submittedOn, Timestamp fixedOn) {
+        if (submittedOn == null) {
+            return -1;
+        }
+        final LocalDate createdAt = new LocalDate(submittedOn.getTime());
+        final LocalDate finalDate;
+        if (fixedOn != null) {
+            finalDate = new LocalDate(fixedOn.getTime());
+        } else {
+            // if issue is not fixed yet, calcule age based on actual date (today)
+            finalDate = new LocalDate();
+        }
+        return Days.daysBetween(createdAt, finalDate).getDays();
     }
 
     public IssueMetrics(Integer issueNumber, String issueKey, String issueBody, List<String> comments) {
