@@ -68,7 +68,13 @@ UPDATE {0}_issues.issues i SET
 i.updated_on = 
 (SELECT MAX(ext.updated) 
    FROM {0}_issues.issues_ext_jira ext 
-  WHERE ext.issue_id = i.id)
+  WHERE ext.issue_id = i.id),
+
+i.comments_updated_on = 
+(SELECT MAX(comments.submitted_on) 
+   FROM {0}_issues.comments comments 
+  WHERE comments.issue_id = i.id)
+
  WHERE 1 = 1 
  {WHERE_ISSUE};
 

@@ -75,7 +75,7 @@ public class FilePairIssueMetrics extends FilePairMetrics {
     public FilePairIssueMetrics(String file, String file2, IssueMetrics issueMetrics, double... metrics) {
         super(file, file2, metrics);
         this.issueMetrics = issueMetrics;
-        this.filePairIssue = new FilePairIssue(getFilePair(), issueMetrics.getIssueNumber());
+        this.filePairIssue = new FilePairIssue(getFilePair(), issueMetrics.getIssueId());
     }
 
     public FilePairIssueMetrics(String file, String file2, Integer issue, double... metrics) {

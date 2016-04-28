@@ -2,8 +2,11 @@ package br.edu.utfpr.recominer.dao;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.batch.bicho.IssueTracker;
+import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.model.Issue;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -99,10 +102,9 @@ public class RecominerDao {
                 "SELECT file_pair_id, file1_id, f1.file_path, file2_id, f2.file_path "
                 + "  FROM {0}.file_pairs fp "
                 + "  JOIN {0}.files f1 ON f1.id = pf.file1_id"
-                + "  JOIN {0}.files f2 ON f2.id = pf.file2_id"
-//                + "  JOIN {0}.file_pair_apriori fpa ON fpa.file_pair_id = fp.id "
-//                + " WHERE (fpa.file1_issues > 1 OR fpa.file2_issues > 1) "
-//                + "   AND (fpa.file1_confidence > 0.5 OR fpa.file2_confidence > 0.5) "
+                + "  JOIN {0}.files f2 ON f2.id = pf.file2_id" //                + "  JOIN {0}.file_pair_apriori fpa ON fpa.file_pair_id = fp.id "
+                //                + " WHERE (fpa.file1_issues > 1 OR fpa.file2_issues > 1) "
+                //                + "   AND (fpa.file1_confidence > 0.5 OR fpa.file2_confidence > 0.5) "
                 , project.getProjectName());
 
         final List<Object[]> rawFilePairs = dao.selectNativeWithParams(selectFilePairs);
@@ -117,17 +119,50 @@ public class RecominerDao {
                 .collect(Collectors.toSet());
     }
 
-    public Set<FilePair> selectFilePairInOpenedIssues(Project project) {
+    public Set<FilePair> selectFilePairInOpenedIssues(final Project project) {
         final String selectFilePairs = QueryUtils.getQueryForDatabase(
                 "SELECT file_pair_id, file1_id, f1.file_path, file2_id, f2.file_path "
                 + "  FROM {0}.file_pairs fp "
                 + "  JOIN {0}.files f1 ON f1.id = pf.file1_id"
                 + "  JOIN {0}.files f2 ON f2.id = pf.file2_id"
-                + "  JOIN {0}.issues_scmlog i2s ON i2s.commit_id = fpi.issue_id"
-                , project.getProjectName());
+                + "  JOIN {0}.issues_scmlog i2s ON i2s.commit_id = fpi.issue_id", project.getProjectName());
 
         final List<Object[]> rawFilePairs = dao.selectNativeWithParams(selectFilePairs);
         return pairFileMapper(rawFilePairs);
+    }
+
+    public Set<Issue> selectLastNonFixedIssues(final Project project) {
+        final StringBuilder selectNonFixedIssuesUpdated
+                = new StringBuilder();
+
+        selectNonFixedIssuesUpdated
+                .append(QueryUtils
+                        .getQueryForDatabase("SELECT i.id, i.type, i.submitted_on, i.fixed_on "
+                                + "  FROM {0}_issues.issues i "
+                                + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
+                                + " WHERE i.fixed_on IS NULL AND i.resolution = \"Unresolved\" ",
+                                project.getProjectName()));
+
+        final List<Object> params = new ArrayList<>();
+        if (project.getLastIssueUpdateForMetrics() != null) {
+            selectNonFixedIssuesUpdated.append(" AND i.updated_on > ?");
+            params.add(project.getLastIssueUpdateForMetrics());
+        }
+
+        final List<Object[]> rawFilePairs = dao.selectNativeWithParams(selectNonFixedIssuesUpdated.toString(),
+                params.toArray());
+
+        return rawFilePairs.stream()
+                .map(o -> new Issue(
+                        (Integer) o[0],
+                        (String) o[1],
+                        (Timestamp) o[2],
+                        (Timestamp) o[3]))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<Commit> selectNewCommits(Project project) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

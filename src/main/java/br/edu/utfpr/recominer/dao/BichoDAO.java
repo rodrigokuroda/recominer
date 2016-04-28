@@ -726,12 +726,13 @@ public class BichoDAO {
         for (Object[] issueCommit : rawIssues) {
             Integer issueId = (Integer) issueCommit[0];
             String issueType = (String) issueCommit[1];
-            java.sql.Timestamp fixedOn = (java.sql.Timestamp) issueCommit[2];
-            Integer commit = (Integer) issueCommit[3];
-            Date commitDate = (java.sql.Timestamp) issueCommit[4];
-            String revision = (String) issueCommit[5];
+            java.sql.Timestamp submittedOn = (java.sql.Timestamp) issueCommit[2];
+            java.sql.Timestamp fixedOn = (java.sql.Timestamp) issueCommit[3];
+            Integer commit = (Integer) issueCommit[4];
+            Date commitDate = (java.sql.Timestamp) issueCommit[5];
+            String revision = (String) issueCommit[6];
 
-            Issue issue = new Issue(issueId, issueType, fixedOn);
+            Issue issue = new Issue(issueId, issueType, submittedOn, fixedOn);
             if (issuesCommits.containsKey(issue)) {
                 issuesCommits.get(issue).add(new Commit(commit, revision, null, commitDate));
             } else {

@@ -84,6 +84,10 @@ public class Project implements Serializable {
     @Column(name = "last_apriori_update")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastAprioriUpdate;
+    
+    @Column(name = "last_apriori_update")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastIssueUpdateForMetrics;
 
     public Project() {
     }
@@ -242,6 +246,14 @@ public class Project implements Serializable {
 
     public void setLastAprioriUpdate(Date lastAprioriUpdate) {
         this.lastAprioriUpdate = lastAprioriUpdate;
+    }
+
+    public Date getLastIssueUpdateForMetrics() {
+        return lastIssueUpdateForMetrics;
+    }
+
+    public void setLastIssueUpdateForMetrics(Date lastIssueUpdateForMetrics) {
+        this.lastIssueUpdateForMetrics = lastIssueUpdateForMetrics;
     }
 
     @Override

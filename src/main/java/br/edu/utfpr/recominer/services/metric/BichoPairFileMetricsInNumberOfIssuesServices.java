@@ -9,19 +9,21 @@ import br.edu.utfpr.recominer.metric.committer.Committer;
 import br.edu.utfpr.recominer.metric.committer.CommitterFileMetrics;
 import br.edu.utfpr.recominer.metric.committer.CommitterFileMetricsCalculator;
 import br.edu.utfpr.recominer.metric.committer.EmptyCommitterFileMetrics;
+import br.edu.utfpr.recominer.metric.network.CommunicationNetworkMetricsCalculator;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
-import br.edu.utfpr.recominer.metric.network.NetworkMetricsCalculator;
 import br.edu.utfpr.recominer.model.CodeChurn;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.CommitMetrics;
-import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.ContextualMetrics;
+import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.model.Issue;
 import br.edu.utfpr.recominer.model.IssueMetrics;
 import br.edu.utfpr.recominer.model.matrix.EntityMatrix;
 import br.edu.utfpr.recominer.model.matrix.EntityMatrixNode;
 import br.edu.utfpr.recominer.model.metric.EntityMetric;
 import br.edu.utfpr.recominer.services.matrix.BichoPairOfFileGroupingByNumberOfIssuesServices;
+import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 import br.edu.utfpr.recominer.services.util.MatrixUtils;
 import br.edu.utfpr.recominer.util.OutLog;
 import java.util.Arrays;
@@ -31,7 +33,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static br.edu.utfpr.recominer.services.metric.AbstractBichoMetricServices.objectsToNodes;
 
 /**
  *
@@ -214,7 +215,7 @@ public class BichoPairFileMetricsInNumberOfIssuesServices extends AbstractBichoM
                     if (!allFileChanges.contains(fileIssueMetrics)) {
                         // pair file network
                         final NetworkMetrics networkMetrics
-                                = new NetworkMetricsCalculator(null, bichoDAO).getNetworkMetrics();
+                                = new CommunicationNetworkMetricsCalculator(null).calcule(new Issue(issue));
 
                         fileIssueMetrics.setNetworkMetrics(networkMetrics);
 

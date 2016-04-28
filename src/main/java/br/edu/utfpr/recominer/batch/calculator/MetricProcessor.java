@@ -6,12 +6,15 @@ import br.edu.utfpr.recominer.dao.BichoPairFileDAO;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.dao.RecominerDao;
+import br.edu.utfpr.recominer.dao.RecominerMetricDao;
 import br.edu.utfpr.recominer.metric.committer.CommitterFileMetrics;
 import br.edu.utfpr.recominer.metric.committer.CommitterFileMetricsCalculator;
 import br.edu.utfpr.recominer.metric.file.FileMetricCalculator;
 import br.edu.utfpr.recominer.metric.file.FileMetrics;
+import br.edu.utfpr.recominer.metric.network.BichoCommunicationNetworkDao;
+import br.edu.utfpr.recominer.metric.network.CommunicationNetworkDao;
+import br.edu.utfpr.recominer.metric.network.CommunicationNetworkMetricsCalculator;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
-import br.edu.utfpr.recominer.metric.network.NetworkMetricsCalculator;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.CommitMetrics;
 import br.edu.utfpr.recominer.model.ContextualMetrics;
@@ -64,36 +67,9 @@ public class MetricProcessor implements ItemProcessor {
         final Cacher cacher = new Cacher(null, bichoPairFileDAO);
 
         final Set<FilePair> filePairs = recominerDao.selectFilePairInOpenedIssues(project);
-
+        
         final CommitterFileMetricsCalculator committerFileMetricsCalculator = new CommitterFileMetricsCalculator(fileDao);
 
-//        for (FilePair filePair : filePairs) {
-//            final String filename = filePair.getFile1().getFileName();
-//
-//            final Set<Committer> fileCommittersInPreviousVersion
-//                    = bichoFileDAO.selectCommitters(filename, fixVersion);
-//
-//            for (Committer committer : fileCommittersInPreviousVersion) {
-//                final CommitterFileMetrics committerFileMetrics;
-//                if (pastMajorVersion != null) {
-//                    committerFileMetrics
-//                            = committerFileMetricsCalculator.calculeForVersion(
-//                                    filename, committer, pastMajorVersion);
-//                } else {
-//                    committerFileMetrics = new EmptyCommitterFileMetrics();
-//                }
-//                committerFileMetricsList.put(committer, committerFileMetrics);
-//                if (committerFileMetrics.getOwnership() > 0.05) { // maior que 5% = major
-//                    majorContributorsInPreviousVersion.add(committer);
-//                }
-//
-//                if (ownerExperience.containsKey(filename)) {
-//                    ownerExperience.put(filename, Math.max(committerFileMetrics.getExperience(), ownerExperience.get(filename)));
-//                } else {
-//                    ownerExperience.put(filename, committerFileMetrics.getExperience());
-//                }
-//            }
-//        }
         final FileMetricCalculator fileMetricCalculator = new FileMetricCalculator(fileDao);
         for (FilePair filePair : filePairs) {
             final Set<ContextualMetrics> allFileChanges = new LinkedHashSet<>();
@@ -145,9 +121,10 @@ public class MetricProcessor implements ItemProcessor {
                     // calculo das metricas de commit apenas para o primeiro arquivo
                     if (!allFileChanges.contains(metrics)) {
                         // pair file network
+                        final CommunicationNetworkDao communicationNetworkDao = new BichoCommunicationNetworkDao(dao, project);
                         final NetworkMetrics networkMetrics
-                                = new NetworkMetricsCalculator(issue, bichoDAO)
-                                        .getNetworkMetrics();
+                                = new CommunicationNetworkMetricsCalculator(communicationNetworkDao)
+                                        .calcule(issue);
 
                         metrics.setNetworkMetrics(networkMetrics);
 
@@ -160,5 +137,33 @@ public class MetricProcessor implements ItemProcessor {
             }
         }
         return project;
+    }
+    
+    public void calcule(Project project) {
+        final Properties properties = new Properties();
+        final String projectName = project.getProjectName();
+        properties.put(PersistenceUnitProperties.MULTITENANT_PROPERTY_DEFAULT, projectName);
+        final GenericDao dao = new GenericDao(factory.createEntityManager(properties));
+
+        final IssueMetricCalculator issueMetricCalculator = new IssueMetricCalculator(project, dao);
+        final RecominerDao recominerDao = new RecominerDao(dao);
+        final RecominerMetricDao recominerMetricDao = new RecominerMetricDao(dao, project);
+        
+        final Set<Commit> newCommits = recominerDao.selectNewCommits(project);
+        
+        for (Commit newCommit : newCommits) {
+            // 1. Generating test (input for classification)
+            // 1.1 calcule metrics for new commit and issue related with it
+            final Issue issueFromNewCommit = newCommit.getIssue();
+            issueMetricCalculator.calculeIssueMetrics(issueFromNewCommit);
+            
+            // 2. Generating train
+            for (File file : newCommit.getFiles()) {
+                // 2.1 get all file's commits and issues in past
+//                recominerMetricDao.selectFileCommits(file);
+                recominerMetricDao.selectPairFiles(file);
+                // 2.2 calcule issue and commit metrics
+            }
+        }
     }
 }

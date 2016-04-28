@@ -4,17 +4,15 @@ import br.edu.utfpr.recominer.dao.BichoDAO;
 import br.edu.utfpr.recominer.dao.BichoFileDAO;
 import br.edu.utfpr.recominer.dao.BichoPairFileDAO;
 import br.edu.utfpr.recominer.metric.committer.Committer;
+import br.edu.utfpr.recominer.metric.network.CommunicationNetworkMetricsCalculator;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
-import br.edu.utfpr.recominer.metric.network.NetworkMetricsCalculator;
 import br.edu.utfpr.recominer.model.CodeChurn;
-import br.edu.utfpr.recominer.model.Commenter;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
 import br.edu.utfpr.recominer.model.FilePairIssue;
 import br.edu.utfpr.recominer.model.Issue;
 import br.edu.utfpr.recominer.model.IssueMetrics;
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,7 +56,7 @@ public class Cacher {
     private final Map<Integer, IssueMetrics> issuesCommentsCacher = new HashMap<>();
     private final Map<Integer, Long> issuesReopenedCountCacher = new HashMap<>();
 
-    private final Map<Integer, NetworkMetricsCalculator> networkMetricsMap = new HashMap<>();
+    private final Map<Integer, NetworkMetrics> networkMetricsMap = new HashMap<>();
 
     private final Map<FilePairIssue, CodeChurn> cummulativeCodeChurnMap = new HashMap<>();
 
@@ -301,15 +299,15 @@ public class Cacher {
         }
     }
 
-    public NetworkMetrics calculeNetworkMetrics(Integer issue, DirectedSparseGraph<String, String> issueGraph, Map<String, Integer> edgesWeigth, Set<Commenter> devsCommentters) {
-        NetworkMetricsCalculator networkMetrics;
+    public NetworkMetrics calculeNetworkMetrics(Integer issue) {
+        NetworkMetrics networkMetrics;
         if (networkMetricsMap.containsKey(issue)) {
             networkMetrics = networkMetricsMap.get(issue);
         } else {
-            networkMetrics = new NetworkMetricsCalculator(issueGraph, edgesWeigth, devsCommentters);
+            networkMetrics = new CommunicationNetworkMetricsCalculator(null).calcule(new Issue(issue));
             networkMetricsMap.put(issue, networkMetrics);
         }
-        return networkMetrics.getNetworkMetrics();
+        return networkMetrics;
     }
 
     public long calculeCummulativeCommitters(String file1, String file2, String fixVersion) {

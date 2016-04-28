@@ -32,7 +32,7 @@ public class FileMetricInLastIssuesDao implements FileMetricDao {
     private final String from;
     private final String joinPeopleCommitters;
     private final String where;
-    private final String fixedIssueOnly;
+//    private final String fixedIssueOnly;
     private final String filterByCommitter;
     private final String orderByCommitDate;
     private final String filterByMaxFilesInCommit;
@@ -49,16 +49,17 @@ public class FileMetricInLastIssuesDao implements FileMetricDao {
 
         joinPeopleCommitters = "  JOIN {0}_vcs.people p ON p.id = s.committer_id";
 
-        fixedIssueOnly
-                = " AND i.resolution = \"Fixed\""
-                + " AND c.field = \"Resolution\""
-                + " AND c.new_value = i.resolution";
+//        fixedIssueOnly
+//                = " AND i.resolution = \"Fixed\""
+//                + " AND c.field = \"Resolution\""
+//                + " AND c.new_value = i.resolution";
 
         where = " WHERE com.file_path = ?"
                 + "   AND com.date > i.submitted_on"
                 + "   AND com.date < i.fixed_on"
                 + "   AND EXISTS (SELECT 1 FROM {0}.issues_fix_version ifv WHERE ifv.issue_id = i.id)"
-                + fixedIssueOnly;
+//                + fixedIssueOnly
+                ;
 
         orderByCommitDate = " ORDER BY com.date ASC";
         filterByMaxFilesInCommit = " AND s.num_files <= 20";

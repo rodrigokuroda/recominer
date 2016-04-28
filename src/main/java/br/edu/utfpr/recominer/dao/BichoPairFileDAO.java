@@ -249,7 +249,7 @@ public class BichoPairFileDAO {
                         + "     assigned.user_id, submitted.user_id, "
                         + "     i.num_watchers, i.reopened_times,"
                         + "     i.num_commenters, i.num_dev_commenters,"
-                        + "     i.submitted_on, MAX(c.changed_on)"
+                        + "     i.submitted_on, i.fixed_on, MAX(c.changed_on)"
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
                         + "  JOIN {0}_issues.changes c ON c.issue_id = i.id"
@@ -1307,7 +1307,8 @@ public class BichoPairFileDAO {
                 (Integer) rawIssues[10], // i.num_commenters
                 (Integer) rawIssues[11], // i.num_dev_commenters
                 (Timestamp) rawIssues[12], // i.submitted_on
-                (Timestamp) rawIssues[13] // c.changed_on where value = "Fixed"
+                (Timestamp) rawIssues[13], // i.fixed_on (preprocessed)
+                (Timestamp) rawIssues[14] // c.changed_on where value = "Fixed" (last update)
         );
 
         return issueWithComments;

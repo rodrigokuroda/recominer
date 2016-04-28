@@ -61,8 +61,8 @@ public class CochangeIdentifierProcessor implements ItemProcessor {
         boolean fixedIssueOnly = false;
         if (fixedIssueOnly) {
             selectIssuesAndCommits +=
-                  "   AND s.date <= i.fixed_on "
-                + "   AND i.fixed_on IS NOT NULL";
+                  "   AND i.fixed_on IS NOT NULL "
+                + "   AND s.date <= i.fixed_on";
             
         } else {
             selectIssuesAndCommits +=

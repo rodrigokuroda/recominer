@@ -41,7 +41,7 @@
         
     </flow>
     
-    <flow id="cochangeFlow">
+    <flow id="cochangeFlow" next="metricFlow">
         <step id="cochangeIdentificationStep" next="aprioriCalculationStep">
             <chunk item-count="1" checkpoint-policy="custom">
                 <reader ref="cochangeIdentifierReader" />
@@ -59,17 +59,16 @@
                 <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
         </step>
-        
     </flow>
     
-    <!--flow id="metricFlow">
-        <step id="metricsStep" next="metricsCalculationStep">
+    <flow id="metricFlow">
+        <step id="issueMetricsStep">
             <chunk item-count="1" checkpoint-policy="custom">
-                <reader ref="metricReader" />
-                <processor ref="metricProcessor" />
-                <writer ref="metricWriter" />
+                <reader ref="issueMetricReader" />
+                <processor ref="issueMetricProcessor" />
+                <writer ref="issueMetricWriter" />
                 <checkpoint-algorithm ref="recominerCheckPoint" />
             </chunk>
         </step>
-    </flow-->
+    </flow>
 </job>

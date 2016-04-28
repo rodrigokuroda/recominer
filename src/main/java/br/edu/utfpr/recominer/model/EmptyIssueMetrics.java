@@ -10,7 +10,7 @@ public final class EmptyIssueMetrics extends IssueMetrics {
 
     @SuppressWarnings("unchecked")
     public EmptyIssueMetrics() {
-        super(0, "", "", "", "", "", "", "", 0, 0, Collections.EMPTY_LIST, 0, 0, null, null);
+        super(0, "", "", "", "", "", "", "", 0, 0, Collections.EMPTY_LIST, 0, 0, null, null, null);
     }
 
     @Override

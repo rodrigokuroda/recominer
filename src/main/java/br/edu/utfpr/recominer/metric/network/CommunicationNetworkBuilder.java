@@ -1,8 +1,8 @@
 package br.edu.utfpr.recominer.metric.network;
 
-import br.edu.utfpr.recominer.dao.BichoDAO;
-import br.edu.utfpr.recominer.util.PairUtils;
 import br.edu.utfpr.recominer.model.Commenter;
+import br.edu.utfpr.recominer.model.Issue;
+import br.edu.utfpr.recominer.util.PairUtils;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -13,21 +13,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Builds a Directed Weighted Network from comments ordered by submit date.
+ * 
  * @author Rodrigo T. Kuroda
  */
-public class CommunicationNetworkBuilder {
+public class CommunicationNetworkBuilder implements NetworkBuilder {
 
-    private final BichoDAO bichoDAO;
-    private final Set<Integer> noCommenters;
+    private final CommunicationNetworkDao communicationNetworkDao;
+    private final Set<Issue> noCommenters;
 
-    public CommunicationNetworkBuilder(BichoDAO bichoDAO) {
-        this.bichoDAO = bichoDAO;
+    public CommunicationNetworkBuilder(CommunicationNetworkDao communicationNetworkDao) {
+        this.communicationNetworkDao = communicationNetworkDao;
         this.noCommenters = new HashSet<>();
     }
 
-    public Network<String, String> buildDirectedWeightedNetwork(Integer issue) {
-        final List<Commenter> commenters = bichoDAO.selectCommentersByIssueOrderBySubmissionDate(issue);
+    @Override
+    public Network<String, String> build(final Issue issue) {
+        final List<Commenter> commenters = communicationNetworkDao.selectCommenters(issue);
         final Graph<String, String> graphMulti = new DirectedSparseGraph<>();
         final Map<String, Integer> edgesWeigth = new HashMap<>();
 
@@ -69,8 +71,7 @@ public class CommunicationNetworkBuilder {
                 }
             }
         }
-        Network<String, String> network = new Network<>(graphMulti, edgesWeigth, commenters);
-
-        return network;
+        
+        return new Network<>(graphMulti, edgesWeigth, commenters);
     }
 }

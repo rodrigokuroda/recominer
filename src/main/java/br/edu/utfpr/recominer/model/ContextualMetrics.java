@@ -41,14 +41,14 @@ public class ContextualMetrics {
         this.file = new File(file);
         this.file2 = file2;
         this.issueMetrics = issueMetrics;
-        this.fileIssue = new FileIssue(getFile(), issueMetrics.getIssueNumber());
+        this.fileIssue = new FileIssue(getFile(), issueMetrics.getIssueId());
     }
 
     public ContextualMetrics(String file, String file2, Commit commit, IssueMetrics issueMetrics) {
         this.file = new File(file);
         this.file2 = file2;
         this.issueMetrics = issueMetrics;
-        this.fileIssue = new FileIssueCommit(getFile(), issueMetrics.getIssueNumber(), commit);
+        this.fileIssue = new FileIssueCommit(getFile(), issueMetrics.getIssueId(), commit);
     }
 
     public ContextualMetrics(String file, String file2, Integer issue, double... metrics) {

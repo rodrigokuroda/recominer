@@ -26,6 +26,7 @@ ALTER TABLE {0}_issues.issues ADD COLUMN num_watchers INT(11);
 ALTER TABLE {0}_issues.issues ADD COLUMN reopened_times INT(11);
 ALTER TABLE {0}_issues.issues ADD COLUMN fixed_on DATETIME;
 ALTER TABLE {0}_issues.issues ADD COLUMN updated_on DATETIME;
+ALTER TABLE {0}_issues.issues ADD COLUMN comments_updated_on DATETIME;
 
 -- Denormalize vcs schema
 CREATE SCHEMA IF NOT EXISTS {0} CHARACTER SET utf8 COLLATE utf8_general_ci;
