@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.batch.git;
+package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.externalprocess.ExternalCommand;

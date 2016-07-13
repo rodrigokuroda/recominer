@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
-import br.edu.utfpr.recominer.batch.bicho.IssueTracker;
-import br.edu.utfpr.recominer.batch.cvsanaly.VersionControl;
+import br.edu.utfpr.recominer.batch.extractor.IssueTracker;
+import br.edu.utfpr.recominer.batch.extractor.VersionControl;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -85,7 +85,7 @@ public class Project implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastAprioriUpdate;
     
-    @Column(name = "last_apriori_update")
+    @Column(name = "last_metrics_calculation")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastIssueUpdateForMetrics;
 

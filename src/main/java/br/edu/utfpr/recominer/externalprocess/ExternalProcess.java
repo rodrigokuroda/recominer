@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  * @author Rodrigo T. Kuroda
  */
 public class ExternalProcess {
-    
+
     private final Logger log = LogManager.getLogger();
 
     private final ProcessBuilder processBuilder;
@@ -24,7 +24,17 @@ public class ExternalProcess {
         processBuilder.redirectErrorStream(true);
     }
 
-    public int start() throws IOException, InterruptedException {
+    /**
+     * Start the process, wait for it conclusion and returns the exit value for
+     * the subprocess.
+     *
+     * @return the exit value of the subprocess represented by this Process
+     * object. By convention, the value 0 indicates normal termination.
+     * 
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public int startAndWaitFor() throws IOException, InterruptedException {
         Process process = processBuilder.start();
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         // TODO return Process or InputStream
@@ -44,5 +54,5 @@ public class ExternalProcess {
     public int getExitValue() {
         return exitValue;
     }
-    
+
 }

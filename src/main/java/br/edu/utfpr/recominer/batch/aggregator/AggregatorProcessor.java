@@ -1,6 +1,6 @@
 package br.edu.utfpr.recominer.batch.aggregator;
 
-import br.edu.utfpr.recominer.batch.bicho.IssueTrackerSystem;
+import br.edu.utfpr.recominer.batch.extractor.IssueTrackerSystem;
 import br.edu.utfpr.recominer.dao.GenericDao;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.dao.QueryUtils;

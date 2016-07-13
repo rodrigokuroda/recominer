@@ -1,10 +1,8 @@
-package br.edu.utfpr.recominer.batch.bicho;
+package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.Mysql;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
-import javax.batch.api.chunk.ItemProcessor;
-import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -15,24 +13,19 @@ import javax.persistence.EntityManagerFactory;
  * @author Rodrigo T. Kuroda
  */
 @Named
-public class BichoProcessor implements ItemProcessor {
+public class BichoProcessor {
 
     @Inject
     @Mysql
     private EntityManagerFactory factory;
-    
-    @Inject
-    private JobContext jobContext;
 
-    @Override
-    public Object processItem(Object item) throws Exception {
-        Project project = (Project) item;
+    public int process(Project project) throws Exception {
         EntityManager em = factory.createEntityManager();
         em.createNativeQuery("CREATE SCHEMA IF NOT EXISTS " + project.getProjectName().toLowerCase() + "_issues CHARACTER SET utf8 COLLATE utf8_general_ci").executeUpdate();
 
         ExternalProcess ep = new ExternalProcess(new BichoCommand(project));
-        ep.start();
+        int processExitCode = ep.startAndWaitFor();
 
-        return project;
+        return processExitCode;
     }
 }

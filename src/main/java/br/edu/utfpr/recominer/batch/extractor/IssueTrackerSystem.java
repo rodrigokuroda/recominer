@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.batch.bicho;
+package br.edu.utfpr.recominer.batch.extractor;
 
 /**
  *

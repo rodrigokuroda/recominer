@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.batch.bicho;
+package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import java.io.Serializable;
@@ -53,6 +53,9 @@ public class IssueTracker implements Serializable {
     
     @OneToMany(mappedBy = "issueTracker", cascade = CascadeType.ALL)
     private List<Project> project;
+
+    public IssueTracker() {
+    }
 
     public IssueTracker(final Integer id) {
         this.id = id;

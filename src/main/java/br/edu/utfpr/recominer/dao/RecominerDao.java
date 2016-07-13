@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.dao;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
-import br.edu.utfpr.recominer.batch.bicho.IssueTracker;
+import br.edu.utfpr.recominer.batch.extractor.IssueTracker;
 import br.edu.utfpr.recominer.model.Commit;
 import br.edu.utfpr.recominer.model.File;
 import br.edu.utfpr.recominer.model.FilePair;
@@ -163,6 +163,10 @@ public class RecominerDao {
 
     public Set<Commit> selectNewCommits(Project project) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public List<Project> listProjects() {
+        return dao.selectAll(Project.class);
     }
 
 }

@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.batch.cvsanaly;
+package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import br.edu.utfpr.recominer.dao.GenericDao;
@@ -10,18 +10,14 @@ import javax.batch.runtime.context.JobContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManagerFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Rodrigo T. Kuroda
  */
 @Named
-public class CvsanalyWriter extends AbstractItemWriter {
-    
-    private final Logger log = LogManager.getLogger();
-    
+public class ExtractorWriter extends AbstractItemWriter {
+
     @Inject
     private EntityManagerFactory factory;
     
@@ -36,9 +32,9 @@ public class CvsanalyWriter extends AbstractItemWriter {
         final RecominerDao recominerDao = new RecominerDao(dao);
         for (Object item : items) {
             final Project project = (Project) item;
-            project.setLastVcsUpdate(new Date());
+            project.setLastItsUpdate(new Date());
             recominerDao.updateProjectUpdate(project);
         }
     }
-    
+
 }

@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.batch.cvsanaly;
+package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.batch.aggregator.Project;
 import java.io.Serializable;
@@ -34,6 +34,9 @@ public class VersionControl implements Serializable {
     
     @OneToMany(mappedBy = "versionControl", cascade = CascadeType.ALL)
     private List<Project> project;
+
+    public VersionControl() {
+    }
 
     public VersionControl(final Integer id) {
         this.id = id;
