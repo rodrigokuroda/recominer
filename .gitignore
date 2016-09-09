@@ -1,3 +1,13 @@
 /.settings/
+/recominer-core/.settings/
+/recominer-web/.settings/
+/recominer-extractor/.settings/
 /nbproject/
+/recominer-core/nbproject/
+/recominer-web/nbproject/
+/recominer-extractor/nbproject/
 /target/
+/recominer-core/target/
+/recominer-web/target/
+/recominer-extractor/target/
+/recominer-extractor/generated/
