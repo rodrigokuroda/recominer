@@ -1,9 +1,9 @@
 package br.edu.utfpr.recominer.batch.extractor;
 
-import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import br.edu.utfpr.recominer.core.model.IssueTracker;
 import br.edu.utfpr.recominer.core.model.IssueTrackerSystem;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +22,7 @@ class BichoCommand implements ExternalCommand {
     private static final String BICHO_DB_PASSWORD = "--db-password-out=root";
     private static final String BICHO_DB_NAME = "--db-database-out=${DB_NAME}_issues";
     private static final String BICHO_DELAY = "-d";
+    private static final String BICHO_N_ISSUES_PER_TIME = "-n 10";
     private static final String BICHO_DEBUG = "-g";
     private static final String BICHO_ISSUE_TRACKER_SYSTEM = "-b";
     private static final String BICHO_ISSUE_TRACKER_URL = "-u";
@@ -51,6 +52,7 @@ class BichoCommand implements ExternalCommand {
         command.add(BICHO_DB_PASSWORD);
         command.add(BICHO_DB_NAME.replace("${DB_NAME}", project.getProjectName().toLowerCase()));
 
+        command.add(BICHO_N_ISSUES_PER_TIME);
         command.add(BICHO_DELAY);
         command.add(its.getExtractionDelay().toString());
         command.add(BICHO_DEBUG);
