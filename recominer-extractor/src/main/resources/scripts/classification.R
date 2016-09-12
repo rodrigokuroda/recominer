@@ -42,11 +42,17 @@ file1 <- train[1,2]
 file2Id <- train[1,3]
 file2 <- train[1,4]
 
-train<-train[,c("issueType", "issuePriority", "issueAssignedTo", "issueSubmittedBy", "commenters", "devCommenters", "issueAge", "wordinessBody", "wordinessComments", "comments", "btwMdn", "clsMdn", "dgrMdn", "efficiencyMdn", "efvSizeMdn", "constraintMdn", "hierarchyMdn", "size", "ties", "density", "diameter", "revision", "committer", "committers", "commits", "fileAge", "addedLines", "deletedLines", "changedLines", "cochanged")]
-test<-test[,c("issueType", "issuePriority", "issueAssignedTo", "issueSubmittedBy", "commenters", "devCommenters", "issueAge", "wordinessBody", "wordinessComments", "comments", "btwMdn", "clsMdn", "dgrMdn", "efficiencyMdn", "efvSizeMdn", "constraintMdn", "hierarchyMdn", "size", "ties", "density", "diameter", "revision", "committer", "committers", "commits", "fileAge", "addedLines", "deletedLines", "changedLines")]
+cochanged<-train[,c("cochanged")]
+train<-train[,c("issueType", "issuePriority", "issueAssignedTo", "issueSubmittedBy", "commenters", "devCommenters", "issueAge", "wordinessBody", "wordinessComments", "comments", "btwMdn", "clsMdn", "dgrMdn", "efficiencyMdn", "efvSizeMdn", "constraintMdn", "hierarchyMdn", "size", "ties", "density", "diameter", "committer", "committers", "commits", "fileAge", "addedLines", "deletedLines", "changedLines")]
+test<-test[,c("issueType", "issuePriority", "issueAssignedTo", "issueSubmittedBy", "commenters", "devCommenters", "issueAge", "wordinessBody", "wordinessComments", "comments", "btwMdn", "clsMdn", "dgrMdn", "efficiencyMdn", "efvSizeMdn", "constraintMdn", "hierarchyMdn", "size", "ties", "density", "diameter", "committer", "committers", "commits", "fileAge", "addedLines", "deletedLines", "changedLines")]
+
+#lastcol <- ncol(train)
+#train[,lastcol]
+#summary(train)
+#summary(test)
 
 # Transforming the class (cochanged == 1 to "Changed", otherwise "Not changed")
-train$cochanged <- as.factor(ifelse(train$cochanged==1, "C", "N"))
+cochanged <- as.factor(ifelse(cochanged==1, "C", "N"))
 
 # Transforming string/char metrics in factors
 train$issueType <- factor(train$issueType)
@@ -59,11 +65,8 @@ test$issueAssignedTo <- factor(test$issueAssignedTo)
 test$issueSubmittedBy <- factor(test$issueSubmittedBy)
 test$committer <- factor(test$committer)
 
-Number_trainClassCochange<-length(which(train$cochanged=='C'))
-Number_trainWithoutClassCochange<-length(which(train$cochanged=='N'))
-
 print("Training...")
-rf_model <- train(train$cochanged ~ ., method="rf",  tuneLength = 2, trControl=trainControl(method = "boot"), data=train, importance = FALSE)
+rf_model <- train(cochanged ~ ., method="rf",  tuneLength = 2, trControl=trainControl(method = "boot"), data=train, importance = FALSE)
 
 id <- which(!(test$issueType %in% levels(train$issueType)))
 test$issueType[id] <- NA

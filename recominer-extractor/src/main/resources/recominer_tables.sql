@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS {0}.ar_prediction(
 );
 
 -- Sequence for grouping a set of files (table fileset)
-CREATE TABLE {0}.fileset_sequence (id INT NOT NULL);
-INSERT INTO {0}.fileset_sequence VALUES (0);
+CREATE TABLE IF NOT EXISTS {0}.fileset_sequence (id INT NOT NULL);
+-- INSERT INTO {0}.fileset_sequence VALUES (0);
 
 CREATE TABLE IF NOT EXISTS {0}.fileset(
     id INT(11) NOT NULL AUTO_INCREMENT,

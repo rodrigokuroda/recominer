@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.batch.classificator;
 
-import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,7 @@ public class RscriptCommand implements ExternalCommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(RscriptCommand.class);
 
-    private static final String RSCRIPT = "C:\\Program Files\\R\\R-3.1.1\\bin\\x64\\Rscript";
+    private static final String RSCRIPT = "Rscript";
     private final Project project;
 
     public RscriptCommand(final Project project) {
