@@ -4,22 +4,22 @@ import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.ProjectRepository;
 import java.util.List;
 import javax.inject.Inject;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class PredictionController {
+public class ProjectController {
 
     @Inject
     private ProjectRepository repository;
 
-    public PredictionController() {
+    public ProjectController() {
     }
 
-    @RequestMapping(value = "/projects", method = RequestMethod.POST)
-    public List<Project> evaluate(@RequestBody(required = false) String password) {
+    @RequestMapping(value = "/projects", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Project> listProjects() {
         return repository.findAll();
     }
 }
