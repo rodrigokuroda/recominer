@@ -23,6 +23,7 @@ public class DataSourceConfiguration {
 //    private Resource schemaScript;
 
     @Bean
+    @Primary
     public DataSource mysqlDataSource() throws SQLException {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriver(new com.mysql.jdbc.Driver());

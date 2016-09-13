@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @EnableAutoConfiguration
 @Import({DataSourceConfiguration.class})
-@ComponentScan("br.com.utfpr.recominer")
+@ComponentScan("br.edu.utfpr.recominer")
 public class WebAppInitializer{
 
     public static void main(String[] args) throws Exception{
