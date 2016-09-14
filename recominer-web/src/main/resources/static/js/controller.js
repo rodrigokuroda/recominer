@@ -1,5 +1,8 @@
 app.controller("projectController", ['$scope', '$log', '$window', '$http', function ($scope, $log, $window, $http) {
         $scope.projects = null;
+        $scope.issues = null;
+        $scope.files = null;
+        $scope.tabIndex = 0;
 
         $log.debug("Fetching project...");
         $http.get("/projects")
@@ -11,19 +14,48 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', funct
                         }
                 );
 
-    }]);
-
-
-app.controller('AppCtrl', ['$scope', '$mdBottomSheet', '$mdSidenav', '$mdDialog', function ($scope, $mdBottomSheet, $mdSidenav, $mdDialog) {
-
         // Toolbar search toggle
-        $scope.toggleSearch = function (element) {
-            $scope.showSearch = !$scope.showSearch;
+        $scope.toggleSearchProjects = function (element) {
+            $scope.showSearchProjects = !$scope.showSearchProjects;
+        };
+        $scope.toggleSearchIssues = function (element) {
+            $scope.showSearchIssues = !$scope.showSearchIssues;
+        };
+        $scope.toggleSearchFiles = function (element) {
+            $scope.showSearchFiles = !$scope.showSearchFiles;
         };
 
         // Sidenav toggle
         $scope.toggleSidenav = function (menuId) {
             $mdSidenav(menuId).toggle();
+        };
+
+        // Load issues
+        $scope.getIssuesOf = function (project) {
+            $log.debug("Fetching issues from project id " + project + "...");
+            $http.post("/issues", project)
+                    .then(function (response) {
+                        $scope.issues = response.data;
+                    },
+                            function (response) { // optional
+                                $scope.issues = null;
+                            }
+                    );
+            $scope.tabIndex = 1;
+        };
+
+        // Load files
+        $scope.getFilesOf = function (issue) {
+            $log.debug("Fetching issues from issue id " + issue + "...");
+            $http.post("/issues", issue)
+                    .then(function (response) {
+                        $scope.files = response.data;
+                    },
+                            function (response) { // optional
+                                $scope.files = null;
+                            }
+                    );
+            $scope.tabIndex = 2;
         };
 
         // Menu items
