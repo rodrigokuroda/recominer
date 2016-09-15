@@ -30,12 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  *
  * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
  */
 @Configuration
+@Profile({"dev", "test"})
 public class BatchConfiguration {
 
     @Autowired
@@ -66,7 +68,7 @@ public class BatchConfiguration {
     protected Step extractorStep(ExtractorReader reader,
             ExtractorProcessor processor,
             ExtractorWriter writer) {
-        return steps.get("step1")
+        return steps.get("extractorStep")
                 .<Project, ExtractorLog>chunk(10)
                 .reader(reader)
                 .processor(processor)
@@ -78,7 +80,7 @@ public class BatchConfiguration {
     protected Step calculatorStep(CalculatorReader reader,
             CalculatorProcessor processor,
             CalculatorWriter writer) {
-        return steps.get("step2")
+        return steps.get("calculatorStep")
                 .<Project, CalculatorLog>chunk(10)
                 .reader(reader)
                 .processor(processor)
@@ -90,7 +92,7 @@ public class BatchConfiguration {
     protected Step datasetStep(DatasetReader reader,
             DatasetProcessor processor,
             DatasetWriter writer) {
-        return steps.get("step3")
+        return steps.get("datasetStep")
                 .<Project, DatasetLog>chunk(10)
                 .reader(reader)
                 .processor(processor)
@@ -102,7 +104,7 @@ public class BatchConfiguration {
     protected Step classificationStep(ClassificatorReader reader,
             ClassificatorProcessor processor,
             ClassificatorWriter writer) {
-        return steps.get("step4")
+        return steps.get("classificationStep")
                 .<Project, ClassificatorLog>chunk(10)
                 .reader(reader)
                 .processor(processor)
@@ -114,7 +116,7 @@ public class BatchConfiguration {
     protected Step associationRuleStep(AssociationRuleReader reader,
             AssociationRuleProcessor processor,
             AssociationRuleWriter writer) {
-        return steps.get("step5")
+        return steps.get("associationRuleStep")
                 .<Project, AssociationRuleLog>chunk(10)
                 .reader(reader)
                 .processor(processor)

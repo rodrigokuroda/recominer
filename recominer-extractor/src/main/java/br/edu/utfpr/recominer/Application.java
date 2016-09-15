@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  *
@@ -23,8 +23,8 @@ import org.springframework.context.annotation.Import;
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 @org.springframework.context.annotation.Configuration
 @EnableBatchProcessing
-@Import({DataSourceConfiguration.class})
 @ComponentScan("br.edu.utfpr.recominer")
+@ActiveProfiles("dev")
 public class Application {
 
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
