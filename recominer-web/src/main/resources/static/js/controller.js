@@ -57,8 +57,8 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', funct
         $scope.getCommitsOf = function (issue) {
             $scope.activeIssue = issue;
             $log.debug("Fetching commits from issue " + issue.key + "...");
-            params = {'project' : $scope.activeProject, 'issue' : issue}
-            $http.post("/commits", params)
+            issue.project = $scope.activeProject;
+            $http.post("/commits", issue)
                     .then(function (response) {
                         $scope.commits = response.data;
                     },
@@ -73,7 +73,8 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', funct
         $scope.getFilesOf = function (commit) {
             $scope.activeCommit = commit
             $log.debug("Fetching files from commit " + commit.revision + "...");
-            $http.post("/files", $scope.activeProject, commit)
+            commit.project = $scope.activeProject;
+            $http.post("/files", commit)
                     .then(function (response) {
                         $scope.files = response.data;
                     },

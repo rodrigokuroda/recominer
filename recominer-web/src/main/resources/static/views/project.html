@@ -45,7 +45,7 @@
                                     <md-list-item class="md-2-line" ng-repeat="project in projects| filter:search" role="link"
                                                   ng-click="getIssuesOf(project)" ng-class="{ 'nav-active': project == activeProject }">
                                         <div class="md-list-item-text">
-                                            <div class="md-body-2">{{project.projectName}}</div>
+                                            <div class="md-body-2">{{project.name}}</div>
                                         </div>
                                         <md-divider></md-divider>
                                     </md-list-item>

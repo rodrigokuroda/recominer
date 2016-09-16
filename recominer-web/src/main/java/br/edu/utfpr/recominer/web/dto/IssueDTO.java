@@ -20,6 +20,10 @@ public class IssueDTO {
         this.key = issue.getKey();
     }
 
+    public Issue getIssue() {
+        return new Issue(id);
+    }
+
     public Integer getId() {
         return id;
     }

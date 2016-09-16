@@ -53,5 +53,8 @@ public class CommitDTO {
         this.revision = revision;
     }
 
+    public Commit getCommit() {
+        return new Commit(id);
+    }
 
 }
