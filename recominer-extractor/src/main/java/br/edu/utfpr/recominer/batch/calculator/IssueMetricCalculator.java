@@ -35,7 +35,7 @@ public class IssueMetricCalculator {
 //                QueryUtils.getQueryForDatabase(
 //                        "SELECT comments.text"
 //                        + "  FROM {0}_issues.comments comments "
-//                        + " WHERE comments.issue_id = ?", project.getProjectName()),
+//                        + " WHERE comments.issue_id = ?",  project),
 //                (ResultSet rs, int rowNum) -> rs.getString(1),
 //                issue.getId());
 //
@@ -67,7 +67,7 @@ public class IssueMetricCalculator {
 //                ;
 //
 //        IssuesMetrics metrics = template.queryForObject(
-//                QueryUtils.getQueryForDatabase(selectMetric, project.getProjectName()),
+//                QueryUtils.getQueryForDatabase(selectMetric,  project),
 //                (ResultSet rs, int rowNum) -> {
 //                    return new IssuesMetrics(
 //                            rs.getInt("id"),
@@ -99,7 +99,7 @@ public class IssueMetricCalculator {
                         "SELECT comments.text"
                         + "  FROM {0}_issues.comments comments "
                         + " WHERE comments.issue_id = ?"
-                        + "   AND comments.submitted_on <= (SELECT s.date FROM {0}_vcs.scmlog s WHERE s.id = ?)", project.getProjectName()),
+                        + "   AND comments.submitted_on <= (SELECT s.date FROM {0}_vcs.scmlog s WHERE s.id = ?)",  project),
                 (ResultSet rs, int rowNum) -> rs.getString(1),
                 issue.getId(), commit.getId());
 
@@ -120,32 +120,24 @@ public class IssueMetricCalculator {
                 + "                         AND pc.is_dev = 1"
                 + "                         AND comments2.submitted_on <= "
                 + "                            s.date) AS num_dev_commenters, "
-                
                 + "                     i.submitted_on, i.fixed_on, "
-                + "                     MAX(c.changed_on) as updated_on, "
-                
-                + "                     (SELECT MAX(comments2.submitted_on) "
-                + "                        FROM {0}_issues.comments comments2"
-                + "                       WHERE comments2.issue_id = i.id"
-                + "                         AND comments2.submitted_on <= "
-                + "                            s.date) AS comments_updated_on"
-                
+                + "                     i.updated_on, "
+                + "                     i.comments_updated_on"
                 + "                  FROM {0}_issues.issues i"
                 + "                  LEFT JOIN {0}.issues_metrics im ON im.issue_id = i.id AND im.commit_id = ?"
                 + "                  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
-                + "                  LEFT JOIN {0}_issues.changes c ON c.issue_id = i.id "
                 + "                  LEFT JOIN {0}_issues.comments comments ON comments.issue_id = i.id"
                 + "                  JOIN {0}_issues.people assigned ON assigned.id = i.assigned_to"
                 + "                  JOIN {0}_issues.people submitted ON submitted.id = i.submitted_by"
                 + "                  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                 + "                  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                 + "                 WHERE i.id = ? "
-                + "                 GROUP BY i.id " // for "MAX(c.changed_on)" work
+                + "                 GROUP BY i.id "
                 + "                 ORDER BY i.submitted_on" 
                 ;
 
         IssuesMetrics metrics = template.queryForObject(
-                QueryUtils.getQueryForDatabase(selectMetric, project.getProjectName()),
+                QueryUtils.getQueryForDatabase(selectMetric,  project),
                 (ResultSet rs, int rowNum) -> {
                     return new IssuesMetrics(
                             rs.getInt("id"),

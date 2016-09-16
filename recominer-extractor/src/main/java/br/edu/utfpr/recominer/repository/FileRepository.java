@@ -1785,21 +1785,37 @@ public class FileRepository extends JdbcRepository<File, Integer> {
 //    }
     public CodeChurn calculeCodeChurn(File file, Commit commit) {
         return jdbcOperations.queryForObject(
-                QueryUtils.getQueryForDatabase("SELECT lines_added, lines_removed FROM {0}.files_commits WHERE file_id = ? AND commit_id = ?", project.getProjectName()),
-                (ResultSet rs, int rowNum) -> new CodeChurn(file, rs.getLong("lines_added"), rs.getLong("lines_removed")),
+                QueryUtils.getQueryForDatabase(
+                        "SELECT lines_added, lines_removed "
+                        + " FROM {0}.files_commits "
+                        + "WHERE file_id = ? "
+                        + "  AND commit_id = ?", project),
+                (ResultSet rs, int rowNum)
+                -> new CodeChurn(
+                        file,
+                        rs.getLong("lines_added"),
+                        rs.getLong("lines_removed")),
                 file.getId(), commit.getId());
     }
 
     public Long calculeCommitters(File file, Commit commit) {
         return jdbcOperations.queryForObject(
-                QueryUtils.getQueryForDatabase("SELECT COUNT(DISTINCT(committer_id)) as committers FROM {0}.files_commits fc JOIN {0}.commits c ON c.commit_id = fc.commit_id WHERE fc.file_id = ? AND fc.commit_id = ?", project.getProjectName()),
+                QueryUtils.getQueryForDatabase(
+                        "SELECT COUNT(DISTINCT(committer_id)) as committers "
+                        + " FROM {0}.files_commits fc "
+                        + " JOIN {0}.commits c ON c.commit_id = fc.commit_id "
+                        + "WHERE fc.file_id = ? AND fc.commit_id = ?", project),
                 (ResultSet rs, int rowNum) -> rs.getLong("committers"),
                 file.getId(), commit.getId());
     }
 
     public Long calculeCommits(File file, Commit commit) {
         return jdbcOperations.queryForObject(
-                QueryUtils.getQueryForDatabase("SELECT COUNT(DISTINCT(commit_id)) as commits FROM {0}.files_commits WHERE file_id = ? AND commit_id = ?", project.getProjectName()),
+                QueryUtils.getQueryForDatabase(
+                        "SELECT COUNT(DISTINCT(commit_id)) as commits "
+                        + " FROM {0}.files_commits "
+                        + "WHERE file_id = ? "
+                        + "  AND commit_id = ?", project),
                 (ResultSet rs, int rowNum) -> rs.getLong("commits"),
                 file.getId(), commit.getId());
     }
@@ -1812,8 +1828,22 @@ public class FileRepository extends JdbcRepository<File, Integer> {
 //    }
     public Long calculeTotalFileAgeInDays(File file, Commit commit) {
         return jdbcOperations.queryForObject(
-                QueryUtils.getQueryForDatabase("SELECT MIN(c.date) as first_commit, MAX(c.date) as last_commit FROM {0}.commits c JOIN {0}.files_commits fc ON fc.commit_id = c.commit_id WHERE fc.file_id = ? AND c.date <= (SELECT DISTINCT(c2.date) FROM {0}.files_commits fc2 JOIN {0}.commits c2 ON c2.commit_id = fc2.commit_id WHERE fc2.file_id = ? AND fc2.commit_id = ?)", project.getProjectName()),
-                (ResultSet rs, int rowNum) -> (long) Days.daysBetween(new LocalDate(rs.getTimestamp("first_commit")), new LocalDate(rs.getTimestamp("last_commit"))).getDays(),
+                QueryUtils.getQueryForDatabase(
+                        "SELECT MIN(c.date) as first_commit, "
+                        + "     MAX(c.date) as last_commit "
+                        + " FROM {0}.commits c "
+                        + " JOIN {0}.files_commits fc ON fc.commit_id = c.commit_id "
+                        + "WHERE fc.file_id = ? "
+                        + "  AND c.date <= "
+                        + "      (SELECT DISTINCT(c2.date) "
+                        + "         FROM {0}.files_commits fc2 "
+                        + "         JOIN {0}.commits c2 ON c2.commit_id = fc2.commit_id "
+                        + "        WHERE fc2.file_id = ? "
+                        + "          AND fc2.commit_id = ?)", project),
+                (ResultSet rs, int rowNum) -> (long) Days.daysBetween(
+                        new LocalDate(rs.getTimestamp("first_commit")),
+                        new LocalDate(rs.getTimestamp("last_commit")))
+                .getDays(),
                 file.getId(), file.getId(), commit.getId());
     }
 
@@ -1823,7 +1853,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         "SELECT f.id, f.file_path"
                         + "  FROM {0}.files f"
                         + "  JOIN {0}.files_commits fc ON f.id = fc.file_id"
-                        + " WHERE fc.commit_id = ?", project.getProjectName()),
+                        + " WHERE fc.commit_id = ?", project),
                 (ResultSet rs, int rowNum) -> new File(rs.getInt("id"), rs.getString("file_path")),
                 commit.getId());
     }
@@ -1835,7 +1865,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         + "  FROM {0}.files f"
                         + "  JOIN {0}.files_commits fc ON f.id = fc.file_id"
                         + " WHERE fc.commit_id = ?"
-                        + "   AND f.id <> ?", project.getProjectName()),
+                        + "   AND f.id <> ?", project),
                 (ResultSet rs, int rowNum) -> new Cochange(new File(rs.getInt("id"), rs.getString("file_path")), commit),
                 commit.getId(), withFile.getId());
     }
@@ -1843,12 +1873,12 @@ public class FileRepository extends JdbcRepository<File, Integer> {
     public Long countFixedIssues(FilePair cochange) {
         return jdbcOperations.queryForObject(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT * FROM avro.files_commits fc\n"
-                        + "  JOIN avro.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id\n"
-                        + " WHERE fc.file_id = ?\n"
-                        + "   AND EXISTS (SELECT * FROM avro.files_commits fc2\n"
-                        + "  JOIN avro.issues_scmlog i2s2 ON i2s2.scmlog_id = fc2.commit_id\n"
-                        + "  WHERE fc2.file_id = ? AND i2s2.issue_id = i2s.issue_id)", project.getProjectName()),
+                        "SELECT * FROM avro.files_commits fc "
+                        + "  JOIN avro.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
+                        + " WHERE fc.file_id = ? "
+                        + "   AND EXISTS (SELECT * FROM avro.files_commits fc2 "
+                        + "  JOIN avro.issues_scmlog i2s2 ON i2s2.scmlog_id = fc2.commit_id "
+                        + "  WHERE fc2.file_id = ? AND i2s2.issue_id = i2s.issue_id)", project),
                 Long.class,
                 cochange.getFile1().getId(), cochange.getFile2().getId());
 
@@ -1861,7 +1891,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         + "  FROM {0}.files f"
                         + "  JOIN {0}.files_commits fc ON f.id = fc.file_id"
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id"
-                        + " WHERE i2s.issue_id = ?", project.getProjectName()),
+                        + " WHERE i2s.issue_id = ?", project),
                 (ResultSet rs, int rowNum) -> new File(rs.getInt("id"), rs.getString("file_path")),
                 issue.getId());
     }

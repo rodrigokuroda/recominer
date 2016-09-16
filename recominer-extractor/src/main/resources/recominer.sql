@@ -151,6 +151,7 @@ CREATE TABLE `project` (
   `last_its_update` datetime DEFAULT NULL,
   `last_vcs_update` datetime DEFAULT NULL,
   `project_name` varchar(255) DEFAULT NULL,
+  `schema_prefix` varchar(255) DEFAULT NULL,
   `repository_path` varchar(255) DEFAULT NULL,
   `version_control_url` varchar(255) DEFAULT NULL,
   `issue_tracker` int(2) DEFAULT NULL,
@@ -173,7 +174,7 @@ CREATE TABLE `project` (
 
 LOCK TABLES `project` WRITE;
 /*!40000 ALTER TABLE `project` DISABLE KEYS */;
-INSERT INTO `project` VALUES (1,'https://issues.apache.org/jira/browse/AVRO','2016-07-13 00:37:14','2016-05-01 22:51:14','avro','/home/kuroda/Git/avro','https://github.com/apache/avro.git',1,NULL,'2016-03-15 08:47:31','2016-03-28 18:25:04','2016-03-17 16:56:38','2016-03-31 20:21:15',NULL,NULL);
+INSERT INTO `project` VALUES (1,'https://issues.apache.org/jira/browse/AVRO','2016-07-13 00:37:14','2016-05-01 22:51:14','avro','avro','/home/kuroda/Git/avro','https://github.com/apache/avro.git',1,NULL,'2016-03-15 08:47:31','2016-03-28 18:25:04','2016-03-17 16:56:38','2016-03-31 20:21:15',NULL,NULL);
 /*!40000 ALTER TABLE `project` ENABLE KEYS */;
 UNLOCK TABLES;
 

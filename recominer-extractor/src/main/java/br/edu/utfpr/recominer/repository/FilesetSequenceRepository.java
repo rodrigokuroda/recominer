@@ -12,25 +12,25 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class FilesetSequenceRepository {
-    
+
     @Inject
     private JdbcTemplate template;
-    
+
     private Project project;
 
     public void setProject(Project project) {
         this.project = project;
     }
-    
+
     public Long getNext() {
         template.update(
                 QueryUtils.getQueryForDatabase(
-                        "UPDATE {0}.fileset_sequence SET id=LAST_INSERT_ID(id+1)",
-                        project.getProjectName()));
+                        "UPDATE {0}.fileset_sequence SET id = LAST_INSERT_ID(id+1)",
+                        project));
         return template.queryForObject(
                 QueryUtils.getQueryForDatabase("SELECT id FROM {0}.fileset_sequence",
-                        project.getProjectName()),
+                        project),
                 Long.class);
     }
-    
+
 }

@@ -51,7 +51,7 @@ public class ExtractorReader implements ItemReader<Project> {
             lastCommitDateAnalyzed = template.queryForObject(
                 QueryUtils.getQueryForDatabase(
                         "SELECT MAX(date) FROM {0}_vcs.scmlog WHERE id IN (SELECT scmlog_id FROM {0}.issues_scmlog)",
-                        project.getProjectName()), Date.class);
+                        project), Date.class);
         } catch (Exception e) {
             lastCommitDateAnalyzed = null;
         }

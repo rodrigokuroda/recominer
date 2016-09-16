@@ -38,8 +38,8 @@ public class DataSourceConfiguration {
     @Value("classpath:test_recominer.sql")
     private Resource testRecominerScript;
 
-    @Value("classpath:test_recominer.sql")
-    private Resource testBatchScript;
+    @Value("classpath:test_schemas.sql")
+    private Resource testSchemas;
 
     @Value("${spring.datasource.initialize:false}")
     private boolean databaseInitializationEnabled = false;
@@ -49,7 +49,6 @@ public class DataSourceConfiguration {
         if (databaseInitializationEnabled) {
             System.out.println("Initializing database...");
             DatabasePopulatorUtils.execute(databasePopulator(), dataSource());
-            DatabasePopulatorUtils.execute(batchDatabasePopulator(), batchDataSource());
         }
     }
 
@@ -109,16 +108,11 @@ public class DataSourceConfiguration {
 
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(testSchemas);
         populator.addScript(testRecominerScript);
         populator.addScript(testIssuesScript);
         populator.addScript(testScript);
         populator.addScript(testVcsScript);
-        return populator;
-    }
-
-    private DatabasePopulator batchDatabasePopulator() {
-        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-        populator.addScript(testBatchScript);
         return populator;
     }
 

@@ -5,7 +5,8 @@ import java.util.Date;
 import org.springframework.data.domain.Persistable;
 
 /**
- *
+ * Represents a software project, containing information about of it.
+ * 
  * @author Rodrigo T. Kuroda
  */
 public class Project implements Persistable<Integer>, Serializable {
@@ -14,6 +15,7 @@ public class Project implements Persistable<Integer>, Serializable {
 
     private Integer id;
     private String projectName;
+    private String schemaPrefix;
     private String issueTrackerUrl;
     private IssueTracker issueTracker;
     private String versionControlUrl;
@@ -35,37 +37,13 @@ public class Project implements Persistable<Integer>, Serializable {
         this.id = id;
     }
 
-    public Project(Integer id, String projectName, String issueTrackerUrl, IssueTracker issueTrackerSystem, String versionControlUrl) {
+    public Project(Integer id, String projectName, String schemaPrefix, String issueTrackerUrl, IssueTracker issueTrackerSystem, String versionControlUrl) {
         this.id = id;
         this.projectName = projectName;
+        this.schemaPrefix = schemaPrefix;
         this.issueTrackerUrl = issueTrackerUrl;
         this.issueTracker = issueTrackerSystem;
         this.versionControlUrl = versionControlUrl;
-    }
-
-    /**
-     * "SELECT id," + " issue_tracker_url," + " last_its_update," + "
-     * last_vcs_update," + " project_name," + " repository_path," + "
-     * version_control_url," + " issue_tracker," + " version_control," + "
-     * last_commit_date_analyzed," + " last_issue_update_analyzed," + "
-     * last_issue_update_analyzed_for_cochange," + " last_apriori_update"
-     *
-     * @param rawProject
-     */
-    public Project(Object[] rawProject) {
-        id = (Integer) rawProject[0];
-        issueTrackerUrl = (String) rawProject[1];
-        lastItsUpdate = (Date) rawProject[2];
-        lastVcsUpdate = (Date) rawProject[3];
-        projectName = (String) rawProject[4];
-        repositoryPath = (String) rawProject[5];
-        versionControlUrl = (String) rawProject[6];
-        issueTracker = new IssueTracker((Integer) rawProject[7]);
-        versionControl = new VersionControl((Integer) rawProject[8]);
-        lastCommitDateAnalyzed = (Date) rawProject[9];
-        lastIssueUpdateAnalyzed = (Date) rawProject[10];
-        lastIssueUpdateAnalyzedForCochange = (Date) rawProject[11];
-        lastAprioriUpdate = (Date) rawProject[12];
     }
 
     @Override
@@ -83,6 +61,14 @@ public class Project implements Persistable<Integer>, Serializable {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getSchemaPrefix() {
+        return schemaPrefix;
+    }
+
+    public void setSchemaPrefix(String schemaPrefix) {
+        this.schemaPrefix = schemaPrefix;
     }
 
     public String getIssueTrackerUrl() {

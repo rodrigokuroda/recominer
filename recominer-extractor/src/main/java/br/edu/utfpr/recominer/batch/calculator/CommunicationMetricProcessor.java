@@ -36,7 +36,7 @@ public class CommunicationMetricProcessor {
                             "SELECT id "
                             + " FROM {0}.communication_network_metrics "
                             + "WHERE issue_id = ?"
-                            + "  AND commit_id = ?", project.getProjectName()),
+                            + "  AND commit_id = ?",  project),
                     (ResultSet rs, int rowNum) -> rs.getInt("id"),
                     issue.getId(), commit.getId());
         } catch (EmptyResultDataAccessException e) {

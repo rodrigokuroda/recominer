@@ -32,6 +32,7 @@ public class ProjectRepository extends JdbcRepository<Project, Integer> {
                 project.setIssueTracker(new IssueTracker(rs.getInt("issue_tracker")));
                 project.setIssueTrackerUrl(rs.getString("issue_tracker_url"));
                 project.setProjectName(rs.getString("project_name"));
+                project.setSchemaPrefix(rs.getString("schema_prefix"));
                 project.setRepositoryPath(rs.getString("repository_path"));
                 project.setVersionControl(new VersionControl(rs.getInt("version_control")));
                 project.setVersionControlUrl(rs.getString("version_control_url"));
@@ -42,12 +43,13 @@ public class ProjectRepository extends JdbcRepository<Project, Integer> {
             = (Project p) -> {
                 Map<String, Object> mapping = new LinkedHashMap<>();
                 mapping.put("id", p.getId());
-                mapping.put("issue_tracker", p.getIssueTracker());
+                mapping.put("issue_tracker_id", p.getIssueTracker().getId());
                 mapping.put("issue_tracker_url", p.getIssueTrackerUrl());
                 mapping.put("project_name", p.getProjectName());
-                mapping.put("repository_path", p.getProjectName());
-                mapping.put("version_control", p.getProjectName());
-                mapping.put("version_constrol_url", p.getVersionControlUrl());
+                mapping.put("schema_prefix", p.getSchemaPrefix());
+                mapping.put("repository_path", p.getRepositoryPath());
+                mapping.put("version_control", p.getVersionControl().getId());
+                mapping.put("version_constrol", p.getVersionControlUrl());
 
                 return mapping;
             };

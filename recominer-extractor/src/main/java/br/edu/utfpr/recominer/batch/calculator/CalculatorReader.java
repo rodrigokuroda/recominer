@@ -50,7 +50,7 @@ public class CalculatorReader implements ItemReader<Project> {
                 template.queryForObject(
                         QueryUtils.getQueryForDatabase(
                                 "SELECT MAX(date) FROM {0}_vcs.scmlog WHERE id IN (SELECT scmlog_id FROM {0}.issues_scmlog)",
-                                project.getProjectName()), Date.class));
+                                 project), Date.class));
         
         project.setIssueTracker(issueTrackerRepository.findOne(project.getIssueTracker().getId()));
         return project;

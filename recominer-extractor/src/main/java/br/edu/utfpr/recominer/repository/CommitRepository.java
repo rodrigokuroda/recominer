@@ -63,7 +63,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND i.fixed_on IS NULL",
-                        getTable().getSchema()),
+                        project),
                 ROW_MAPPER,
                 "max_files_per_commit");
     }
@@ -76,7 +76,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i2s.issue_id = ?", table.getSchema()),
+                        + "   AND i2s.issue_id = ?",  project),
                 ROW_MAPPER,
                 "max_files_per_commit", issue.getId());
     }
@@ -90,7 +90,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND i2s.issue_id = ?"
-                        + "   AND fc.file_id = ?", table.getSchema()),
+                        + "   AND fc.file_id = ?", project),
                 ROW_MAPPER,
                 "max_files_per_commit", issue.getId(), file.getId());
     }

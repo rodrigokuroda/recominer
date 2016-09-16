@@ -49,16 +49,17 @@ public class JiraAggregation {
                         "SELECT DISTINCT i.id, i.submitted_on, i.fixed_on"
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
-                        + " WHERE UPPER(iej.issue_key) = ?" //                + "   AND i.resolution = \"Fixed\""
+                        + " WHERE UPPER(iej.issue_key) = ?" 
+                        //                + "   AND i.resolution = \"Fixed\""
                         //                + "   AND i.fixed_on IS NOT NULL"
-                        , projectName);
+                        , project);
 
         this.regex = Pattern.compile(issueReferencePattern, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
         this.insertAssociation
                 = QueryUtils.getQueryForDatabase(
                         "INSERT INTO {0}.issues_scmlog (issue_id, scmlog_id) VALUES (?, ?)",
-                        projectName);
+                        project);
     }
 
     public void aggregate(Iterable<Scmlog> commits) {

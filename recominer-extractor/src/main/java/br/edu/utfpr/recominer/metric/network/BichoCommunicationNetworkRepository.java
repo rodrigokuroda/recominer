@@ -25,7 +25,7 @@ public class BichoCommunicationNetworkRepository implements CommunicationNetwork
                         + "  JOIN {0}_issues.people p ON p.id = c.submitted_by"
                         + " WHERE c.issue_id = ?"
                         + "   AND c.submitted_on < (SELECT date FROM {0}_vcs.scmlog s WHERE s.id = ?)"
-                        + " ORDER BY c.submitted_on ASC", project.getProjectName());
+                        + " ORDER BY c.submitted_on ASC", project);
         this.template = template;
     }
 

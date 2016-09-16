@@ -80,11 +80,11 @@ public abstract class ReadOnlyJdbcRepository<T extends Persistable<ID>, ID exten
     
     public void setProject(Project project) {
         this.project = project;
-        setTable(new TableDescription(project.getProjectName(), table.getName(), table.getIdColumns().toArray(new String[1])));
+        setTable(new TableDescription(project.getSchemaPrefix(), table.getName(), table.getIdColumns().toArray(new String[1])));
     }
     
     protected String getQueryForSchema(String query) {
-        return QueryUtils.getQueryForDatabase(query, table.getSchema(), table.getName());
+        return QueryUtils.getQueryForDatabase(query, project, table.getName());
     }
 
     @Override

@@ -36,30 +36,29 @@ public class ExtractFixVersion {
     public ExtractFixVersion(final JdbcTemplate template, final Project project) {
         this.template = template;
         this.project = project;
-        final String projectName = project.getProjectName();
 
         // TODO mover para um Repository
         this.insertIssueFixVersion
                 = QueryUtils.getQueryForDatabase(
                         "INSERT INTO "
                         + "{0}.issues_fix_version (issue_id, fix_version, minor_fix_version, major_fix_version) "
-                        + "VALUES (?, ?, ?, ?)", projectName);
+                        + "VALUES (?, ?, ?, ?)", project);
 
         this.selectFixedVersionOrder
                 = QueryUtils.getQueryForDatabase(
                         "SELECT minor_fix_version "
-                        + "  FROM {0}.issues_fix_version_order", projectName);
+                        + "  FROM {0}.issues_fix_version_order", project);
 
         this.selectExistingIssuesRelatedToFixVersion
                 = QueryUtils.getQueryForDatabase(
                         "SELECT issue_id, fix_version "
-                        + "  FROM {0}.issues_fix_version", projectName);
+                        + "  FROM {0}.issues_fix_version", project);
 
         this.insertFixedVersionOrder
                 = QueryUtils.getQueryForDatabase(
                         "INSERT INTO "
                         + "{0}.issues_fix_version_order (minor_fix_version, major_fix_version, version_order) "
-                        + "VALUES (?, ?, ?)", projectName);
+                        + "VALUES (?, ?, ?)", project);
 
         this.selectIssuesIdAndFixVersions
                 = QueryUtils.getQueryForDatabase(
@@ -67,11 +66,11 @@ public class ExtractFixVersion {
                         + "  FROM {0}.issues i"
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
                         + " WHERE i.fixed_on IS NOT NULL"
-                        + "   AND i.updated_on > ?", projectName);
+                        + "   AND i.updated_on > ?", project);
 
         this.deleteFixedVersionOrder
                 = QueryUtils.getQueryForDatabase(
-                        "DELETE FROM {0}.issues_fix_version_order", projectName);
+                        "DELETE FROM {0}.issues_fix_version_order", project);
     }
 
     public void extract() {

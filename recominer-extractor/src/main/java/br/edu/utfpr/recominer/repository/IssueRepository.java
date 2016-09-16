@@ -55,7 +55,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "    OR im.updated_on < (SELECT MAX(c.changed_on) FROM {0}_issues.changes c WHERE c.issue_id = i.id))"
                         + "   AND (im.comments_updated_on IS NULL "
                         + "    OR im.comments_updated_on < (SELECT MAX(comments.submitted_on) FROM {0}_issues.comments comments WHERE comments.issue_id = i.id))",
-                        project.getProjectName()),
+                         project),
                 ROW_MAPPER, commit.getId());
     }
 
@@ -67,7 +67,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                         + "  LEFT JOIN {0}.issues_metrics im ON im.issue_id = i.id"
                         + " WHERE i2s.scmlog_id = ? ",
-                        project.getProjectName()),
+                         project),
                 ROW_MAPPER, commit.getId());
     }
 
@@ -84,7 +84,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "    OR im.updated_on < (SELECT MAX(c.changed_on) FROM {0}_issues.changes c WHERE c.issue_id = i.id))"
                         + "   AND (im.comments_updated_on IS NULL "
                         + "    OR im.comments_updated_on < (SELECT MAX(comments.submitted_on) FROM {0}_issues.comments comments WHERE comments.issue_id = i.id))",
-                        project.getProjectName()),
+                         project),
                 ROW_MAPPER, issue.getId());
     }
 
@@ -100,7 +100,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "   AND i.fixed_on IS NOT NULL "
                         + "   AND (im.updated_on IS NULL "
                         + "    OR im.updated_on < (SELECT MAX(c.changed_on) FROM {0}_issues.changes c WHERE c.issue_id = i.id))",
-                        project.getProjectName()),
+                         project),
                 ROW_MAPPER, file.getId());
     }
 
@@ -115,7 +115,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND fc.file_id = ? "
                         + "   AND i.fixed_on IS NOT NULL ",
-                        project.getProjectName()),
+                         project),
                 ROW_MAPPER, 
                 "max_files_per_commit", file.getId());
     }
@@ -125,7 +125,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 QueryUtils.getQueryForDatabase(
                         "SELECT COUNT(DISTINCT(im.issue_id)) "
                         + "  FROM {0}.issues_metrics im",
-                        project.getProjectName()),
+                         project),
                 Long.class);
     }
 
@@ -136,7 +136,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  FROM {0}.issues_scmlog i2s "
                         + "  JOIN {0}_issues.issues i ON i2s.issue_id = i.id "
                         + " WHERE i.fixed_on IS NOT NULL ",
-                        project.getProjectName()),
+                         project),
                 Long.class);
     }
 
@@ -152,7 +152,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + " WHERE fc.file_id = ? "
                         + "   AND s.date < (SELECT s2.date FROM {0}_vcs.scmlog s2 WHERE s2.id = ?)"
                         + "   AND i.fixed_on IS NOT NULL ",
-                        project.getProjectName()),
+                         project),
                 ROW_MAPPER, changedFile.getId(), until.getId());
     }
 

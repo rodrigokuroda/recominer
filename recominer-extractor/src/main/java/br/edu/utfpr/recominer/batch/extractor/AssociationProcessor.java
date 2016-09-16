@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 /**
  *
@@ -39,15 +40,19 @@ public class AssociationProcessor {
         executeSqlScript(project, RECOMINER_TABLES_SCRIPT_NAME);
 
         final List<Scmlog> commitsToAnalyze;
+
+        final RowMapper<Scmlog> mapper = (ResultSet rs, int rowNum) -> new Scmlog(rs.getInt("id"), rs.getDate("date"), rs.getString("message"));
+        final String selectScmlog = "SELECT id, date, message FROM {0}_vcs.scmlog";
+
         if (project.getLastCommitDateAnalyzed() != null) {
             commitsToAnalyze = template.query(
-                    QueryUtils.getQueryForDatabase("SELECT id, date, message FROM {0}_vcs.scmlog WHERE date > ?", projectName),
-                    (ResultSet rs, int rowNum) -> new Scmlog(rs.getInt(1), rs.getDate(2), rs.getString(3)),
+                    QueryUtils.getQueryForDatabase(selectScmlog + " WHERE date > ?", project),
+                    mapper,
                     project.getLastCommitDateAnalyzed());
         } else {
             commitsToAnalyze = template.query(
-                    QueryUtils.getQueryForDatabase("SELECT id, date, message FROM {0}_vcs.scmlog", projectName),
-                    (ResultSet rs, int rowNum) -> new Scmlog(rs.getInt(1), rs.getDate(2), rs.getString(3)));
+                    QueryUtils.getQueryForDatabase(selectScmlog, project),
+                    mapper);
         }
 
         if (!commitsToAnalyze.isEmpty()) {
@@ -61,7 +66,8 @@ public class AssociationProcessor {
             jiraAggregation.aggregate(commitsToAnalyze);
 
             final java.sql.Timestamp lastIssueUpdate = template.queryForObject(
-                    "SELECT MAX(updated_on) FROM " + projectName + "_issues.issues", java.sql.Timestamp.class);
+                    QueryUtils.getQueryForDatabase("SELECT MAX(updated_on) FROM {0}_issues.issues", project),
+                    java.sql.Timestamp.class);
 
             // setting date of last commit analyzed
             project.setLastCommitDateAnalyzed(commitsToAnalyze.get(commitsToAnalyze.size() - 1).getDate());
