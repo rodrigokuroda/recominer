@@ -26,14 +26,8 @@ public class IssueMetricCalculatorTest {
     @Inject
     private JobLauncherTestUtils jobLauncherTestUtils;
 
-    private Project project;
-
     @Before
     public void setUp() {
-        project = new Project();
-        project.setProjectName("avro");
-        
-        
     }
 
     @Test

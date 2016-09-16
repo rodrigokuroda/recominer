@@ -75,4 +75,9 @@ public class Application {
     BatchConfigurer configurer(@Qualifier("batchDataSource") DataSource dataSource) {
         return new DefaultBatchConfigurer(dataSource);
     }
+    
+    @Bean
+    org.springframework.batch.test.JobLauncherTestUtils jobLauncherTestUtils() {
+        return new org.springframework.batch.test.JobLauncherTestUtils();
+    }
 }

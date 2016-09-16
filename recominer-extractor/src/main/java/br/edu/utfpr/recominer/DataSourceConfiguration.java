@@ -1,19 +1,19 @@
 package br.edu.utfpr.recominer;
 
-import java.sql.SQLException;
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -26,22 +26,50 @@ public class DataSourceConfiguration {
 
 //    @Value("classpath:schema-mysql.sql")
 //    private Resource schemaScript;
+    @Value("classpath:test_avro.sql")
+    private Resource testScript;
+
+    @Value("classpath:test_avro_issues.sql")
+    private Resource testIssuesScript;
+
+    @Value("classpath:test_avro_vcs.sql")
+    private Resource testVcsScript;
+
+    @Value("classpath:test_recominer.sql")
+    private Resource testRecominerScript;
+
+    @Value("classpath:test_recominer.sql")
+    private Resource testBatchScript;
+
+    @Value("${spring.datasource.initialize:false}")
+    private boolean databaseInitializationEnabled = false;
+
+    @PostConstruct
+    protected void initDatabaseForTesting() {
+        if (databaseInitializationEnabled) {
+            System.out.println("Initializing database...");
+            DatabasePopulatorUtils.execute(databasePopulator(), dataSource());
+            DatabasePopulatorUtils.execute(batchDatabasePopulator(), batchDataSource());
+        }
+    }
+
     @Bean
     @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource mysqlDataSource() throws SQLException {
-        return DataSourceBuilder.create().build();
+    public DataSource dataSource() {
+        final DataSource datasource = DataSourceBuilder.create().build();
+        return datasource;
     }
 
     @Bean
     @Primary
     @ConfigurationProperties(prefix = "spring.batch.datasource")
-    public DataSource batchDataSource() throws SQLException {
+    public DataSource batchDataSource() {
         return DataSourceBuilder.create().build();
     }
 
     @Bean
     @Primary
-    public JdbcTemplate mysqlJdbcTemplate(@Qualifier("mysqlDataSource") final DataSource dataSource) {
+    public JdbcTemplate jdbcTemplate(@Qualifier("dataSource") final DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
 
@@ -66,7 +94,7 @@ public class DataSourceConfiguration {
 
     @Bean
     @Primary
-    public PlatformTransactionManager mysqlTransactionManager(@Qualifier("mysqlDataSource") DataSource dataSource) {
+    public PlatformTransactionManager transactionManager(@Qualifier("dataSource") DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
@@ -81,17 +109,17 @@ public class DataSourceConfiguration {
 
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-//        populator.addScript(schemaScript);
+        populator.addScript(testRecominerScript);
+        populator.addScript(testIssuesScript);
+        populator.addScript(testScript);
+        populator.addScript(testVcsScript);
         return populator;
     }
 
-    @Bean
-    @Profile("test")
-    public DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder()
-                .setType(EmbeddedDatabaseType.H2)
-                .addScript("classpath:schema.sql")
-                .addScript("classpath:test-data.sql")
-                .build();
+    private DatabasePopulator batchDatabasePopulator() {
+        final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+        populator.addScript(testBatchScript);
+        return populator;
     }
+
 }
