@@ -9,7 +9,7 @@ import java.util.Map;
  * Measures properties of each node from the graph (in, out, in out degree, 
  * and clustering coefficient).
  * 
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class LocalMeasureCalculator {
 

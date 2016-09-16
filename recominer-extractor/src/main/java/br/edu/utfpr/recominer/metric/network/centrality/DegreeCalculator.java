@@ -9,7 +9,7 @@ import java.util.Map;
  * Calculates the degree centrality measure for a graph <code>G</code>.
  *
  * @see edu.uci.ics.jung.algorithms.scoring.DegreeScorer
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class DegreeCalculator {
 

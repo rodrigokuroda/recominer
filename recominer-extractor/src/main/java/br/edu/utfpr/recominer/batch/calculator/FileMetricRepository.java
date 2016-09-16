@@ -1,6 +1,6 @@
 package br.edu.utfpr.recominer.batch.calculator;
 
-import br.edu.utfpr.recominer.model.CodeChurn;
+import br.edu.utfpr.recominer.core.model.CodeChurn;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.Committer;
 import br.edu.utfpr.recominer.core.model.File;
@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public interface FileMetricRepository {
 

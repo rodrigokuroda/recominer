@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Profile;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Configuration
 @Profile({"dev", "test"})

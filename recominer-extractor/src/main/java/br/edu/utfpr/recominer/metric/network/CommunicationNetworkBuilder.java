@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Builds a Directed Weighted Network from comments ordered by submit date.
  * 
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class CommunicationNetworkBuilder implements NetworkBuilder {
 

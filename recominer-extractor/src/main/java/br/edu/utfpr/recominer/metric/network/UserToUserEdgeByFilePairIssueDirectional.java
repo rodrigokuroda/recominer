@@ -4,7 +4,7 @@ import java.util.Objects;
 
 /**
  *
- * @author douglas
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class UserToUserEdgeByFilePairIssueDirectional extends UserToUserEdgeByFilePairDirectional {
 

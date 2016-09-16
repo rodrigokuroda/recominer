@@ -13,7 +13,7 @@ import org.apache.commons.collections15.Transformer;
  * To compute the Structural Holes using JUNG API, it is necessary the edges to
  * have a weight (or another metric).
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class StructuralHolesCalculator {
 

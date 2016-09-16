@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class FileCopy implements Serializable {
     private static final long serialVersionUID = 1L;

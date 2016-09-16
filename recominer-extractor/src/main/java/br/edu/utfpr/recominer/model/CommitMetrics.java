@@ -7,7 +7,7 @@ import org.springframework.data.domain.Persistable;
 /**
  * TODO add other metrics
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class CommitMetrics implements Persistable<Integer> {
 

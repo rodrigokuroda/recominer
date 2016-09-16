@@ -1,10 +1,11 @@
 package br.edu.utfpr.recominer.model.associationrule;
 
+import br.edu.utfpr.recominer.core.model.AssociationRule;
 import java.util.Objects;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class AssociationRulePerformance<I> {
 

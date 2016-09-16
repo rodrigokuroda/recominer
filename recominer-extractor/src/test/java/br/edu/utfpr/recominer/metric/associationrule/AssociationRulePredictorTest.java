@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.metric.associationrule;
 
-import br.edu.utfpr.recominer.model.associationrule.AssociationRule;
-import br.edu.utfpr.recominer.model.associationrule.Transaction;
+import br.edu.utfpr.recominer.core.model.AssociationRule;
+import br.edu.utfpr.recominer.core.model.Transaction;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,7 +12,7 @@ import org.junit.Test;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class AssociationRulePredictorTest {
 

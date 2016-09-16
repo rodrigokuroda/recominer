@@ -5,7 +5,7 @@ import java.util.Objects;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class IssueScmlog implements Serializable {
 

@@ -3,7 +3,7 @@ package br.edu.utfpr.recominer.metric.network;
 /**
  * Stores the eigenvector measure of the vertex <code>V</code>.
  * 
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @param <V> Class of vertex
  */
 public class EgoMeasure<V> extends Measure<V> {

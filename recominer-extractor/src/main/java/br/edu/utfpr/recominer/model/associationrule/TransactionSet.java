@@ -1,5 +1,7 @@
 package br.edu.utfpr.recominer.model.associationrule;
 
+import br.edu.utfpr.recominer.core.model.Transaction;
+import br.edu.utfpr.recominer.core.model.AssociationRule;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @param <I> Type of item in transaction
  */
 public class TransactionSet<I> {

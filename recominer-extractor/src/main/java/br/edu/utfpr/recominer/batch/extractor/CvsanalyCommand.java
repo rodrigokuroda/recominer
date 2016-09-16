@@ -11,7 +11,7 @@ import java.util.List;
  * --metrics-noerr --extensions=CommitsLOCDet,FileTypes ${2} >
  * ${1}/vcs_miner.log;
 
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 class CvsanalyCommand implements ExternalCommand {
 

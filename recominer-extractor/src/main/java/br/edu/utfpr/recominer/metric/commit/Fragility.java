@@ -1,11 +1,11 @@
 package br.edu.utfpr.recominer.metric.commit;
 
-import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.core.model.FilePair;
 import java.util.Objects;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class Fragility {
 

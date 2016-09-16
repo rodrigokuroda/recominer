@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.metric.associationrule;
 
-import br.edu.utfpr.recominer.model.associationrule.AssociationRule;
-import br.edu.utfpr.recominer.model.associationrule.Transaction;
+import br.edu.utfpr.recominer.core.model.AssociationRule;
+import br.edu.utfpr.recominer.core.model.Transaction;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -11,7 +11,7 @@ import java.util.Set;
  * navigation rules, prevention rules and closure rules (Zimmermmann et al.,
  * 2005).
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @param <I> Type of items in transaction
  */
 public class AssociationRuleExtractor<I> {

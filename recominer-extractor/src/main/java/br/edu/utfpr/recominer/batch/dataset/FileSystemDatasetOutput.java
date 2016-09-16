@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
 public class FileSystemDatasetOutput implements DatasetOutput {

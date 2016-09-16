@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Identify measure of an element.
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @param <I> Class of identifier (usually vertex, edge, or graph)
  */
 public class Measure<I> {

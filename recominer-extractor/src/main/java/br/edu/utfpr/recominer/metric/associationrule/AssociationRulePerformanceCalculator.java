@@ -1,6 +1,6 @@
 package br.edu.utfpr.recominer.metric.associationrule;
 
-import br.edu.utfpr.recominer.model.associationrule.AssociationRule;
+import br.edu.utfpr.recominer.core.model.AssociationRule;
 import br.edu.utfpr.recominer.model.associationrule.AssociationRulePerformance;
 import br.edu.utfpr.recominer.model.associationrule.AssociationRulePerformanceMeasure;
 import java.util.LinkedHashMap;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class AssociationRulePerformanceCalculator<I> {
 

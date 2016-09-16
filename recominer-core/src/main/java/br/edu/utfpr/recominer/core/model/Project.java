@@ -7,7 +7,7 @@ import org.springframework.data.domain.Persistable;
 /**
  * Represents a software project, containing information about of it.
  * 
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class Project implements Persistable<Integer>, Serializable {
 

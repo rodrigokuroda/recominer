@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
- * @author kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class BichoCommunicationNetworkRepository implements CommunicationNetworkRepository {
 

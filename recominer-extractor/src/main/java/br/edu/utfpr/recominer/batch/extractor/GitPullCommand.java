@@ -6,7 +6,7 @@ import br.edu.utfpr.recominer.core.model.Project;
 /**
  * git --git-dir={}/.git --work-tree=/local/Git/{} pull --all
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class GitPullCommand implements ExternalCommand {
 

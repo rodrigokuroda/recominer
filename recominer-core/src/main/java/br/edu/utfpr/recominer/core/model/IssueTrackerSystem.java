@@ -2,7 +2,7 @@ package br.edu.utfpr.recominer.core.model;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public enum IssueTrackerSystem {
     BUGZILLA("bg"), JIRA("jira"), GITHUB("github");

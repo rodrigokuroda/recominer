@@ -6,7 +6,7 @@ import java.util.Objects;
  * Represents a commenter. To be equals, two commenters needs to have the same
  * ID.
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class Commenter {
 

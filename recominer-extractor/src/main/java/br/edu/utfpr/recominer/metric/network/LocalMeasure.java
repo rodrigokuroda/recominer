@@ -5,7 +5,7 @@ package br.edu.utfpr.recominer.metric.network;
  * incoming edges - out degree: outcoming edges - in and out degree: in degree +
  * out degree
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @param <V> Class of vertex
  */
 public class LocalMeasure<V> extends Measure<V> {

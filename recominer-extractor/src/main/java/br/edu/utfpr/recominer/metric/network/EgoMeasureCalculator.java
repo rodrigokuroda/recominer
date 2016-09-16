@@ -17,7 +17,7 @@ import org.apache.commons.collections15.Transformer;
  * - density
  * - ego betweenness centrality
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class EgoMeasureCalculator {
 

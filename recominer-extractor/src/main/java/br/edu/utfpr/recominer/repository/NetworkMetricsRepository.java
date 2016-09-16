@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Repository
 public class NetworkMetricsRepository extends JdbcRepository<NetworkMetrics, Integer> {

@@ -1,20 +1,21 @@
 package br.edu.utfpr.recominer.batch.associationrule;
 
+import br.edu.utfpr.recominer.core.model.AssociationRule;
+import br.edu.utfpr.recominer.core.model.CochangeApriori;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
+import br.edu.utfpr.recominer.core.model.FilePair;
 import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.model.Transaction;
+import br.edu.utfpr.recominer.core.repository.AssociationRulePredictionRepository;
+import br.edu.utfpr.recominer.core.repository.CommitRepository;
+import br.edu.utfpr.recominer.core.repository.FileRepository;
+import br.edu.utfpr.recominer.core.repository.IssueRepository;
 import br.edu.utfpr.recominer.metric.associationrule.AssociationRuleExtractor;
 import br.edu.utfpr.recominer.metric.associationrule.AssociationRulePerformanceCalculator;
-import br.edu.utfpr.recominer.model.FilePair;
-import br.edu.utfpr.recominer.model.associationrule.AssociationRule;
-import br.edu.utfpr.recominer.model.associationrule.Transaction;
-import br.edu.utfpr.recominer.repository.AssociationRulePredictionRepository;
 import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
-import br.edu.utfpr.recominer.repository.CommitRepository;
 import br.edu.utfpr.recominer.repository.FileMetricsRepository;
-import br.edu.utfpr.recominer.repository.FileRepository;
-import br.edu.utfpr.recominer.repository.IssueRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import org.springframework.batch.item.ItemProcessor;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
 public class AssociationRuleProcessor implements ItemProcessor<Project, AssociationRuleLog> {
@@ -136,7 +137,8 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         Long cochangeIssues = fileRepository.countFixedIssues(cochange);
 
         CochangeApriori apriori = new CochangeApriori(
-                cochange, file1Issues, file2Issues,
+                cochange.getFile1(), cochange.getFile2(),
+                file1Issues, file2Issues,
                 cochangeIssues, totalIssues);
 
         return apriori;

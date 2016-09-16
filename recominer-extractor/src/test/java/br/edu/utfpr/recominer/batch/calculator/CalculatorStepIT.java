@@ -3,9 +3,8 @@ package br.edu.utfpr.recominer.batch.calculator;
 import br.edu.utfpr.recominer.Application;
 import br.edu.utfpr.recominer.model.IssuesMetrics;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
+import java.util.List;
 import javax.inject.Inject;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
@@ -15,16 +14,19 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @SpringApplicationConfiguration(Application.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @IntegrationTest
 @ActiveProfiles(profiles = "test")
-public class IssueMetricCalculatorTest {
+public class CalculatorStepIT {
 
     @Inject
     private JobLauncherTestUtils jobLauncherTestUtils;
@@ -43,6 +45,13 @@ public class IssueMetricCalculatorTest {
                 issueId, commitId);
         assertEquals(1, rowsAffected);
 
+        List<IssuesMetrics> metrics = template.query(
+                "SELECT * FROM avro_test.issues_metrics WHERE issue_id = ? AND commit_id = ?",
+                IssuesMetricsRepository.ROW_MAPPER,
+                issueId,
+                commitId);
+        assertTrue(metrics.isEmpty());
+
         // Running calculation job step.
         JobExecution calculationJob = jobLauncherTestUtils.launchStep("calculatorStep");
         assertEquals("COMPLETED", calculationJob.getExitStatus().getExitCode());
@@ -53,10 +62,6 @@ public class IssueMetricCalculatorTest {
                 issueId,
                 commitId);
         assertNotNull(metric);
-    }
-
-    @Test
-    public void testSaveIssueMetrics() {
     }
 
 }

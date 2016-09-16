@@ -1,7 +1,12 @@
 app.controller("projectController", ['$scope', '$log', '$window', '$http', function ($scope, $log, $window, $http) {
         $scope.projects = null;
         $scope.issues = null;
+        $scope.commits = null;
         $scope.files = null;
+        $scope.activeProject = null;
+        $scope.activeIssue = null;
+        $scope.activeCommit = null;
+        $scope.activeFile = null;
         $scope.tabIndex = 0;
 
         $log.debug("Fetching project...");
@@ -21,6 +26,9 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', funct
         $scope.toggleSearchIssues = function (element) {
             $scope.showSearchIssues = !$scope.showSearchIssues;
         };
+        $scope.toggleSearchCommits = function (element) {
+            $scope.showSearchCommits = !$scope.showSearchCommits;
+        };
         $scope.toggleSearchFiles = function (element) {
             $scope.showSearchFiles = !$scope.showSearchFiles;
         };
@@ -32,7 +40,8 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', funct
 
         // Load issues
         $scope.getIssuesOf = function (project) {
-            $log.debug("Fetching issues from project id " + project + "...");
+            $scope.activeProject = project;
+            $log.debug("Fetching issues from project " + project.projectName + "...");
             $http.post("/issues", project)
                     .then(function (response) {
                         $scope.issues = response.data;
@@ -44,10 +53,27 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', funct
             $scope.tabIndex = 1;
         };
 
+        // Load commits
+        $scope.getCommitsOf = function (issue) {
+            $scope.activeIssue = issue;
+            $log.debug("Fetching commits from issue " + issue.key + "...");
+            params = {'project' : $scope.activeProject, 'issue' : issue}
+            $http.post("/commits", params)
+                    .then(function (response) {
+                        $scope.commits = response.data;
+                    },
+                            function (response) { // optional
+                                $scope.commits = null;
+                            }
+                    );
+            $scope.tabIndex = 2;
+        };
+
         // Load files
-        $scope.getFilesOf = function (issue) {
-            $log.debug("Fetching issues from issue id " + issue + "...");
-            $http.post("/issues", issue)
+        $scope.getFilesOf = function (commit) {
+            $scope.activeCommit = commit
+            $log.debug("Fetching files from commit " + commit.revision + "...");
+            $http.post("/files", $scope.activeProject, commit)
                     .then(function (response) {
                         $scope.files = response.data;
                     },
@@ -55,127 +81,8 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', funct
                                 $scope.files = null;
                             }
                     );
-            $scope.tabIndex = 2;
+            $scope.tabIndex = 3;
         };
-
-        // Menu items
-        $scope.menu = [
-            {
-                link: '',
-                title: 'Dashboard',
-                icon: 'action:ic_dashboard_24px' // we have to use Google's naming convention for the IDs of the SVGs in the spritesheet
-            },
-            {
-                link: '',
-                title: 'Friends',
-                icon: 'social:ic_group_24px'
-            },
-            {
-                link: '',
-                title: 'Messages',
-                icon: 'communication:ic_message_24px'
-            }
-        ];
-        $scope.admin = [
-            {
-                link: '',
-                title: 'Trash',
-                icon: 'action:ic_delete_24px'
-            },
-            {
-                link: 'showListBottomSheet($event)',
-                title: 'Settings',
-                icon: 'action:ic_settings_24px'
-            }
-        ];
-
-        // App items
-        $scope.apps = [
-            {
-                link: '',
-                title: 'Workload',
-                desc: 'App description goes here',
-                icon: 'action:ic_donut_large_24px'
-            },
-            {
-                link: '',
-                title: 'Memberships',
-                desc: 'App description goes here',
-                icon: 'action:ic_card_membership_24px'
-            },
-            {
-                link: '',
-                title: 'Transactions',
-                desc: 'App description goes here',
-                icon: 'action:ic_shopping_cart_24px'
-            },
-            {
-                link: '',
-                title: 'Categories',
-                desc: 'App description goes here',
-                icon: 'device:ic_storage_24px'
-            },
-            {
-                link: '',
-                title: 'Geographics',
-                desc: 'App description goes here',
-                icon: 'maps:ic_place_24px'
-            },
-            {
-                link: '',
-                title: 'Business',
-                desc: 'App description goes here',
-                icon: 'action:ic_store_24px'
-            },
-            {
-                link: '',
-                title: 'Financials',
-                desc: 'App description goes here',
-                icon: 'editor:ic_attach_money_24px'
-            },
-            {
-                link: '',
-                title: 'VP Dashboard',
-                desc: 'App description goes here',
-                icon: 'action:ic_dashboard_24px'
-            },
-            {
-                link: '',
-                title: 'Inventory',
-                desc: 'App description goes here',
-                icon: 'editor:ic_format_list_numbered_24px'
-            },
-            {
-                link: '',
-                title: 'Employees',
-                desc: 'App description goes here',
-                icon: 'action:ic_perm_identity_24px'
-            }
-        ];
-
-        // Mock attributes
-        $scope.attributes = [
-            {
-                title: 'Owner',
-                value: 'Scott Alexander',
-                icon: 'action:ic_assignment_ind_24px'
-            },
-            {
-                title: 'Last updated',
-                value: 'Dec 12, 2015',
-                icon: 'action:ic_today_24px'
-            },
-            {
-                title: 'DNS',
-                value: 'https://appname-environment.company.com:8080',
-                icon: 'action:ic_dns_24px'
-            },
-            {
-                title: 'Version',
-                value: '02.08.10.02',
-                icon: 'action:ic_fingerprint_24px'
-            },
-        ];
 
         // Bottomsheet & Modal Dialogs
         $scope.alert = '';

@@ -1,7 +1,7 @@
 
 package br.edu.utfpr.recominer.metric.commit;
 
-import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.core.model.FilePair;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.UndirectedGraph;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Set;
  * Build a graph for a file list that had been committed. Based on graph, the
  * path between the coupled file
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class FragilityCalculator {
 

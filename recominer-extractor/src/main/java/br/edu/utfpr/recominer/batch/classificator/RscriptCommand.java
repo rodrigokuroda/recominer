@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Rscript \<file\> \<parameters\>
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class RscriptCommand implements ExternalCommand {
 

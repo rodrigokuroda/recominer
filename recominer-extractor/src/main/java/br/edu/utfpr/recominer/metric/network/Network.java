@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @param <V> vertice type
  * @param <E> edge type
  */

@@ -4,7 +4,7 @@ import br.edu.utfpr.recominer.statistic.DescriptiveStatisticsHelper;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class MetricStatistic {
     

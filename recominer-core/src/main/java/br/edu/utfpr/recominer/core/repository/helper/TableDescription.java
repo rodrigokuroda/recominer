@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 
 /**
- * @author Tomasz Nurkiewicz
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @since 12/18/12, 10:06 PM
  */
 public class TableDescription {

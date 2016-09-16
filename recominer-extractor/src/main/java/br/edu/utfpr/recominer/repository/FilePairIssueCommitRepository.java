@@ -1,10 +1,10 @@
 package br.edu.utfpr.recominer.repository;
 
 import br.edu.utfpr.recominer.core.repository.JdbcRepository;
-import br.edu.utfpr.recominer.batch.dataset.Cochange;
+import br.edu.utfpr.recominer.core.model.Cochange;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
-import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.core.model.FilePair;
 import br.edu.utfpr.recominer.model.FilePairIssueCommit;
 import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Repository
 public class FilePairIssueCommitRepository extends JdbcRepository<FilePairIssueCommit, Integer> {

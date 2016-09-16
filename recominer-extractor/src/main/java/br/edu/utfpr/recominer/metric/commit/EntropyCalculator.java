@@ -9,7 +9,7 @@ package br.edu.utfpr.recominer.metric.commit;
  * ...^-------------^........................................
  * ...analisys.period.......................................
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class EntropyCalculator {
     private final int totalCommits;

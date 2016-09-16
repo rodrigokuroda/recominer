@@ -10,7 +10,7 @@ import org.apache.commons.collections15.Transformer;
  * Calculates the betweenness centrality measure for a graph <code>G</code>.
  *
  * @see edu.uci.ics.jung.algorithms.scoring.BetweennessCentrality
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class BetweennessCalculator {
 

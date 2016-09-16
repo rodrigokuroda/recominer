@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.model;
 
+import br.edu.utfpr.recominer.core.model.FilePair;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.Issue;
 import java.util.Objects;
@@ -7,7 +8,7 @@ import org.springframework.data.domain.Persistable;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class FilePairIssueCommit implements Persistable<Integer> {
     

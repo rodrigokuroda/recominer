@@ -5,7 +5,7 @@ import br.edu.utfpr.recominer.core.model.Issue;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public interface NetworkBuilder {
 

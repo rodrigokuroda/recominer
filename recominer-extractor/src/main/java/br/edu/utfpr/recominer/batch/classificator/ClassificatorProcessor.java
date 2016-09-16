@@ -5,11 +5,11 @@ import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import br.edu.utfpr.recominer.model.FilePairIssueCommit;
-import br.edu.utfpr.recominer.model.MachineLearningPrediction;
-import br.edu.utfpr.recominer.repository.CommitRepository;
+import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
+import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
-import br.edu.utfpr.recominer.repository.FileRepository;
-import br.edu.utfpr.recominer.repository.MachineLearningPredictionRepository;
+import br.edu.utfpr.recominer.core.repository.FileRepository;
+import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepository;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.springframework.batch.item.ItemProcessor;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
 public class ClassificatorProcessor implements ItemProcessor<Project, ClassificatorLog> {

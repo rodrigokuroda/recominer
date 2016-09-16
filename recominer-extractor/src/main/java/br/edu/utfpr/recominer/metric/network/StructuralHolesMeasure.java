@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Stores the structural holes measure of the vertex <code>V</code>.
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  * @param <V> Class of vertex
  */
 public class StructuralHolesMeasure<V> extends Measure<V> {

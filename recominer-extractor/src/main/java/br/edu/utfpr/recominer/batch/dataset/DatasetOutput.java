@@ -5,7 +5,7 @@ import br.edu.utfpr.recominer.core.model.Project;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public interface DatasetOutput {
     

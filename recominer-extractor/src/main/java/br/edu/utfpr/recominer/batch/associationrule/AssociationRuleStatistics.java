@@ -2,7 +2,7 @@ package br.edu.utfpr.recominer.batch.associationrule;
 
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
-import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.core.model.FilePair;
 import br.edu.utfpr.recominer.core.model.Issue;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class AssociationRuleStatistics {
     private final Set<String> allFiles = new HashSet<>();

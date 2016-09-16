@@ -1,6 +1,6 @@
 package br.edu.utfpr.recominer.metric.committer;
 
-import br.edu.utfpr.recominer.model.CodeChurn;
+import br.edu.utfpr.recominer.core.model.CodeChurn;
 import br.edu.utfpr.recominer.core.model.Committer;
 import br.edu.utfpr.recominer.core.model.File;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import br.edu.utfpr.recominer.batch.calculator.FileMetricRepository;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class CommitterFileMetricsCalculator {
 

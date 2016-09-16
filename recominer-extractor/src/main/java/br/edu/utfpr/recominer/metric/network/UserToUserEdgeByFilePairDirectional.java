@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author douglas
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class UserToUserEdgeByFilePairDirectional {
 

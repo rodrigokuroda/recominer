@@ -10,7 +10,7 @@ import org.springframework.data.repository.Repository;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public interface ReadOnlyRepository<T extends Persistable<ID>, ID extends Serializable> extends Repository<T, ID> {
 

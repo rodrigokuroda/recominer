@@ -8,7 +8,7 @@ import org.springframework.batch.item.ItemWriter;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
 public class ClassificatorWriter implements ItemWriter<ClassificatorLog> {

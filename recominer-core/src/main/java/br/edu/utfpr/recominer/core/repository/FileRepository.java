@@ -1,16 +1,16 @@
-package br.edu.utfpr.recominer.repository;
+package br.edu.utfpr.recominer.core.repository;
 
-import br.edu.utfpr.recominer.core.repository.JdbcRepository;
-import br.edu.utfpr.recominer.batch.dataset.Cochange;
-import br.edu.utfpr.recominer.model.CodeChurn;
+import br.edu.utfpr.recominer.core.model.Cochange;
+import br.edu.utfpr.recominer.core.model.CodeChurn;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
-import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.core.model.FilePair;
 import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
 import static br.edu.utfpr.recominer.core.util.QueryUtils.filterByIssues;
 import java.sql.ResultSet;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -18,14 +18,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.joda.time.Days;
-import org.joda.time.LocalDate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Repository
 public class FileRepository extends JdbcRepository<File, Integer> {
@@ -1840,10 +1838,9 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         + "         JOIN {0}.commits c2 ON c2.commit_id = fc2.commit_id "
                         + "        WHERE fc2.file_id = ? "
                         + "          AND fc2.commit_id = ?)", project),
-                (ResultSet rs, int rowNum) -> (long) Days.daysBetween(
-                        new LocalDate(rs.getTimestamp("first_commit")),
-                        new LocalDate(rs.getTimestamp("last_commit")))
-                .getDays(),
+                (ResultSet rs, int rowNum) -> (long) ChronoUnit.DAYS.between(
+                        rs.getTimestamp("first_commit").toLocalDateTime(),
+                        rs.getTimestamp("last_commit").toLocalDateTime()),
                 file.getId(), file.getId(), commit.getId());
     }
 

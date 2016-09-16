@@ -25,7 +25,7 @@ import br.edu.utfpr.recominer.web.WebAppInitializer;
 @WebIntegrationTest
 public class PasswordControllerIT {
 
-	private static final String APPLICATION_SERVICE_URL = "http://localhost:8080/evaluate";
+	private static final String APPLICATION_SERVICE_URL = "http://localhost:8080/projects";
 
 	private RestTemplate rest = new TestRestTemplate();
 

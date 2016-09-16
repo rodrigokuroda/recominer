@@ -8,7 +8,7 @@ import org.springframework.data.domain.Persistable;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class Commit implements Persistable<Integer> {
 

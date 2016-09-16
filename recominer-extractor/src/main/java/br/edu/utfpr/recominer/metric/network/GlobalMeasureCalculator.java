@@ -7,7 +7,7 @@ import edu.uci.ics.jung.graph.Graph;
 /**
  * Measures some properties of the graph.
  * 
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class GlobalMeasureCalculator {
 

@@ -9,7 +9,7 @@ import edu.uci.ics.jung.graph.util.EdgeType;
  * Useful helper to create graph (a.k.a. network) easily, using fluent methods.
  *
  * @see edu.uci.ics.jung.graph.Graph
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  *
  * @param <V> The type of graph's vertices
  * @param <E> The type of graph's edges

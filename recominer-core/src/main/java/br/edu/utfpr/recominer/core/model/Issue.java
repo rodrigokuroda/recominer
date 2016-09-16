@@ -6,7 +6,7 @@ import org.springframework.data.domain.Persistable;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class Issue implements Persistable<Integer>, Comparable<Issue> {
 
@@ -44,8 +44,13 @@ public class Issue implements Persistable<Integer>, Comparable<Issue> {
         this.updatedOn = updatedOn;
     }
 
+    @Override
     public Integer getId() {
         return id;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public String getType() {

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author Douglas
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class UserToUserEdgeByCommentDirectional {
 

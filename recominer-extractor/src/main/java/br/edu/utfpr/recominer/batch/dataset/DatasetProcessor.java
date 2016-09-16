@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.batch.dataset;
 
+import br.edu.utfpr.recominer.core.model.Cochange;
 import br.edu.utfpr.recominer.metric.file.FileMetrics;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
 import br.edu.utfpr.recominer.core.model.Commit;
@@ -10,11 +11,11 @@ import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.model.IssuesMetrics;
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
-import br.edu.utfpr.recominer.repository.CommitRepository;
+import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.repository.FileMetricsRepository;
 import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
-import br.edu.utfpr.recominer.repository.FileRepository;
-import br.edu.utfpr.recominer.repository.IssueRepository;
+import br.edu.utfpr.recominer.core.repository.FileRepository;
+import br.edu.utfpr.recominer.core.repository.IssueRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import org.springframework.batch.item.ItemProcessor;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
 public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {

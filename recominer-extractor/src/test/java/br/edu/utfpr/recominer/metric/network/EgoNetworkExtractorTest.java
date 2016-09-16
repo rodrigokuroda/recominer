@@ -14,7 +14,7 @@ import org.junit.Test;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class EgoNetworkExtractorTest {
     

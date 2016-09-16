@@ -1,12 +1,12 @@
 package br.edu.utfpr.recominer.metric.commit;
 
-import br.edu.utfpr.recominer.model.FilePair;
+import br.edu.utfpr.recominer.core.model.FilePair;
 import java.util.Objects;
 
 /**
  * File pair commit-based metrics for developers.
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class Ownership {
 

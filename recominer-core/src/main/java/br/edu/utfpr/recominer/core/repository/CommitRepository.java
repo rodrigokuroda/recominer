@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.repository;
+package br.edu.utfpr.recominer.core.repository;
 
 import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.core.model.Commit;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  *
- * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Repository
 public class CommitRepository extends JdbcRepository<Commit, Integer> {
@@ -68,8 +68,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                 "max_files_per_commit");
     }
 
-    @Deprecated
-    protected List<Commit> selectCommitsOf(Issue issue) {
+    public List<Commit> selectCommitsOf(Issue issue) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"

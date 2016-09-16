@@ -7,7 +7,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class DescriptiveStatisticsHelper extends DescriptiveStatistics {
     private static final double QUANTILE = new Median().getQuantile();

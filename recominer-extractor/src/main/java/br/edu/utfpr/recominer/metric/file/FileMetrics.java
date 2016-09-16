@@ -1,6 +1,6 @@
 package br.edu.utfpr.recominer.metric.file;
 
-import br.edu.utfpr.recominer.model.CodeChurn;
+import br.edu.utfpr.recominer.core.model.CodeChurn;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
 import java.util.Objects;
@@ -8,7 +8,7 @@ import org.springframework.data.domain.Persistable;
 
 /**
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class FileMetrics implements Persistable<Integer> {
 

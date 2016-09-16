@@ -7,7 +7,7 @@ import java.io.File;
 /**
  * git --git-dir={} --work-tree={} clone {}
  *
- * @author Rodrigo T. Kuroda
+ * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 public class GitCloneCommand implements ExternalCommand {
 
