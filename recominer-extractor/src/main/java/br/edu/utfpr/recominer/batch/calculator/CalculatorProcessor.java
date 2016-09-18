@@ -1,19 +1,19 @@
 package br.edu.utfpr.recominer.batch.calculator;
 
+import br.edu.utfpr.recominer.core.model.Commit;
+import br.edu.utfpr.recominer.core.model.File;
+import br.edu.utfpr.recominer.core.model.Issue;
+import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.repository.CommitRepository;
+import br.edu.utfpr.recominer.core.repository.FileRepository;
+import br.edu.utfpr.recominer.core.repository.IssueRepository;
 import br.edu.utfpr.recominer.metric.file.FileMetrics;
 import br.edu.utfpr.recominer.metric.file.FileMetricsCalculator;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
-import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.model.CommitMetrics;
-import br.edu.utfpr.recominer.core.model.File;
-import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.model.IssuesMetrics;
-import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
-import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.repository.FileMetricsRepository;
-import br.edu.utfpr.recominer.core.repository.FileRepository;
-import br.edu.utfpr.recominer.core.repository.IssueRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
 import java.util.List;
@@ -99,9 +99,6 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
                 // find all issues/commits where file was changed
                 List<Issue> issuesOfFile = issueRepository.selectIssuesOf(changedFile);
 
-                if (changedFile.getFileName().endsWith("lang/java/compiler/src/main/java/org/apache/avro/compiler/specific/SpecificCompiler.java")) {
-                    System.out.println("1100");
-                }
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {
                     log.info(++issuesProcessed + " of " + issuesOfFile.size() + " past issues processed.");
