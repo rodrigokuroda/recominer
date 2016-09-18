@@ -6,6 +6,7 @@ import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import java.sql.ResultSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -34,6 +35,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                 machineLearningPrediction.setAlgorithmType(rs.getString("algorithm_type"));
                 return machineLearningPrediction;
             };
+    
     public static final RowUnmapper<MachineLearningPrediction> ROW_UNMAPPER
             = (MachineLearningPrediction machineLearningPrediction) -> {
                 Map<String, Object> mapping = new LinkedHashMap<>();
@@ -45,5 +47,15 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                 mapping.put("algorithm_type", machineLearningPrediction.getAlgorithmType());
                 return mapping;
             };
+
+    public List<MachineLearningPrediction> selectPredictedCochangesFor(Commit commit, File file) {
+        return jdbcOperations.query(
+                getQueryForSchema(
+                        "SELECT * FROM {0}.ml_prediction "
+                        + " WHERE file_id = ? "
+                        + "   AND commit_id = ? "),
+                rowMapper,
+                file.getId(), commit.getId());
+    }
 
 }

@@ -1,6 +1,5 @@
 package br.edu.utfpr.recominer.core.repository;
 
-import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.Committer;
 import br.edu.utfpr.recominer.core.model.File;
@@ -62,7 +61,8 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i.fixed_on IS NULL",
+                        + "   AND i.fixed_on IS NULL"
+                        + " ORDER BY c.date DESC",
                         project),
                 ROW_MAPPER,
                 "max_files_per_commit");
@@ -75,7 +75,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i2s.issue_id = ?",  project),
+                        + "   AND i2s.issue_id = ?", project),
                 ROW_MAPPER,
                 "max_files_per_commit", issue.getId());
     }
