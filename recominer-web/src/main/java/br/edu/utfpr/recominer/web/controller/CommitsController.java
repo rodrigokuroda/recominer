@@ -1,10 +1,11 @@
 package br.edu.utfpr.recominer.web.controller;
 
 import br.edu.utfpr.recominer.core.model.Commit;
+import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.core.repository.ProjectRepository;
 import br.edu.utfpr.recominer.web.dto.CommitDTO;
-import br.edu.utfpr.recominer.web.dto.IssueDTO;
+import br.edu.utfpr.recominer.web.dto.ProjectDTO;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -27,10 +28,11 @@ public class CommitsController {
     }
 
     @RequestMapping(value = "/commits", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<CommitDTO> listCommis(@RequestBody IssueDTO issue) {
-        repository.setProject(projectRepository.findOne(issue.getProject().getId()));
+    public List<CommitDTO> listCommis(@RequestBody ProjectDTO projectDTO) {
+        final Project project = projectRepository.findOne(projectDTO.getId());
+        repository.setProject(project);
         List<CommitDTO> commits = new ArrayList<>();
-        for (Commit commit : repository.selectCommitsOf(issue.getIssue())) {
+        for (Commit commit : repository.selectNewCommits()) {
             commits.add(new CommitDTO(commit));
         }
         return commits;
