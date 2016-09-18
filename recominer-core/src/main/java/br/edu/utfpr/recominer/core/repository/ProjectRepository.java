@@ -25,6 +25,11 @@ public class ProjectRepository extends JdbcRepository<Project, Integer> {
         super(ROW_MAPPER, ROW_UNMAPPER, SCHEMA_NAME, TABLE_NAME, ID_COLUMN);
     }
 
+    @Override
+    public void setProject(Project project) {
+        throw new IllegalArgumentException("The schema for this repository is already set statically.");
+    }
+
     public static final RowMapper<Project> ROW_MAPPER
             = (ResultSet rs, int rowNum) -> {
                 Project project = new Project();
