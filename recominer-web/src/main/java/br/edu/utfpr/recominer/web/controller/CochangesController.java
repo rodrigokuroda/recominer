@@ -41,7 +41,6 @@ public class CochangesController {
     public List<CochangeDTO> listCommis(@RequestBody FileDTO fileDTO) {
         final Project project = projectRepository.findOne(fileDTO.getProject().getId());
 
-        projectRepository.setProject(project);
         commitRepository.setProject(project);
         fileRepository.setProject(project);
         mlPredictionRepository.setProject(project);

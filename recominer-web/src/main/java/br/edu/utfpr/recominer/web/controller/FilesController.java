@@ -1,6 +1,7 @@
 package br.edu.utfpr.recominer.web.controller;
 
 import br.edu.utfpr.recominer.core.model.File;
+import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.ProjectRepository;
 import br.edu.utfpr.recominer.web.dto.CommitDTO;
@@ -28,7 +29,8 @@ public class FilesController {
 
     @RequestMapping(value = "/files", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FileDTO> listFiles(@RequestBody CommitDTO commit) {
-        repository.setProject(projectRepository.findOne(commit.getProject().getId()));
+        final Project project = projectRepository.findOne(commit.getProject().getId());
+        repository.setProject(project);
         List<FileDTO> files = new ArrayList<>();
         for (File file : repository.selectChangedFilesIn(commit.getCommit())) {
             files.add(new FileDTO(file));
