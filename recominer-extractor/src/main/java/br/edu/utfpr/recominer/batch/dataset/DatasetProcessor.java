@@ -30,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -38,11 +39,12 @@ import org.springframework.beans.factory.annotation.Value;
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
+@StepScope
 public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
     private final Logger log = LoggerFactory.getLogger(DatasetProcessor.class);
 
-    @Value("${workingDir:generated}")
+    @Value("#{jobParameters[workingDir]}")
     private String workingDir;
 
     @Inject

@@ -13,8 +13,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -54,19 +54,23 @@ public class DatasetStepIT {
     }
 
     @Test
-    public void shouldCalculateMetricsForNewCommit() {
-        final Integer issueId = 1644;
-        final Integer commitId = 1519;
+    public void shouldCreateDatasetForTrainAndTest() {
+        final Integer issueId = 1698;
+        final Integer commitId = 4219;
+        final Integer cochange = 4221;
 
-        final JobParameters params = new JobParameters();
-        params.getParameters().put("spring.batch.job.enabled", new JobParameter("false"));
-        params.getParameters().put("workingDir", new JobParameter("test"));
+        final JobParameters params = new JobParametersBuilder()
+                .addString("spring.batch.job.enabled", "false")
+                .addString("workingDir", test.getAbsolutePath())
+                .toJobParameters();
 
         // Running dataset generation job step.
         JobExecution datasetJob = jobLauncherTestUtils.launchStep("datasetStep", params);
         assertEquals("COMPLETED", datasetJob.getExitStatus().getExitCode());
 
         assertTrue(test.exists());
+        assertTrue(new File(test, "avro/" + issueId + "/" + commitId + "/test.csv").exists());
+        assertTrue(new File(test, "avro/" + issueId + "/" + commitId + "/" + cochange + "/train.csv").exists());
     }
 
 }
