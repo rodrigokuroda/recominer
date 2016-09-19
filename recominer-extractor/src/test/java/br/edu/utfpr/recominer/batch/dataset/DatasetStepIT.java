@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.batch.calculator;
+package br.edu.utfpr.recominer.batch.dataset;
 
 import br.edu.utfpr.recominer.Application;
 import java.io.File;

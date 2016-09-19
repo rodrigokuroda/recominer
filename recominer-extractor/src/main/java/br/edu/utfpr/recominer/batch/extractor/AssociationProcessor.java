@@ -35,7 +35,6 @@ public class AssociationProcessor {
 
     public void process(Object item) throws Exception {
         final Project project = (Project) item;
-        final String projectName = project.getProjectName().toLowerCase();
 
         executeSqlScript(project, RECOMINER_TABLES_SCRIPT_NAME);
 
@@ -62,7 +61,7 @@ public class AssociationProcessor {
             }
             executeSqlScript(project, OPTIMIZATION_DML_SCRIPT_NAME);
 
-            JiraAggregation jiraAggregation = new JiraAggregation(template, project);
+            JiraAggregator jiraAggregation = new JiraAggregator(template, project);
             jiraAggregation.aggregate(commitsToAnalyze);
 
             final java.sql.Timestamp lastIssueUpdate = template.queryForObject(
@@ -82,7 +81,6 @@ public class AssociationProcessor {
 
         // Create SQL scanner
         final Scanner scanner = new Scanner(script).useDelimiter(SQL_DELIMITER);
-        final String projectName = project.getProjectName().toLowerCase();
 
         // Loop through the SQL file statements
         while (scanner.hasNext()) {

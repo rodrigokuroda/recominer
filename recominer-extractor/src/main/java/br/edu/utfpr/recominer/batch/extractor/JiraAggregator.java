@@ -2,9 +2,9 @@ package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.util.QueryUtils;
 import br.edu.utfpr.recominer.model.issue.IssueScmlog;
 import br.edu.utfpr.recominer.model.svn.Scmlog;
-import br.edu.utfpr.recominer.core.util.QueryUtils;
 import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,14 +16,14 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- *
+ * 
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
-public class JiraAggregation {
+public class JiraAggregator implements Aggregator {
 
     private final Logger log = LoggerFactory.getLogger(AssociationProcessor.class);
 
-    private final String gitUrlPattern = "(\\s+git-svn-id:\\shttps://svn.apache.org/).*";
+    private final String gitUrlPattern = "(\\s+git-svn-id:\\s[a-z]+://[a-zA-Z0-9.]*/).*";
     private final String issueReferencePattern;
     private final String selectIssueByIssueKey;
     private final String insertAssociation;
@@ -34,7 +34,7 @@ public class JiraAggregation {
 
     private final Project project;
 
-    public JiraAggregation(final JdbcTemplate template, final Project project) {
+    public JiraAggregator(final JdbcTemplate template, final Project project) {
         this.template = template;
         this.project = project;
         final String projectName = project.getProjectName();
@@ -62,6 +62,7 @@ public class JiraAggregation {
                         project);
     }
 
+    @Override
     public void aggregate(Iterable<Scmlog> commits) {
         final Set<IssueScmlog> issueAndCommitAssociated = new HashSet<>();
         for (Scmlog commit : commits) {
@@ -108,7 +109,7 @@ public class JiraAggregation {
         }
     }
 
-    private String replaceUrl(String text) {
+    String replaceUrl(String text) {
         return text.replaceAll(gitUrlPattern, "");
     }
 }

@@ -29,7 +29,7 @@ class BichoCommand implements ExternalCommand {
 
     private final Project project;
 
-    BichoCommand(final Project project) {
+    public BichoCommand(final Project project) {
         this.project = project;
     }
 
