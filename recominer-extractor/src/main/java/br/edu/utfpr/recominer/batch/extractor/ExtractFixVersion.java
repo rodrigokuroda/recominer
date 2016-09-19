@@ -1,8 +1,8 @@
 package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.core.model.Project;
-import br.edu.utfpr.recominer.model.Version;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
+import br.edu.utfpr.recominer.model.Version;
 import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,17 +87,6 @@ public class ExtractFixVersion {
                         }
                 );
 
-//        existingIssuesRelatedToVersion.forEach(o -> {
-//            final Integer issueIdFromDb = (Integer) o[0];
-//            final Version issueFixVersionFromDb = new Version((String) o[1]);
-//            if (existingIssuesRelatedToVersion.containsKey(issueIdFromDb)) {
-//                existingIssuesRelatedToVersion.get(issueIdFromDb).add(issueFixVersionFromDb);
-//            } else {
-//                Set<Version> set = new HashSet<>();
-//                set.add(issueFixVersionFromDb);
-//                existingIssuesRelatedToVersion.put(issueIdFromDb, set);
-//            }
-//        });
         final List<IssueAndFixVersions> issuesIdAndFixVersions
                 = template.query(selectIssuesIdAndFixVersions,
                         (ResultSet rs, int rowNum) -> new IssueAndFixVersions(rs.getInt(1), Arrays.asList(rs.getString(2))),

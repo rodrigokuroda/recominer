@@ -19,7 +19,11 @@ public class FileSystemDatasetOutput implements DatasetOutput {
     private final Logger log = LoggerFactory.getLogger(FileSystemDatasetOutput.class);
 
     @Override
-    public void write(Project project, Commit commit, Dataset dataset, String datasetName) {
+    public void write(File workingDir, Project project, Commit commit, Dataset dataset, String datasetName) {
+
+        if (!workingDir.exists()) {
+            throw new IllegalArgumentException("Working directory does not exist.");
+        }
         // Structure of folder: PROJECT/COMMIT/FILE/COCHANGE/train.csv
         //                      PROJECT/COMMIT/FILE/test.csv
         // Using toString() method to force error when attribute is null.
@@ -33,7 +37,7 @@ public class FileSystemDatasetOutput implements DatasetOutput {
             path.append("/").append(dataset.getCochange().getId().toString());
         }
 
-        File dir = new File("generated", path.toString());
+        File dir = new File(workingDir, path.toString());
 
         if (!dir.exists()) {
             dir.mkdirs();

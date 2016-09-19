@@ -5,7 +5,6 @@ import java.util.Objects;
 import org.springframework.data.domain.Persistable;
 
 /**
- * TODO add other metrics
  *
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */

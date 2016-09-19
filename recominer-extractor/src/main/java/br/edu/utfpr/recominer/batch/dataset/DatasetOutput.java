@@ -2,6 +2,7 @@ package br.edu.utfpr.recominer.batch.dataset;
 
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.Project;
+import java.io.File;
 
 /**
  *
@@ -9,6 +10,6 @@ import br.edu.utfpr.recominer.core.model.Project;
  */
 public interface DatasetOutput {
     
-    void write(Project project, Commit commit, Dataset dataset, String datasetName);
+    void write(File workingDir, Project project, Commit commit, Dataset dataset, String datasetName);
     
 }

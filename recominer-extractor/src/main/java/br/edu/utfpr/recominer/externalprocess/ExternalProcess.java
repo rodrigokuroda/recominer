@@ -41,7 +41,6 @@ public class ExternalProcess {
         
         Process process = processBuilder.start();
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        // TODO return Process or InputStream
         String line;
         while ((line = reader.readLine()) != null) {
             LOG.info(line);

@@ -2,8 +2,8 @@ package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.core.model.IssueTrackerSystem;
 import br.edu.utfpr.recominer.core.model.Project;
-import br.edu.utfpr.recominer.model.svn.Scmlog;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
+import br.edu.utfpr.recominer.model.svn.Scmlog;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.util.ArrayList;

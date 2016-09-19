@@ -1,21 +1,21 @@
 package br.edu.utfpr.recominer.batch.dataset;
 
 import br.edu.utfpr.recominer.core.model.Cochange;
-import br.edu.utfpr.recominer.metric.file.FileMetrics;
-import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
 import br.edu.utfpr.recominer.core.model.Commit;
-import br.edu.utfpr.recominer.model.CommitMetrics;
-import br.edu.utfpr.recominer.model.ContextualMetrics;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.Issue;
-import br.edu.utfpr.recominer.model.IssuesMetrics;
 import br.edu.utfpr.recominer.core.model.Project;
-import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
-import br.edu.utfpr.recominer.repository.FileMetricsRepository;
-import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.IssueRepository;
+import br.edu.utfpr.recominer.metric.file.FileMetrics;
+import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
+import br.edu.utfpr.recominer.model.CommitMetrics;
+import br.edu.utfpr.recominer.model.ContextualMetrics;
+import br.edu.utfpr.recominer.model.IssuesMetrics;
+import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
+import br.edu.utfpr.recominer.repository.FileMetricsRepository;
+import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -40,6 +41,9 @@ import org.springframework.batch.item.ItemProcessor;
 public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
     private final Logger log = LoggerFactory.getLogger(DatasetProcessor.class);
+
+    @Value("${workingDir:generated}")
+    private String workingDir;
 
     @Inject
     private CommitRepository commitRepository;
@@ -195,17 +199,21 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
                     final Dataset trainDataset = new Dataset(changedFile, cochange, train, commits);
                     
-                    datasetOutput.write(project, newCommit, trainDataset, "train");
+                    datasetOutput.write(getWorkingDirectory(), project, newCommit, trainDataset, "train");
                 }
 
                 final Dataset testDataset = new Dataset(changedFile, test, newCommit);
                 
-                datasetOutput.write(project, newCommit, testDataset, "test");
+                datasetOutput.write(getWorkingDirectory(), project, newCommit, testDataset, "test");
             }
         }
 
         datasetLog.stop();
 
         return datasetLog;
+    }
+
+    private java.io.File getWorkingDirectory() {
+        return new java.io.File(workingDir);
     }
 }

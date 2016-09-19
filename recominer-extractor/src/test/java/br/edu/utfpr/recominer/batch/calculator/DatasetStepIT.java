@@ -1,22 +1,26 @@
 package br.edu.utfpr.recominer.batch.calculator;
 
 import br.edu.utfpr.recominer.Application;
-import br.edu.utfpr.recominer.model.IssuesMetrics;
-import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 import javax.inject.Inject;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -34,34 +38,35 @@ public class DatasetStepIT {
     @Inject
     private JdbcTemplate template;
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    private File test;
+
+    @Before
+    public void setUp() throws IOException {
+        test = testFolder.newFolder("test");
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        testFolder.delete();
+    }
+
     @Test
     public void shouldCalculateMetricsForNewCommit() {
         final Integer issueId = 1644;
         final Integer commitId = 1519;
 
-        // Delete to recalculate
-        int rowsAffected = template.update(
-                "DELETE FROM avro_test.issues_metrics WHERE issue_id = ? AND commit_id = ?",
-                issueId, commitId);
-        assertEquals(1, rowsAffected);
+        final JobParameters params = new JobParameters();
+        params.getParameters().put("spring.batch.job.enabled", new JobParameter("false"));
+        params.getParameters().put("workingDir", new JobParameter("test"));
 
-        List<IssuesMetrics> metrics = template.query(
-                "SELECT * FROM avro_test.issues_metrics WHERE issue_id = ? AND commit_id = ?",
-                IssuesMetricsRepository.ROW_MAPPER,
-                issueId,
-                commitId);
-        assertTrue(metrics.isEmpty());
-
-        // Running calculation job step.
-        JobExecution datasetJob = jobLauncherTestUtils.launchStep("datasetStep");
+        // Running dataset generation job step.
+        JobExecution datasetJob = jobLauncherTestUtils.launchStep("datasetStep", params);
         assertEquals("COMPLETED", datasetJob.getExitStatus().getExitCode());
 
-        IssuesMetrics metric = template.queryForObject(
-                "SELECT * FROM avro_test.issues_metrics WHERE issue_id = ? AND commit_id = ?",
-                IssuesMetricsRepository.ROW_MAPPER,
-                issueId,
-                commitId);
-        assertNotNull(metric);
+        assertTrue(test.exists());
     }
 
 }
