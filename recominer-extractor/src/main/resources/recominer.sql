@@ -193,20 +193,6 @@ CREATE TABLE `version_control` (
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `version_control`
---
-
-LOCK TABLES `version_control` WRITE;
-/*!40000 ALTER TABLE `version_control` DISABLE KEYS */;
-/*!40000 ALTER TABLE `version_control` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
---
--- Table structure for table `calculator_log`
---
-
 DROP TABLE IF EXISTS `calculator_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -216,15 +202,10 @@ CREATE TABLE IF NOT EXISTS `calculator_log`(
     `metric` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    `last_commit_date` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `dataset_log`
---
 
 DROP TABLE IF EXISTS `dataset_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -235,15 +216,10 @@ CREATE TABLE IF NOT EXISTS `dataset_log`(
     `type` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    `last_commit_date` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `classificator_log`
---
 
 DROP TABLE IF EXISTS `classificator_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -254,16 +230,11 @@ CREATE TABLE IF NOT EXISTS `classificator_log`(
     `type` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    `last_commit_date` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `association_rule_log`
---
 
 DROP TABLE IF EXISTS `association_rule_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -274,12 +245,21 @@ CREATE TABLE IF NOT EXISTS `association_rule_log`(
     `type` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    `last_commit_date` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+--
+-- Dumping data for table `version_control`
+--
+
+LOCK TABLES `version_control` WRITE;
+/*!40000 ALTER TABLE `version_control` DISABLE KEYS */;
+/*!40000 ALTER TABLE `version_control` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

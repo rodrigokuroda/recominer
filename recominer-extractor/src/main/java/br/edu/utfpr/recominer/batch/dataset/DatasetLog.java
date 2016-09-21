@@ -2,7 +2,6 @@ package br.edu.utfpr.recominer.batch.dataset;
 
 import br.edu.utfpr.recominer.core.model.Project;
 import java.util.Date;
-import java.util.Objects;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -16,7 +15,6 @@ public class DatasetLog implements Persistable<Integer> {
     private String type;
     private Date startDate;
     private Date endDate;
-    private Date lastCommitDate;
 
     public DatasetLog(Project project, String type) {
         this.project = project;
@@ -69,6 +67,7 @@ public class DatasetLog implements Persistable<Integer> {
         this.endDate = endDate;
     }
 
+    
     public void start() {
         this.startDate = new Date();
     }
@@ -76,38 +75,5 @@ public class DatasetLog implements Persistable<Integer> {
     public void stop() {
         this.endDate = new Date();
     }
-
-    public Date getLastCommitDate() {
-        return lastCommitDate;
-    }
-
-    public void setLastCommitDate(Date lastCommitDate) {
-        this.lastCommitDate = lastCommitDate;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 79 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final DatasetLog other = (DatasetLog) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
-    }
-
+    
 }

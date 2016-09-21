@@ -19,7 +19,7 @@ public class AssociationRuleWriter implements ItemWriter<AssociationRuleLog> {
     @Override
     public void write(List<? extends AssociationRuleLog> logs) throws Exception {
         for (AssociationRuleLog log : logs) {
-            associationRuleLogRepository.save(log);
+            //associationRuleLogRepository.save(log);
         }
     }
 

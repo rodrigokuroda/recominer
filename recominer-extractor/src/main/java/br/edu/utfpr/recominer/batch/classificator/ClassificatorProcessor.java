@@ -2,14 +2,14 @@ package br.edu.utfpr.recominer.batch.classificator;
 
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
-import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
 import br.edu.utfpr.recominer.core.model.Project;
-import br.edu.utfpr.recominer.core.repository.CommitRepository;
-import br.edu.utfpr.recominer.core.repository.FileRepository;
-import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepository;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import br.edu.utfpr.recominer.model.FilePairIssueCommit;
+import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
+import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
+import br.edu.utfpr.recominer.core.repository.FileRepository;
+import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepository;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -53,7 +53,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         ClassificatorLog classificatorLog = new ClassificatorLog(project, "RandomForest");
         classificatorLog.start();
 
-        final List<Commit> newCommits = commitRepository.selectNewCommitsForClassificator();
+        final List<Commit> newCommits = commitRepository.selectNewCommits();
         for (Commit newCommit : newCommits) {
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 

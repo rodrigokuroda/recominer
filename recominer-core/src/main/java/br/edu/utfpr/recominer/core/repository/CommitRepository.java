@@ -7,7 +7,6 @@ import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
 import java.sql.ResultSet;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +62,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND i.fixed_on IS NULL"
-                        + " ORDER BY c.date ASC",
+                        + " ORDER BY c.date DESC",
                         project),
                 ROW_MAPPER,
                 "max_files_per_commit");
@@ -90,28 +89,9 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "   AND (c.commit_id NOT IN (SELECT DISTINCT(cm.commit_id) FROM {0}.commit_metrics cm) "
                         + "     OR c.commit_id NOT IN (SELECT DISTINCT(fm.commit_id) FROM {0}.file_metrics fm) "
                         + "     OR c.commit_id NOT IN (SELECT DISTINCT(im.commit_id) FROM {0}.issues_metrics im)) "
-                        + " ORDER BY c.date ASC",
+                        + " ORDER BY c.date DESC",
                         project),
                 ROW_MAPPER,
-                "max_files_per_commit");
-    }
-
-    public Date selectLastNewCommitDateForCalculator() {
-        return jdbcOperations.queryForObject(
-                QueryUtils.getQueryForDatabase(
-                        "SELECT MAX(c.date)"
-                        + "  FROM " + getTable().getSchemaAndName() + " c"
-                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
-                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
-                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
-                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i.fixed_on IS NULL"
-                        + "   AND (c.commit_id NOT IN (SELECT DISTINCT(cm.commit_id) FROM {0}.commit_metrics cm) "
-                        + "     OR c.commit_id NOT IN (SELECT DISTINCT(fm.commit_id) FROM {0}.file_metrics fm) "
-                        + "     OR c.commit_id NOT IN (SELECT DISTINCT(im.commit_id) FROM {0}.issues_metrics im)) "
-                        + " ORDER BY c.date ASC",
-                        project),
-                Date.class,
                 "max_files_per_commit");
     }
 
@@ -133,67 +113,10 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND i.fixed_on IS NULL"
-                        + "   AND c.commit_id NOT IN (SELECT DISTINCT(ar.commit_id) FROM {0}.ar_prediction ar)"
-                        + " ORDER BY c.date ASC",
+                        + "   AND c.commit_id NOT IN (SELECT DISTINCT(ar.commit_id) FROM {0}.ar_prediction ar) "
+                        + " ORDER BY c.date DESC",
                         project),
                 ROW_MAPPER,
-                "max_files_per_commit");
-    }
-
-    public Date selectLastNewCommitDateForAssociationRule() {
-        return jdbcOperations.queryForObject(
-                QueryUtils.getQueryForDatabase(
-                        "SELECT MAX(c.date)"
-                        + "  FROM " + getTable().getSchemaAndName() + " c"
-                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
-                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
-                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
-                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i.fixed_on IS NULL"
-                        + "   AND c.commit_id NOT IN (SELECT DISTINCT(ar.commit_id) FROM {0}.ar_prediction ar)",
-                        project),
-                Date.class,
-                "max_files_per_commit");
-    }
-
-    /**
-     * Gets all commits associated with non-fixed issues and commits that have
-     * not Classificator predictions yet. The commits must have a number of
-     * maximum files configured in 'recominer.configuration' table, as key
-     * 'max_files_per_commit'.
-     *
-     * @return Commits of non-fixed issues.
-     */
-    public List<Commit> selectNewCommitsForClassificator() {
-        return jdbcOperations.query(
-                QueryUtils.getQueryForDatabase(
-                        "SELECT c.commit_id, c.rev, c.committer_id, c.date"
-                        + "  FROM " + getTable().getSchemaAndName() + " c"
-                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
-                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
-                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
-                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i.fixed_on IS NULL"
-                        + "   AND c.commit_id NOT IN (SELECT DISTINCT(ml.commit_id) FROM {0}.ml_prediction ml) "
-                        + " ORDER BY c.date ASC",
-                        project),
-                ROW_MAPPER,
-                "max_files_per_commit");
-    }
-
-    public Date selectLastNewCommitForClassificator() {
-        return jdbcOperations.queryForObject(
-                QueryUtils.getQueryForDatabase(
-                        "SELECT MAX(c.date)"
-                        + "  FROM " + getTable().getSchemaAndName() + " c"
-                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
-                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
-                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
-                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i.fixed_on IS NULL"
-                        + "   AND c.commit_id NOT IN (SELECT DISTINCT(ml.commit_id) FROM {0}.ml_prediction ml)",
-                        project),
-                Date.class,
                 "max_files_per_commit");
     }
 
@@ -204,8 +127,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i2s.issue_id = ?"
-                        + " ORDER BY c.date ASC", project),
+                        + "   AND i2s.issue_id = ?", project),
                 ROW_MAPPER,
                 "max_files_per_commit", issue.getId());
     }

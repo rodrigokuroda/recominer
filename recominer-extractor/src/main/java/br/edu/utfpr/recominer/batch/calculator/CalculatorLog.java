@@ -3,7 +3,6 @@ package br.edu.utfpr.recominer.batch.calculator;
 import br.edu.utfpr.recominer.core.model.Project;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -19,7 +18,6 @@ public class CalculatorLog implements Persistable<Integer>, Serializable {
     private String metric;
     private Date startDate;
     private Date endDate;
-    private Date lastCommitDate;
 
     public CalculatorLog(Project project, String metric) {
         this.project = project;
@@ -85,37 +83,5 @@ public class CalculatorLog implements Persistable<Integer>, Serializable {
     public void stop() {
         this.endDate = new Date();
     }
-
-    public Date getLastCommitDate() {
-        return lastCommitDate;
-    }
-
-    public void setLastCommitDate(Date lastCommitDate) {
-        this.lastCommitDate = lastCommitDate;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 59 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final CalculatorLog other = (CalculatorLog) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
-    }
+    
 }

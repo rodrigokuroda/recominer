@@ -1,8 +1,8 @@
 package br.edu.utfpr.recominer.repository;
 
+import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.batch.classificator.ClassificatorLog;
 import br.edu.utfpr.recominer.core.model.Project;
-import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import java.sql.ResultSet;
 import java.util.LinkedHashMap;
@@ -31,7 +31,6 @@ public class ClassificatorLogRepository extends JdbcRepository<ClassificatorLog,
                 classificatorLog.setId(rs.getInt("id"));
                 classificatorLog.setStartDate(rs.getDate("start_date"));
                 classificatorLog.setEndDate(rs.getDate("end_date"));
-                classificatorLog.setLastCommitDate(rs.getDate("last_commit_date"));
                 return classificatorLog;
             };
     
@@ -43,7 +42,6 @@ public class ClassificatorLogRepository extends JdbcRepository<ClassificatorLog,
                 mapping.put("type", classificatorLog.getType());
                 mapping.put("start_date", classificatorLog.getStartDate());
                 mapping.put("end_date", classificatorLog.getEndDate());
-                mapping.put("last_commit_date", classificatorLog.getLastCommitDate());
                 return mapping;
             };
 

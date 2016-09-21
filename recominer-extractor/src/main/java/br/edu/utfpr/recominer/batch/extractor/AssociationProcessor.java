@@ -40,8 +40,7 @@ public class AssociationProcessor {
 
         final List<Scmlog> commitsToAnalyze;
 
-        final RowMapper<Scmlog> mapper = (ResultSet rs, int rowNum) ->
-                new Scmlog(rs.getInt("id"), rs.getDate("date"), rs.getString("message"));
+        final RowMapper<Scmlog> mapper = (ResultSet rs, int rowNum) -> new Scmlog(rs.getInt("id"), rs.getDate("date"), rs.getString("message"));
         final String selectScmlog = "SELECT id, date, message FROM {0}_vcs.scmlog";
 
         if (project.getLastCommitDateAnalyzed() != null) {
@@ -66,8 +65,7 @@ public class AssociationProcessor {
             jiraAggregation.aggregate(commitsToAnalyze);
 
             final java.sql.Timestamp lastIssueUpdate = template.queryForObject(
-                    QueryUtils.getQueryForDatabase(
-                            "SELECT MAX(updated_on) FROM {0}_issues.issues", project),
+                    QueryUtils.getQueryForDatabase("SELECT MAX(updated_on) FROM {0}_issues.issues", project),
                     java.sql.Timestamp.class);
 
             // setting date of last commit analyzed
