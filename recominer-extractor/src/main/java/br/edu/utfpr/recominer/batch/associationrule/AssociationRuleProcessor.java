@@ -12,6 +12,7 @@ import br.edu.utfpr.recominer.core.repository.AssociationRulePredictionRepositor
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.IssueRepository;
+import br.edu.utfpr.recominer.filter.FileFilter;
 import br.edu.utfpr.recominer.metric.associationrule.AssociationRuleExtractor;
 import br.edu.utfpr.recominer.metric.associationrule.AssociationRulePerformanceCalculator;
 import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
@@ -30,6 +31,7 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -64,6 +66,9 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
     @Inject
     private AssociationRulePredictionRepository predictionRepository;
 
+    @Value("${filenameFilter:}")
+    private String filter;
+
     @Override
     public AssociationRuleLog process(Project project) throws Exception {
         commitRepository.setProject(project);
@@ -77,21 +82,20 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         
         AssociationRuleLog associationRuleLog = new AssociationRuleLog(project, "Zimmermann");
         associationRuleLog.start();
+
+        final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
         
         long countFixedIssues = issueRepository.countFixedIssues();
         
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommits();
+        final List<Commit> newCommits = commitRepository.selectNewCommitsForAssociationRule();
         for (Commit newCommit : newCommits) {
         
             log.info("Computing metrics for changed files on commit " + newCommit.getId());
             // select changed files
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
             final List<AssociationRule<File>> predictions = new ArrayList<>();
-
-            // TODO parameterize
-            final Predicate<File> fileFilter = f -> !f.getFileName().equals("CHANGES.txt");
-
+            
             for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
 
                 log.info("Computing association rule for file " + changedFile.getId() + " in the past.");
