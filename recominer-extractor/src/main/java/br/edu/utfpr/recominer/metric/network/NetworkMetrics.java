@@ -77,6 +77,8 @@ public class NetworkMetrics implements Persistable<Integer> {
         this.pairFileGlobal = new GlobalMeasure(0, 0);
     }
 
+
+
     public NetworkMetrics(Issue issue,
             Commit commit,
             DescriptiveStatisticsHelper betweennessStatistics,
@@ -97,6 +99,11 @@ public class NetworkMetrics implements Persistable<Integer> {
         this.constraintStatistics = new MetricStatistic(constraintStatistics);
         this.hierarchyStatistics = new MetricStatistic(hierarchyStatistics);
         this.pairFileGlobal = pairFileGlobal;
+    }
+
+    public NetworkMetrics(Integer id) {
+        this();
+        this.id = id;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package br.edu.utfpr.recominer.batch.dataset;
 
 import br.edu.utfpr.recominer.Application;
+import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import java.io.File;
 import java.io.IOException;
 import javax.inject.Inject;
@@ -36,6 +38,9 @@ public class DatasetStepIT {
     private JobLauncherTestUtils jobLauncherTestUtils;
 
     @Inject
+    private CommitRepository repository;
+
+    @Inject
     private JdbcTemplate template;
 
     @Rule
@@ -59,6 +64,8 @@ public class DatasetStepIT {
         final Integer commitId = 4219;
         final Integer cochange = 4221;
 
+        repository.setProject(new Project(1, "avro", "avro_test", null, null, null));
+
         final JobParameters params = new JobParametersBuilder()
                 .addString("spring.batch.job.enabled", "false")
                 .addString("workingDir", test.getAbsolutePath())
@@ -71,6 +78,8 @@ public class DatasetStepIT {
         assertTrue(test.exists());
         assertTrue(new File(test, "avro/" + issueId + "/" + commitId + "/test.csv").exists());
         assertTrue(new File(test, "avro/" + issueId + "/" + commitId + "/" + cochange + "/train.csv").exists());
+
+        assertTrue(repository.selectNewCommitsForDataset().isEmpty());
     }
 
 }

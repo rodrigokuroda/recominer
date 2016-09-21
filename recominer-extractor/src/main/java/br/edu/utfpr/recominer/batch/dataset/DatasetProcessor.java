@@ -14,6 +14,7 @@ import br.edu.utfpr.recominer.model.CommitMetrics;
 import br.edu.utfpr.recominer.model.ContextualMetrics;
 import br.edu.utfpr.recominer.model.IssuesMetrics;
 import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
+import br.edu.utfpr.recominer.repository.ContextualMetricsRepository;
 import br.edu.utfpr.recominer.repository.FileMetricsRepository;
 import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
@@ -74,6 +75,9 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     @Inject
     private DatasetOutput datasetOutput;
 
+    @Inject
+    private ContextualMetricsRepository metricsRepository;
+
     @Override
     public DatasetLog process(Project project) throws Exception {
         DatasetLog datasetLog = new DatasetLog(project, "All");
@@ -87,9 +91,12 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
         fileMetricsRepository.setProject(project);
         commitMetricsRepository.setProject(project);
         filePairIssueCommitRepository.setProject(project);
+        metricsRepository.setProject(project);
 
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommits();
+        final List<Commit> newCommits = commitRepository.selectNewCommitsForDataset();
+        log.info(newCommits.size() + " new commits to be processed.");
+
         for (Commit newCommit : newCommits) {
 
             log.info("Computing metrics of new commit " + newCommit.getId());
@@ -133,6 +140,11 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
                                     issuesMetricsCache.get(issue),
                                     networkMetricsCache.get(issue),
                                     newCommitMetrics, fileMetrics);
+
+                    // what commit/file these metrics are for
+                    contextualMetrics.setCommit(newCommit);
+                    contextualMetrics.setFile(changedFile);
+                    
                     test.add(contextualMetrics);
                 }
 
@@ -174,6 +186,11 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
                         // creates a dataset's instance (one line)
                         ContextualMetrics contextualMetrics = new ContextualMetrics(issuesMetrics,
                                 networkMetrics, historicalCommitMetrics, historicalFileMetrics);
+
+                        // what commit/file these metrics are for
+                        contextualMetrics.setCommit(newCommit);
+                        contextualMetrics.setFile(changedFile);
+
                         // collecting instances that will compose the train dataset
                         train.add(contextualMetrics);
                     }
@@ -204,9 +221,12 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
                     datasetOutput.write(getWorkingDirectory(), project, newCommit, trainDataset, "train");
                 }
 
+                metricsRepository.save(train);
+
                 final Dataset testDataset = new Dataset(changedFile, test, newCommit);
                 
                 datasetOutput.write(getWorkingDirectory(), project, newCommit, testDataset, "test");
+                metricsRepository.save(test);
             }
         }
 

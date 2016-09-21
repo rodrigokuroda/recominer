@@ -70,6 +70,31 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
 
     /**
      * Gets all commits associated with non-fixed issues and commits that have
+     * not Dataset generated yet. The commits must have a number of
+     * maximum files configured in 'recominer.configuration' table, as key
+     * 'max_files_per_commit'.
+     *
+     * @return Commits of non-fixed issues.
+     */
+    public List<Commit> selectNewCommitsForDataset() {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT c.commit_id, c.rev, c.committer_id, c.date"
+                        + "  FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
+                        + "   AND i.fixed_on IS NULL"
+                        + "   AND c.commit_id NOT IN (SELECT DISTINCT(cm.commit_id) FROM {0}.contextual_metrics cm) "
+                        + " ORDER BY c.date DESC",
+                        project),
+                ROW_MAPPER,
+                "max_files_per_commit");
+    }
+
+    /**
+     * Gets all commits associated with non-fixed issues and commits that have
      * not metrics calculated yet. The commits must have a number of maximum
      * files configured in 'recominer.configuration' table, as key
      * 'max_files_per_commit'.

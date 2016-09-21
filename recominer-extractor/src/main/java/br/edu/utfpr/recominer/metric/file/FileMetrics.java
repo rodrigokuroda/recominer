@@ -61,6 +61,10 @@ public class FileMetrics implements Persistable<Integer> {
         this.age = fileAgeInProject;
     }
 
+    public FileMetrics(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public boolean isNew() {
         return id == null || id == 0;

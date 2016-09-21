@@ -21,9 +21,9 @@ public class MapperGenerator {
         mapper.append("package br.edu.utfpr.recominer.repository;\n"
                 + "\n"
                 + "import br.edu.utfpr.recominer.model." + clazz.getSimpleName() + ";\n"
-                + "import br.edu.utfpr.recominer.model.Project;\n"
-                + "import br.edu.utfpr.recominer.repository.helper.RowUnmapper;\n"
-                + "import br.edu.utfpr.recominer.repository.helper.TableDescription;\n"
+                + "import br.edu.utfpr.recominer.core.model.Project;\n"
+                + "import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;\n"
+                + "import br.edu.utfpr.recominer.core.repository.helper.TableDescription;\n"
                 + "import java.sql.ResultSet;\n"
                 + "import java.util.LinkedHashMap;\n"
                 + "import java.util.List;\n"
@@ -33,7 +33,7 @@ public class MapperGenerator {
                 + "\n"
                 + "/**\n"
                 + " *\n"
-                + " * @author Rodrigo T. Kuroda <rodrigokuroda at gmail.com>\n"
+                + " * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>\n"
                 + " */\n"
                 + "@Repository\n"
                 + "public class " + clazz.getSimpleName() + "Repository extends JdbcRepository<" + clazz.getSimpleName() + ", Integer> {\n"
@@ -115,7 +115,7 @@ public class MapperGenerator {
         unmapper.append("                return mapping;\n"
                 + "            };\n");
 
-        mapper.append("            };").append(unmapper)
+        mapper.append("            };\n").append(unmapper)
                 .append("\n}");
 
         System.out.println(mapper.toString());

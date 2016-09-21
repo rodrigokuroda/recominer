@@ -625,6 +625,21 @@ LOCK TABLES `avro_test`.`ml_prediction` WRITE;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+--DROP TABLE IF EXISTS `avro_test`.`contextual_metrics`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `avro_test`.`contextual_metrics` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `commit_id` INT(11) NOT NULL,
+    `file_id` INT(11) NOT NULL,
+    `network_metrics_id` INT(11) NOT NULL, 
+    `issue_metrics_id` INT(11) NOT NULL, 
+    `commit_metrics_id` INT(11) NOT NULL, 
+    `file_metrics_id` INT(11) NOT NULL, 
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

@@ -96,6 +96,10 @@ public class IssuesMetrics implements Persistable<Integer> {
         this.commit = commit;
     }
 
+    public IssuesMetrics(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public boolean isNew() {
         return id == null || id == 0;

@@ -118,6 +118,18 @@ CREATE TABLE IF NOT EXISTS {0}.communication_network_metrics(
     UNIQUE KEY issue_id_commit_id (issue_id, commit_id)
 );
 
+-- dataset of metrics generated
+CREATE TABLE IF NOT EXISTS {0}.contextual_metrics(
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    commit_id INT(11) NOT NULL,
+    file_id INT(11) NOT NULL,
+    network_metrics_id_id INT(11) NOT NULL, 
+    issue_metrics_id INT(11) NOT NULL, 
+    commit_metrics_id INT(11) NOT NULL, 
+    file_metrics_id INT(11) NOT NULL, 
+    PRIMARY KEY (id)
+);
+
 -- cochanges of set of files (antecedent) predicted by association rule
 CREATE TABLE IF NOT EXISTS {0}.ar_prediction(
     id INT(11) NOT NULL AUTO_INCREMENT,

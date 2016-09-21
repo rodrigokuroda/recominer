@@ -1,29 +1,35 @@
 package br.edu.utfpr.recominer.model;
 
+import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.metric.file.FileMetrics;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
 import java.util.Objects;
+import org.springframework.data.domain.Persistable;
 
 /**
  *
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
-public class ContextualMetrics {
+public class ContextualMetrics implements Persistable<Integer> {
 
     public static final String HEADER
             = IssuesMetrics.HEADER
             + NetworkMetrics.HEADER
             + CommitMetrics.HEADER
-            + FileMetrics.HEADER
-            //+ "changedAfterReopened" // index (1a reabertura, 2a, 3a e assim sucessivamente) onde o arquivo B foi alterado após a issue ter sido reaberta
+            + FileMetrics.HEADER //+ "changedAfterReopened" // index (1a reabertura, 2a, 3a e assim sucessivamente) onde o arquivo B foi alterado após a issue ter sido reaberta
             ;
 
+    private Integer id;
+    private Commit commit;
     private File file;
     private IssuesMetrics issueMetrics;
     private NetworkMetrics networkMetrics;
     private CommitMetrics commitMetrics;
     private FileMetrics fileMetrics;
+
+    public ContextualMetrics() {
+    }
 
     public ContextualMetrics(IssuesMetrics issueMetrics, NetworkMetrics networkMetrics, CommitMetrics commitMetrics, FileMetrics fileMetrics) {
         this.issueMetrics = issueMetrics;
@@ -31,9 +37,19 @@ public class ContextualMetrics {
         this.commitMetrics = commitMetrics;
         this.fileMetrics = fileMetrics;
     }
-    
-    public String getHeader() {
-        return HEADER;
+
+    @Override
+    public boolean isNew() {
+        return id == null;
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public File getFile() {
@@ -43,7 +59,15 @@ public class ContextualMetrics {
     public void setFile(File file) {
         this.file = file;
     }
-    
+
+    public Commit getCommit() {
+        return commit;
+    }
+
+    public void setCommit(Commit commit) {
+        this.commit = commit;
+    }
+
     public IssuesMetrics getIssueMetrics() {
         return issueMetrics;
     }
@@ -119,7 +143,6 @@ public class ContextualMetrics {
         final ContextualMetrics other = (ContextualMetrics) obj;
         return Objects.equals(issueMetrics, other.issueMetrics)
                 && Objects.equals(commitMetrics, other.commitMetrics)
-                && Objects.equals(file, other.file)
-                ;
+                && Objects.equals(file, other.file);
     }
 }
