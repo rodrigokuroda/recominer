@@ -19,6 +19,7 @@ import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +88,9 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
         fileMetricsRepository.setProject(project);
         commitMetricsRepository.setProject(project);
         filePairIssueCommitRepository.setProject(project);
+
+        final Date lastCommitDate = commitRepository.selectLastNewCommitDateForAssociationRule();
+        datasetLog.setLastCommitDate(lastCommitDate);
 
         // select new commits
         final List<Commit> newCommits = commitRepository.selectNewCommits();

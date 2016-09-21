@@ -1,10 +1,9 @@
 package br.edu.utfpr.recominer.repository;
 
-import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.batch.associationrule.AssociationRuleLog;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
-import br.edu.utfpr.recominer.core.repository.helper.TableDescription;
 import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,21 +18,19 @@ import org.springframework.stereotype.Repository;
 public class AssociationRuleLogRepository extends JdbcRepository<AssociationRuleLog, Integer> {
 
     public AssociationRuleLogRepository() {
-        super(ROW_MAPPER, ROW_UNMAPPER, TABLE_NAME, ID_COLUMN);
-    }
-
-    public void setProject(Project project) {
-        setTable(new TableDescription(project.getProjectName(), TABLE_NAME, ID_COLUMN));
+        super(ROW_MAPPER, ROW_UNMAPPER, SCHEMA_NAME, TABLE_NAME, ID_COLUMN);
     }
 
     private static final String ID_COLUMN = "id";
     private static final String TABLE_NAME = "association_rule_log";
+    private static final String SCHEMA_NAME = "recominer";
 
     public static final RowMapper<AssociationRuleLog> ROW_MAPPER
             = (ResultSet rs, int rowNum) -> {
                 AssociationRuleLog associationRuleLog = new AssociationRuleLog(new Project(rs.getInt("project_id")), rs.getString("type"));
                 associationRuleLog.setStartDate(rs.getDate("start_date"));
                 associationRuleLog.setEndDate(rs.getDate("end_date"));
+                associationRuleLog.setLastCommitDate(rs.getDate("last_commit_date"));
                 return associationRuleLog;
             };
 
@@ -45,6 +42,7 @@ public class AssociationRuleLogRepository extends JdbcRepository<AssociationRule
                 mapping.put("type", associationRuleLog.getType());
                 mapping.put("start_date", associationRuleLog.getStartDate());
                 mapping.put("end_date", associationRuleLog.getEndDate());
+                mapping.put("last_commit_date", associationRuleLog.getLastCommitDate());
                 return mapping;
             };
 

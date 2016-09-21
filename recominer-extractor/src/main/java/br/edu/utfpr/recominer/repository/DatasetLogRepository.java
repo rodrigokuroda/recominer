@@ -1,8 +1,8 @@
 package br.edu.utfpr.recominer.repository;
 
-import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.batch.dataset.DatasetLog;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.repository.JdbcRepository;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import java.sql.ResultSet;
 import java.util.LinkedHashMap;
@@ -34,6 +34,7 @@ public class DatasetLogRepository extends JdbcRepository<DatasetLog, Integer> {
                 datasetLog.setId(rs.getInt("id"));
                 datasetLog.setStartDate(rs.getDate("start_date"));
                 datasetLog.setEndDate(rs.getDate("end_date"));
+                datasetLog.setLastCommitDate(rs.getDate("last_commit_date"));
                 
                 return datasetLog;
             };
@@ -46,6 +47,7 @@ public class DatasetLogRepository extends JdbcRepository<DatasetLog, Integer> {
                 mapping.put("type", datasetLog.getType());
                 mapping.put("start_date", datasetLog.getStartDate());
                 mapping.put("end_date", datasetLog.getEndDate());
+                mapping.put("last_commit_date", datasetLog.getLastCommitDate());
                 return mapping;
             };
 

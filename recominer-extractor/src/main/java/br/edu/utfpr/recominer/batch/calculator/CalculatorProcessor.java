@@ -17,6 +17,7 @@ import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
 import br.edu.utfpr.recominer.repository.FileMetricsRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -84,6 +85,9 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
         networkMetricsRepository.setProject(project);
         fileMetricsRepository.setProject(project);
         commitMetricsRepository.setProject(project);
+
+        final Date lastCommitDate = commitRepository.selectLastNewCommitDateForCalculator();
+        calculatorLog.setLastCommitDate(lastCommitDate);
 
         // select new commits
         final List<Commit> newCommits = commitRepository.selectNewCommitsForCalculator();

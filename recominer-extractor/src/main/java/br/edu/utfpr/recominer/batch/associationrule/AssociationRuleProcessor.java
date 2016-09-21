@@ -20,6 +20,7 @@ import br.edu.utfpr.recominer.repository.FileMetricsRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -86,7 +87,10 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
         
         long countFixedIssues = issueRepository.countFixedIssues();
-        
+
+        final Date lastCommitDate = commitRepository.selectLastNewCommitDateForAssociationRule();
+        associationRuleLog.setLastCommitDate(lastCommitDate);
+
         // select new commits
         final List<Commit> newCommits = commitRepository.selectNewCommitsForAssociationRule();
         for (Commit newCommit : newCommits) {

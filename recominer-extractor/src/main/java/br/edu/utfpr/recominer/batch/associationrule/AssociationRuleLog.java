@@ -2,6 +2,7 @@ package br.edu.utfpr.recominer.batch.associationrule;
 
 import br.edu.utfpr.recominer.core.model.Project;
 import java.util.Date;
+import java.util.Objects;
 import org.springframework.data.domain.Persistable;
 
 /**
@@ -15,6 +16,7 @@ public class AssociationRuleLog implements Persistable<Integer> {
     private String type;
     private Date startDate;
     private Date endDate;
+    private Date lastCommitDate;
 
     public AssociationRuleLog(Project project, String type) {
         this.project = project;
@@ -67,13 +69,45 @@ public class AssociationRuleLog implements Persistable<Integer> {
         this.endDate = endDate;
     }
 
-    
     public void start() {
         this.startDate = new Date();
     }
     
     public void stop() {
         this.endDate = new Date();
+    }
+
+    public Date getLastCommitDate() {
+        return lastCommitDate;
+    }
+
+    public void setLastCommitDate(Date lastCommitDate) {
+        this.lastCommitDate = lastCommitDate;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AssociationRuleLog other = (AssociationRuleLog) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
     }
     
 }
