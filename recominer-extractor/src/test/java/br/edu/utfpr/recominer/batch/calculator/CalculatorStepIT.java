@@ -1,12 +1,20 @@
 package br.edu.utfpr.recominer.batch.calculator;
 
 import br.edu.utfpr.recominer.Application;
+import br.edu.utfpr.recominer.core.model.Commit;
+import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.model.IssuesMetrics;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import java.util.List;
 import javax.inject.Inject;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.boot.test.IntegrationTest;
@@ -14,9 +22,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -26,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @IntegrationTest
 @ActiveProfiles(profiles = "test")
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CalculatorStepIT {
 
     @Inject
@@ -33,6 +39,11 @@ public class CalculatorStepIT {
 
     @Inject
     private JdbcTemplate template;
+
+    @Inject
+    private CommitRepository repository;
+
+    private Project project = new Project(1, "avro", "avro_test", null, null, null);
 
     @Test
     public void shouldCalculateMetricsForNewCommit() {
@@ -62,6 +73,10 @@ public class CalculatorStepIT {
                 issueId,
                 commitId);
         assertNotNull(metric);
+
+        repository.setProject(project);
+        List<Commit> commits = repository.selectNewCommitsForCalculator();
+        assertTrue(commits.isEmpty());
     }
 
 }

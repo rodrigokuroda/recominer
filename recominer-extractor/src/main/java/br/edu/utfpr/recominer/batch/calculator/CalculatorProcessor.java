@@ -7,6 +7,7 @@ import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.IssueRepository;
+import br.edu.utfpr.recominer.filter.FileFilter;
 import br.edu.utfpr.recominer.metric.file.FileMetrics;
 import br.edu.utfpr.recominer.metric.file.FileMetricsCalculator;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
@@ -24,6 +25,7 @@ import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -67,6 +69,9 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Inject
     private CommitMetricsRepository commitMetricsRepository;
 
+    @Value("${filenameFilter:}")
+    private String filter;
+
     @Override
     public CalculatorLog process(Project project) throws Exception {
         CalculatorLog calculatorLog = new CalculatorLog(project, "AllMetrics");
@@ -81,15 +86,16 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
         commitMetricsRepository.setProject(project);
 
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommits();
+        final List<Commit> newCommits = commitRepository.selectNewCommitsForCalculator();
+        log.info(newCommits.size() + " new commits to be processed.");
+        
         for (Commit newCommit : newCommits) {
 
             log.info("Computing metrics for changed files on commit " + newCommit.getId());
             // select changed files
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 
-            // TODO parameterize
-            final Predicate<File> fileFilter = f -> !f.getFileName().contains("CHANGES.txt");
+            final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
 
             for (File changedFile : changedFiles.stream()
                     .filter(fileFilter)
