@@ -71,6 +71,10 @@ public class DatasetStepIT {
                 .addString("workingDir", test.getAbsolutePath())
                 .toJobParameters();
 
+        // Running calculation job step.
+        JobExecution calculationJob = jobLauncherTestUtils.launchStep("calculatorStep");
+        assertEquals("COMPLETED", calculationJob.getExitStatus().getExitCode());
+        
         // Running dataset generation job step.
         JobExecution datasetJob = jobLauncherTestUtils.launchStep("datasetStep", params);
         assertEquals("COMPLETED", datasetJob.getExitStatus().getExitCode());

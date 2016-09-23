@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
+@StepScope
 public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog> {
 
     private final Logger log = LoggerFactory.getLogger(CalculatorProcessor.class);
@@ -69,7 +71,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Inject
     private CommitMetricsRepository commitMetricsRepository;
 
-    @Value("${filenameFilter:}")
+    @Value("#{jobParameters[filenameFilter]}")
     private String filter;
 
     @Override
@@ -86,7 +88,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
         commitMetricsRepository.setProject(project);
 
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommitsForCalculator();
+        final List<Commit> newCommits = commitRepository.selectNewCommits();
         log.info(newCommits.size() + " new commits to be processed.");
         
         for (Commit newCommit : newCommits) {

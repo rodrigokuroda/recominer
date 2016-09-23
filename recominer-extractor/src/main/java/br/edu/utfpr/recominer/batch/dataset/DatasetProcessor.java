@@ -8,6 +8,7 @@ import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.IssueRepository;
+import br.edu.utfpr.recominer.filter.FileFilter;
 import br.edu.utfpr.recominer.metric.file.FileMetrics;
 import br.edu.utfpr.recominer.metric.network.NetworkMetrics;
 import br.edu.utfpr.recominer.model.CommitMetrics;
@@ -77,6 +78,9 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
     @Inject
     private ContextualMetricsRepository metricsRepository;
+    
+    @Value("#{jobParameters[filenameFilter]}")
+    private String filter;
 
     @Override
     public DatasetLog process(Project project) throws Exception {
@@ -123,7 +127,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
             // select changed files
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 
-            final Predicate<File> fileFilter = f -> !f.getFileName().equals("CHANGES.txt");
+            final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
 
             for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
 
@@ -236,6 +240,9 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     }
 
     private java.io.File getWorkingDirectory() {
+        if (workingDir == null) {
+            workingDir = "generated";
+        }
         return new java.io.File(workingDir);
     }
 }
