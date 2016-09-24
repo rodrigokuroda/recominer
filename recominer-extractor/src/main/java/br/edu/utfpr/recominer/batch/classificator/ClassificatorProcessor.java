@@ -10,6 +10,7 @@ import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepository;
+import br.edu.utfpr.recominer.filter.FileFilter;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -20,13 +21,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
+@StepScope
 public class ClassificatorProcessor implements ItemProcessor<Project, ClassificatorLog> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClassificatorProcessor.class);
@@ -39,9 +43,15 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
     @Inject
     private FilePairIssueCommitRepository filePairIssueCommitRepository;
-    
+
     @Inject
     private MachineLearningPredictionRepository predictionRepository;
+
+    @Value("#{jobParameters[filenameFilter]}")
+    private String filter;
+
+    @Value("#{jobParameters[workingDir]}")
+    private String workingDir;
 
     @Override
     public ClassificatorLog process(Project project) throws Exception {
@@ -54,68 +64,56 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         classificatorLog.start();
 
         final List<Commit> newCommits = commitRepository.selectNewCommits();
+        int processedCommits = 0;
         for (Commit newCommit : newCommits) {
+            LOG.info(++processedCommits + " of " + newCommits.size() + " commits processed.");
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 
-            final Predicate<File> fileFilter = f -> !f.getFileName().equals("CHANGES.txt");
+            final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
 
-            for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
-                List<FilePairIssueCommit> cochanges = filePairIssueCommitRepository.selectCochangesOf(changedFile, newCommit);
+            int processedFile = 0;
+            final List<File> filesToProcessed = changedFiles.stream().filter(fileFilter).collect(Collectors.toList());
+            for (File changedFile : filesToProcessed) {
+                LOG.info(++processedFile + " of " + filesToProcessed.size() + " commits processed.");
+                //List<FilePairIssueCommit> cochanges = filePairIssueCommitRepository.selectCochangesOf(changedFile, newCommit);
 
-                final java.io.File generationPath = new java.io.File("D:\\");
-                final java.io.File workingDirectory = new java.io.File(generationPath, 
+                final java.io.File generationPath = getWorkingDirectory();
+                final java.io.File workingDirectory = new java.io.File(generationPath,
                         project.getProjectName() + "/"
                         + newCommit.getId().toString() + "/"
                         + changedFile.getId().toString()
                 );
 
-                for (FilePairIssueCommit cochange : cochanges) {
-                    String script;
-                    try {
-                        script = Paths.get(RscriptCommand.class
-                                .getClassLoader()
-                                .getResource("scripts/classification.R")
-                                .toURI())
-                                .toFile()
-                                .getAbsolutePath();
-                    } catch (URISyntaxException ex) {
-                        LOG.error("Error to load R script for classification.", ex);
-                        throw ex;
-                    }
-                    final java.io.File train = new java.io.File(workingDirectory,
-                            cochange.getFilePair().getFile2().getId().toString() + "/train.csv");
-                    final java.io.File test = new java.io.File(workingDirectory, "test.csv");
+                String script;
+                try {
+                    script = Paths.get(RscriptCommand.class
+                            .getClassLoader()
+                            .getResource("scripts/classification.R")
+                            .toURI())
+                            .toFile()
+                            .getAbsolutePath();
+                } catch (URISyntaxException ex) {
+                    LOG.error("Error to load R script for classification.", ex);
+                    throw ex;
+                }
 
-                    if (train.exists()
-                            && test.exists()) {
-                        LOG.info("Running classification on file " + changedFile.getId() + " of new commit " + newCommit.getId());
-                        
-                        RscriptCommand command = new RscriptCommand(project);
-                        ExternalProcess ep = new ExternalProcess(command);
-                        int returnCode = ep.startAndWaitFor(script,
-                                generationPath.getAbsolutePath(),
-                                project.getProjectName(),
-                                newCommit.getId().toString(),
-                                changedFile.getId().toString(),
-                                cochange.getFilePair().getFile2().getId().toString()
-                        );
+                RscriptCommand command = new RscriptCommand(project);
+                ExternalProcess ep = new ExternalProcess(command);
+                int returnCode = ep.startAndWaitFor(script,
+                        generationPath.getAbsolutePath(),
+                        project.getProjectName(),
+                        newCommit.getId().toString(),
+                        changedFile.getId().toString()
+                );
 
-                        if (returnCode != 0) {
-                            LOG.warn("R return code " + returnCode);
-                        }
-                    } else {
-                        LOG.warn("Train or test dataset does not exists for project "
-                                + project.getProjectName()
-                                + ", commit " + newCommit.getId()
-                                + ", file " + changedFile.getId()
-                                + ", cochange " + cochange.getFilePair().getFile2().getId().toString());
-                    }
+                if (returnCode != 0) {
+                    LOG.warn("R return code " + returnCode);
                 }
 
                 final java.io.File resultTest = new java.io.File(workingDirectory,
                         "resultTest.csv"
                 );
-                
+
                 if (resultTest.exists()) {
                     Scanner resultReader = new Scanner(resultTest);
                     resultReader.useDelimiter("\r\n");
@@ -126,9 +124,9 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                         File cochange = new File(Integer.valueOf(result[0]), result[1]);
                         String predictionResult = result[3];
 
-                        MachineLearningPrediction prediction = 
-                                new MachineLearningPrediction(
-                                        changedFile, newCommit, 
+                        MachineLearningPrediction prediction
+                                = new MachineLearningPrediction(
+                                        changedFile, newCommit,
                                         cochange, predictionResult, "RandomForest");
 
                         predictionRepository.save(prediction);
@@ -139,5 +137,12 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         classificatorLog.stop();
 
         return classificatorLog;
+    }
+
+    private java.io.File getWorkingDirectory() {
+        if (workingDir == null) {
+            workingDir = "generated";
+        }
+        return new java.io.File(workingDir);
     }
 }

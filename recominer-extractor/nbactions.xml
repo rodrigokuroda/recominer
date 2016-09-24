@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-enableassertions -classpath %classpath br.edu.utfpr.recominer.Application</exec.args>
+                <exec.args>-enableassertions -Xms128m -Xmx1536m -classpath %classpath br.edu.utfpr.recominer.Application filenameFilter=CHANGES.txt</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -enableassertions -classpath %classpath br.edu.utfpr.recominer.Application</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -enableassertions -Xms128m -Xmx1536m -classpath %classpath br.edu.utfpr.recominer.Application filenameFilter=CHANGES.txt</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-enableassertions -classpath %classpath br.edu.utfpr.recominer.Application</exec.args>
+                <exec.args>-enableassertions -Xms128m -Xmx1536m -classpath %classpath br.edu.utfpr.recominer.Application filenameFilter=CHANGES.txt</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

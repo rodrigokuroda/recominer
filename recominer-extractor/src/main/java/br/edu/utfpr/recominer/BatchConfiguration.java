@@ -21,11 +21,15 @@ import br.edu.utfpr.recominer.batch.extractor.ExtractorReader;
 import br.edu.utfpr.recominer.batch.extractor.ExtractorWriter;
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.model.ExtractorLog;
+import javax.sql.DataSource;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
+import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +52,16 @@ public class BatchConfiguration {
 
     private final RunIdIncrementer runIdIncrementer = new RunIdIncrementer();
 
+    @Bean
+    public BatchConfigurer configurer(@Qualifier("batchDataSource") DataSource dataSource) {
+        return new DefaultBatchConfigurer(dataSource);
+    }
+
+    @Bean
+    public JobLauncherTestUtils jobLauncherTestUtils() {
+        return new JobLauncherTestUtils();
+    }
+    
     @Bean
     public Job job(@Qualifier("extractorStep") Step extractorStep,
             @Qualifier("calculatorStep") Step calculatorStep,
