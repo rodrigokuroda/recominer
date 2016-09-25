@@ -30,12 +30,12 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                 MachineLearningPrediction machineLearningPrediction = new MachineLearningPrediction(rs.getInt("id"));
                 machineLearningPrediction.setFile(new File(rs.getInt("file_id")));
                 machineLearningPrediction.setCommit(new Commit(rs.getInt("commit_id")));
-                machineLearningPrediction.setPredictedFile(new File(rs.getInt("predicted_file_id")));
+                machineLearningPrediction.setPredictedFile(new File(rs.getInt("predicted_file_id"), rs.getString("file_path")));
                 machineLearningPrediction.setPredictionResult(rs.getString("prediction_result"));
-                machineLearningPrediction.setAlgorithmType(rs.getString("algorithm_type"));
+                machineLearningPrediction.setAlgorithmType(rs.getString("algorithm_name"));
                 return machineLearningPrediction;
             };
-    
+
     public static final RowUnmapper<MachineLearningPrediction> ROW_UNMAPPER
             = (MachineLearningPrediction machineLearningPrediction) -> {
                 Map<String, Object> mapping = new LinkedHashMap<>();
@@ -44,16 +44,24 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                 mapping.put("commit_id", machineLearningPrediction.getCommit().getId());
                 mapping.put("predicted_file_id", machineLearningPrediction.getPredictedFile().getId());
                 mapping.put("prediction_result", machineLearningPrediction.getPredictionResult());
-                mapping.put("algorithm_type", machineLearningPrediction.getAlgorithmType());
+                mapping.put("algorithm_name", machineLearningPrediction.getAlgorithmType());
                 return mapping;
             };
 
     public List<MachineLearningPrediction> selectPredictedCochangesFor(Commit commit, File file) {
         return jdbcOperations.query(
                 getQueryForSchema(
-                        "SELECT * FROM {0}.ml_prediction "
-                        + " WHERE file_id = ? "
-                        + "   AND commit_id = ? "),
+                        "SELECT mlp.id, mlp.file_id, "
+                        + "     mlp.commit_id, "
+                        + "     mlp.predicted_file_id, "
+                        + "     mlp.prediction_result, "
+                        + "     mlp.algorithm_name, "
+                        + "     f.file_path"
+                        + "  FROM {0}.ml_prediction mlp "
+                        + "  JOIN {0}.files f ON f.id = mlp.predicted_file_id "
+                        + " WHERE mlp.file_id = ? "
+                        + "   AND mlp.commit_id = ? "
+                        + " ORDER BY mlp.prediction_result"),
                 rowMapper,
                 file.getId(), commit.getId());
     }

@@ -2,6 +2,7 @@ package br.edu.utfpr.recominer.core.repository;
 
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class FilesetSequenceRepository {
 
+    @Autowired
     private JdbcTemplate template;
+    
     private Project project;
 
     public void setProject(Project project) {

@@ -3,13 +3,12 @@ package br.edu.utfpr.recominer.batch.classificator;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.Project;
-import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
-import br.edu.utfpr.recominer.model.FilePairIssueCommit;
 import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepository;
+import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import br.edu.utfpr.recominer.filter.FileFilter;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -108,28 +107,36 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
                 if (returnCode != 0) {
                     LOG.warn("R return code " + returnCode);
-                }
+                } else {
+                    LOG.debug("Classification executed successfully.");
 
-                final java.io.File resultTest = new java.io.File(workingDirectory,
-                        "resultTest.csv"
-                );
+                    final java.io.File resultTest = new java.io.File(workingDirectory,
+                            "resultsTest.csv"
+                    );
 
-                if (resultTest.exists()) {
-                    Scanner resultReader = new Scanner(resultTest);
-                    resultReader.useDelimiter("\r\n");
-                    while (resultReader.hasNextLine()) {
-                        String resultLine = resultReader.next();
-                        String[] result = resultLine.split(";");
+                    if (resultTest.exists()) {
+                        Scanner resultReader = new Scanner(resultTest);
+                        resultReader.useDelimiter("\r\n");
+                        while (resultReader.hasNextLine()) {
+                            String resultLine = resultReader.next().replace("\"", "");
+                            String[] result = resultLine.split(";");
 
-                        File cochange = new File(Integer.valueOf(result[0]), result[1]);
-                        String predictionResult = result[3];
+                            File cochange = new File(Integer.valueOf(result[0]), result[1]);
+                            String predictionResult = result[2].replace("\"", "");
 
-                        MachineLearningPrediction prediction
-                                = new MachineLearningPrediction(
-                                        changedFile, newCommit,
-                                        cochange, predictionResult, "RandomForest");
+                            MachineLearningPrediction prediction
+                                    = new MachineLearningPrediction(
+                                            changedFile, newCommit,
+                                            cochange, predictionResult, "RandomForest");
 
-                        predictionRepository.save(prediction);
+                            try {
+                                predictionRepository.save(prediction);
+                            } catch (org.springframework.dao.DuplicateKeyException ex) {
+                                LOG.warn("Duplicated key for commit " + newCommit.getId() + ", file " + changedFile.getId(), ex);
+                            }
+                        }
+                    } else {
+                        LOG.warn("Results file does not exist.");
                     }
                 }
             }

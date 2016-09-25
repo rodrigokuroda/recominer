@@ -11,7 +11,8 @@ import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -22,16 +23,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AssociationRulePredictionRepository extends JdbcRepository<AssociationRulePrediction, Integer> {
 
+    @Autowired
     private FilesetSequenceRepository filesetSequence;
+    
+    @Autowired
     private FilesetRepository filesetRepository;
 
     public AssociationRulePredictionRepository() {
         super(ROW_MAPPER, ROW_UNMAPPER, TABLE_NAME, ID_COLUMN);
-    }
-
-    @PostConstruct
-    public void injectRepositories() {
-
     }
 
     @Override
