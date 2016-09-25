@@ -119,29 +119,31 @@
         </md-sidenav>
         <md-content layout="column" layout-fill>
             <div class="inset" hide-sm></div>
-            <div layout-gt-sm="row" layout-align="center center">
+            <div layout-gt-sm="row" layout-align="center stretch">
                 <div flex-gt-sm="100" flex-gt-lg="95">
-                    <md-card>
-                        <md-toolbar class="animate-show md-hue-2" ng-show="!editApp">
-                            <md-list-item class="md-3-line">
-                                <md-icon class="md-avatar" hide-sm md-svg-icon="{{appIcon || 'navigation:ic_apps_24px'}}"></md-icon>
-                                <div class="md-list-item-text">
-                                    <div class="md-headline">{{activeProject.name || 'Select one project'}}</div>
-                                    <div class="md-title">{{activeCommit.revision || 'Select one commit'}}</div>
-                                    <div class="md-subhead">{{activeFile.name || 'Select one file'}}</div>
-                                </div>
-                            </md-list-item>
-                        </md-toolbar>
-                        <md-list>
-                            <md-list-item class="md-3-line" ng-repeat="cochange in cochanges">
-                                <div class="md-list-item-text">
-                                    <div class="md-body-2">{{ cochange.file.name }}</div>
-                                </div>
-                                <md-divider md-inset hide-sm></md-divider>
-                                <md-divider hide-gt-sm></md-divider>
-                            </md-list-item>
-                        </md-list>
-                    </md-card>
+                    <md-toolbar class="animate-show md-hue-2" ng-show="!editApp">
+                        <md-list-item class="md-3-line">
+                            <md-icon class="md-avatar" hide-sm md-svg-icon="{{appIcon || 'navigation:ic_apps_24px'}}"></md-icon>
+                            <div class="md-list-item-text">
+                                <div class="md-headline">{{activeProject.name || 'Select one project'}}</div>
+                                <div class="md-title">{{activeCommit.revision || 'Select one commit'}}</div>
+                                <div class="md-subhead">{{activeFile.name || 'Select one file'}}</div>
+                            </div>
+                        </md-list-item>
+                    </md-toolbar>
+                    <md-list>
+                        <md-list-item class="md-2-line" ng-repeat="cochange in cochanges">
+                            <md-icon md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}"
+                              hide-sm md-svg-icon="{{cochange.predictionResult == 'C' ? 'action:ic_done_24px' : 'content:ic_clear_24px'}}"
+                              aria-label="{{cochange.predictionResult == 'C' ? 'Probably change' : 'Probably not change'}}"></md-icon>
+                            <div class="md-list-item-text">
+                                <h3>{{ cochange.file.name }}</h3>
+                                <p>{{ cochange.algorithmName }}</p>
+                            </div>
+                            <md-divider md-inset hide-sm></md-divider>
+                            <md-divider hide-gt-sm></md-divider>
+                        </md-list-item>
+                    </md-list>
                 </div>
             </div>
         </md-content>
@@ -149,14 +151,14 @@
     <div layout="row" flex="noshrink" layout-align="center center" class="layout-align-center-center layout-row flex-noshrink">
         <div id="license-footer" layout="row" layout-align="center center" layout-fill class="ng-binding flex">
             <div flex="none">
-              <a href="https://www.utfpr.edu.br/" target="_blank"><img ng-src="/svg/utfpr-logo-b.svg" alt="UTFPR Logo" width="68" height="25" /></a>
+                <a href="https://www.utfpr.edu.br/" target="_blank"><img ng-src="/svg/utfpr-logo-b.svg" alt="UTFPR Logo" width="68" height="25"/></a>
             </div>
             <div flex class="md-body-2">
-              Recominer by Universidade Tecnológica Federal do Paraná - UTFPR © 2016. Developed by
-              <a href="mailto:rodrigokuroda@alunos.utfpr.edu.br">Rodrigo T. Kuroda.</a>
-              </div>
+                Recominer by Universidade Tecnológica Federal do Paraná - UTFPR © 2016. Developed by
+                <a href="mailto:rodrigokuroda@alunos.utfpr.edu.br">Rodrigo T. Kuroda.</a>
+            </div>
             <div flex="none">
-              <a href="https://github.com/rodrigokuroda/recominer" target="_blank"><img ng-src="/svg/github-logo.svg" alt="GitHub Logo" width="92" height="25" /></a>
+                <a href="https://github.com/rodrigokuroda/recominer" target="_blank"><img ng-src="/svg/github-logo.svg" alt="GitHub Logo" width="92" height="25"/></a>
             </div>
         </div>
     </div>
