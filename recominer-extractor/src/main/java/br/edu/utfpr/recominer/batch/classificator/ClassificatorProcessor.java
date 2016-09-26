@@ -118,7 +118,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                         Scanner resultReader = new Scanner(resultTest);
                         resultReader.useDelimiter("\r\n");
                         while (resultReader.hasNextLine()) {
-                            String resultLine = resultReader.next().replace("\"", "");
+                            String resultLine = resultReader.nextLine().replace("\"", "");
                             String[] result = resultLine.split(";");
 
                             File cochange = new File(Integer.valueOf(result[0]), result[1]);
