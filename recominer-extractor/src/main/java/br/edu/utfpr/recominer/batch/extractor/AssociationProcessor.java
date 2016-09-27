@@ -40,7 +40,8 @@ public class AssociationProcessor {
 
         final List<Scmlog> commitsToAnalyze;
 
-        final RowMapper<Scmlog> mapper = (ResultSet rs, int rowNum) -> new Scmlog(rs.getInt("id"), rs.getDate("date"), rs.getString("message"));
+        final RowMapper<Scmlog> mapper = (ResultSet rs, int rowNum) -> 
+                new Scmlog(rs.getInt("id"), rs.getDate("date"), rs.getString("message"));
         final String selectScmlog = "SELECT id, date, message FROM {0}_vcs.scmlog";
 
         if (project.getLastCommitDateAnalyzed() != null) {
@@ -85,13 +86,10 @@ public class AssociationProcessor {
         // Loop through the SQL file statements
         while (scanner.hasNext()) {
 
-            // Get statement from file, replacing all comments SQL command 
-            // (starts with "--" and ends with "\n" or ";") 
-            // in order to check if is a empty SQL command.
-            final String rawSql = scanner.next().replaceAll("-{2,}.*(\n|;)", "");
+            final String rawSql = QueryUtils.removeComments(scanner.next());
 
             // Setting schema for query
-            final String sql = rawSql.replace("{0}", project.getProjectName());
+            final String sql = QueryUtils.getQueryForDatabase(rawSql, project);
 
             if (StringUtils.isNotBlank(sql)) {
                 try {
@@ -117,9 +115,13 @@ public class AssociationProcessor {
                     }
 
                     final String replace = sql
-                            .replace("{WHERE_SCMLOG}", whereScmlog)
-                            .replace("{WHERE_ISSUE}", whereIssue)
-                            .replace("{ISSUE_TRACKER_SYSTEM}", project.getIssueTracker().getSystem().toString().toUpperCase());
+                            .replace("WHERE_SCMLOG", whereScmlog)
+                            .replace("WHERE_ISSUE", whereIssue)
+                            .replace("ISSUE_TRACKER_SYSTEM", 
+                                    project.getIssueTracker()
+                                            .getSystem()
+                                            .toString()
+                                            .toUpperCase());
 
                     template.update(replace, params.toArray());
                 } catch (Exception e) {

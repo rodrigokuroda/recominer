@@ -1,6 +1,5 @@
 package br.edu.utfpr.recominer.core.model;
 
-import br.edu.utfpr.recominer.core.model.Commit;
 import java.util.Objects;
 import org.springframework.data.domain.Persistable;
 

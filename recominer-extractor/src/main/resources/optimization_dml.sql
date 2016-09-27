@@ -4,7 +4,7 @@ UPDATE {0}_vcs.scmlog s SET s.num_files =
           FROM {0}_vcs.actions ca
          WHERE ca.commit_id = s.id)
  WHERE 1 = 1
- {WHERE_SCMLOG};
+ WHERE_SCMLOG;
 
 -- Sets 1 (one) to authors that are developers (committers) too
 -- if the name or user are same in both issue tracker and version control.
@@ -28,7 +28,7 @@ UPDATE {0}_issues.issues i SET i.fixed_on =
       AND c.field = "Resolution"
       AND c.new_value = "Fixed")
  WHERE i.resolution = "Fixed"
- {WHERE_ISSUE};
+ WHERE_ISSUE;
 
 -- Inserts pre-processed count
 UPDATE {0}_issues.issues i SET
@@ -61,7 +61,7 @@ i.reopened_times =
     AND c.field = "Status"
     AND c.issue_id = i.id)
  WHERE 1 = 1 
- {WHERE_ISSUE}
+ WHERE_ISSUE
 ;
 
 UPDATE {0}_issues.issues i SET
@@ -76,7 +76,7 @@ i.comments_updated_on =
   WHERE comments.issue_id = i.id)
 
  WHERE 1 = 1 
- {WHERE_ISSUE};
+ WHERE_ISSUE;
 
 -- Denormalize vcs schema
 INSERT INTO {0}.commits (commit_id, rev, committer_id, date, message, repository_id, branch_id)
@@ -85,7 +85,7 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
   JOIN {0}_vcs.actions a ON a.commit_id = s.id
  WHERE s.id IN (SELECT scmlog_id FROM {0}.issues_scmlog)
    AND s.id NOT IN (SELECT commit_id FROM {0}.commits)
- {WHERE_SCMLOG}
+ WHERE_SCMLOG
  ORDER BY date ASC;
 
 -- denormalize absolute file path
@@ -99,7 +99,7 @@ SELECT fill.id, fill.file_path, fil.id, fil.file_name
        JOIN {0}_vcs.scmlog s ON s.id = afill.commit_id
       WHERE afill.file_id = fil.id
         AND afill.file_path LIKE CONCAT("%", fil.file_name)
-        {WHERE_SCMLOG})
+        WHERE_SCMLOG)
  WHERE NOT EXISTS (SELECT 1 FROM {0}.files f WHERE f.fl_id = fill.id AND f.f_id = fil.id);
 
 -- relationship between file and commit
@@ -110,5 +110,5 @@ SELECT distinct fil.id, a.commit_id, a.type, a.branch_id, filcl.added, filcl.rem
   JOIN {0}_vcs.scmlog s ON s.id = a.commit_id
   JOIN {0}_vcs.commits_files_lines filcl ON filcl.commit = a.commit_id AND filcl.path = fil.file_path
 WHERE NOT EXISTS (SELECT 1 FROM {0}.files_commits fc WHERE fc.file_id = fil.id AND fc.commit_id = a.commit_id)
-{WHERE_SCMLOG}
+WHERE_SCMLOG
  ORDER BY a.commit_id;

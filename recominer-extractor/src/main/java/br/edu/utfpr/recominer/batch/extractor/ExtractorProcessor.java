@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.batch.extractor;
 
-import br.edu.utfpr.recominer.model.ExtractorLog;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.model.ExtractorLog;
 import java.util.Date;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,26 +33,26 @@ public class ExtractorProcessor implements ItemProcessor<Project, ExtractorLog> 
         // update or clone the project from version control system
         log.setGitProcessStartDate(new Date());
 
-        int gitProcessExitCode = gitProcessor.process(project);
+//        int gitProcessExitCode = gitProcessor.process(project);
 
         log.setGitProcessEndDate(new Date());
-        log.setGitProcessReturnCode(gitProcessExitCode);
+//        log.setGitProcessReturnCode(gitProcessExitCode);
 
         // extract data from version control system
         log.setCvsanalyProcessStartDate(new Date());
 
-        int cvsanalyProcessExitCode = cvsanalyProcessor.process(project);
+//        int cvsanalyProcessExitCode = cvsanalyProcessor.process(project);
 
         log.setCvsanalyProcessEndDate(new Date());
-        log.setCvsanalyProcessReturnCode(cvsanalyProcessExitCode);
+//        log.setCvsanalyProcessReturnCode(cvsanalyProcessExitCode);
 
         // extract data from issue tracker
         log.setBichoProcessStartDate(new Date());
 
-        int bichoProcessExitCode = bichoProcessor.process(project);
+//        int bichoProcessExitCode = bichoProcessor.process(project);
 
         log.setBichoProcessEndDate(new Date());
-        log.setBichoProcessReturnCode(bichoProcessExitCode);
+//        log.setBichoProcessReturnCode(bichoProcessExitCode);
         
         log.setAssociationProcessStartDate(new Date());
 

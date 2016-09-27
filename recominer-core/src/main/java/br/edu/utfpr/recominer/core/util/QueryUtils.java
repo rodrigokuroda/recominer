@@ -66,4 +66,16 @@ public class QueryUtils {
                     .append(" ");
         }
     }
+
+    /**
+     * Get statement from file, replacing all comments SQL command (starts with
+     * "--" and ends with "\n" or ";") in order to check if is a empty SQL
+     * command.
+     *
+     * @param sql SQL statement without comments
+     * @return
+     */
+    public static String removeComments(String sql) {
+        return sql.replaceAll("(\\s)*-{2,}.*(\r?\n|;)", "");
+    }
 }
