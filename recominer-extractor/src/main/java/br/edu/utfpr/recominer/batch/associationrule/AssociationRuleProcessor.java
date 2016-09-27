@@ -66,8 +66,11 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
     @Inject
     private AssociationRulePredictionRepository predictionRepository;
 
-    @Value("${filenameFilter:}")
+    @Value("${jobParameters[filenameFilter]:}")
     private String filter;
+
+    @Value("${jobParameters[topAssociationRules]:3}")
+    private Integer topAssociationRules;
 
     @Override
     public AssociationRuleLog process(Project project) throws Exception {
@@ -120,13 +123,13 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
                 AssociationRulePerformanceCalculator<File> calculatorNavigation
                         = new AssociationRulePerformanceCalculator<>(countFixedIssues, navigationRules);
 
-                Set<AssociationRule<File>> topAssociationRules
-                        = calculatorNavigation.getTopAssociationRules(3);
+//                Set<AssociationRule<File>> topAssociationRules
+//                        = calculatorNavigation.getAssociationRules();
 
-                predictions.addAll(topAssociationRules);
+                predictions.addAll(calculatorNavigation.getAssociationRules());
             }
             
-            predictionRepository.savePrediction(newCommit, predictions);
+            predictionRepository.savePrediction(newCommit, predictions, topAssociationRules);
         }
         
         associationRuleLog.stop();

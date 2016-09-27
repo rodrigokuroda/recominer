@@ -15,6 +15,7 @@ public class AssociationRulePrediction implements Persistable<Integer> {
     private Fileset fileset;
     private Integer rank;
     private Fileset predictedFileset;
+    private String predictionResult;
 
     public AssociationRulePrediction() {
     }
@@ -23,11 +24,12 @@ public class AssociationRulePrediction implements Persistable<Integer> {
         this.id = id;
     }
 
-    public AssociationRulePrediction(Commit commit, Fileset file, Integer rank, Fileset predictedFile) {
+    public AssociationRulePrediction(Commit commit, Fileset file, Integer rank, Fileset predictedFile, String predictionResult) {
         this.commit = commit;
         this.fileset = file;
         this.rank = rank;
         this.predictedFileset = predictedFile;
+        this.predictionResult = predictionResult;
     }
     
     @Override
@@ -74,6 +76,14 @@ public class AssociationRulePrediction implements Persistable<Integer> {
 
     public void setPredictedFileset(Fileset predictedFileset) {
         this.predictedFileset = predictedFileset;
+    }
+
+    public String getPredictionResult() {
+        return predictionResult;
+    }
+
+    public void setPredictionResult(String predictionResult) {
+        this.predictionResult = predictionResult;
     }
 
     @Override

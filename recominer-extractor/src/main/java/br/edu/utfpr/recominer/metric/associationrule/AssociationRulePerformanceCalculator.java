@@ -64,6 +64,10 @@ public class AssociationRulePerformanceCalculator<I> {
         return associationRules.stream().limit(topK).collect(Collectors.toSet());
     }
 
+    public Set<AssociationRule<I>> getAssociationRules() {
+        return associationRules.stream().collect(Collectors.toSet());
+    }
+
     /**
      * For each association rule, calcule the coverage for the three top
      * association rules previously ordered.

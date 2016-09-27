@@ -136,6 +136,7 @@ CREATE TABLE IF NOT EXISTS {0}.ar_prediction(
     commit_id INT(11) NOT NULL,
     fileset_id INT(11) NOT NULL,
     predicted_fileset_id INT(11) NOT NULL, 
+    prediction_result VARCHAR(2) NOT NULL,
     rank INT(11) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY (fileset_id, commit_id, predicted_fileset_id)

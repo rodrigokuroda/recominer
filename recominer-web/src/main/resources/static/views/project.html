@@ -135,10 +135,11 @@
                         <md-list-item class="md-2-line" ng-repeat="cochange in cochanges">
                             <md-icon md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}"
                               hide-sm md-svg-icon="{{cochange.predictionResult == 'C' ? 'action:ic_done_24px' : 'content:ic_clear_24px'}}"
-                              aria-label="{{cochange.predictionResult == 'C' ? 'Probably change' : 'Probably not change'}}"></md-icon>
+                              aria-label="{{cochange.predictionResult == 'C' ? 'Probably change' : 'Probably not change'}}"
+                              alt="{{cochange.predictionResult == 'C' ? 'Probably change' : 'Probably not change'}}"></md-icon>
                             <div class="md-list-item-text">
                                 <h3>{{ cochange.file.name }}</h3>
-                                <p>{{ cochange.algorithmName }}</p>
+                                <p>{{ cochange.rank == null ? '' : '(' + cochange.rank + ')' }} {{ cochange.algorithmName }}</p>
                             </div>
                             <md-divider md-inset hide-sm></md-divider>
                             <md-divider hide-gt-sm></md-divider>

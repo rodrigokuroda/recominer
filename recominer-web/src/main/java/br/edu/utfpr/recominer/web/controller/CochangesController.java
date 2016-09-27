@@ -1,9 +1,11 @@
 package br.edu.utfpr.recominer.web.controller;
 
+import br.edu.utfpr.recominer.core.model.AssociationRulePrediction;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.repository.AssociationRulePredictionRepository;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepository;
@@ -33,6 +35,9 @@ public class CochangesController {
 
     @Inject
     private MachineLearningPredictionRepository mlPredictionRepository;
+    
+    @Inject
+    private AssociationRulePredictionRepository arPredictionRepository;
 
     public CochangesController() {
     }
@@ -44,13 +49,17 @@ public class CochangesController {
         commitRepository.setProject(project);
         fileRepository.setProject(project);
         mlPredictionRepository.setProject(project);
+        arPredictionRepository.setProject(project);
 
         final Commit commit = commitRepository.findOne(fileDTO.getCommit().getId());
         final File file = fileRepository.findOne(fileDTO.getId());
 
         List<CochangeDTO> cochanges = new ArrayList<>();
         for (MachineLearningPrediction cochange : mlPredictionRepository.selectPredictedCochangesFor(commit, file)) {
-            cochanges.add(new CochangeDTO(cochange));
+            cochanges.add(CochangeDTO.from(cochange));
+        }
+        for (AssociationRulePrediction cochange : arPredictionRepository.selectPredictedCochangesFor(commit, file)) {
+            cochanges.addAll(CochangeDTO.from(cochange));
         }
         return cochanges;
     }

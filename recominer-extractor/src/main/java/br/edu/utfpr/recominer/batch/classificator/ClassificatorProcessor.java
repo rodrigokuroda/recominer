@@ -62,7 +62,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         ClassificatorLog classificatorLog = new ClassificatorLog(project, "RandomForest");
         classificatorLog.start();
 
-        final List<Commit> newCommits = commitRepository.selectNewCommits();
+        final List<Commit> newCommits = commitRepository.selectNewCommitsForClassification();
         int processedCommits = 0;
         for (Commit newCommit : newCommits) {
             LOG.info(++processedCommits + " of " + newCommits.size() + " commits processed.");
