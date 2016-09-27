@@ -1870,11 +1870,11 @@ public class FileRepository extends JdbcRepository<File, Integer> {
     public Long countFixedIssues(FilePair cochange) {
         return jdbcOperations.queryForObject(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT * FROM avro.files_commits fc "
-                        + "  JOIN avro.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
+                        "SELECT * FROM {0}.files_commits fc "
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
                         + " WHERE fc.file_id = ? "
-                        + "   AND EXISTS (SELECT * FROM avro.files_commits fc2 "
-                        + "  JOIN avro.issues_scmlog i2s2 ON i2s2.scmlog_id = fc2.commit_id "
+                        + "   AND EXISTS (SELECT * FROM {0}.files_commits fc2 "
+                        + "  JOIN {0}.issues_scmlog i2s2 ON i2s2.scmlog_id = fc2.commit_id "
                         + "  WHERE fc2.file_id = ? AND i2s2.issue_id = i2s.issue_id)", project),
                 Long.class,
                 cochange.getFile1().getId(), cochange.getFile2().getId());
