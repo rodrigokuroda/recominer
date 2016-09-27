@@ -202,8 +202,7 @@ CREATE TABLE IF NOT EXISTS `calculator_log`(
     `metric` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
+    PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -216,8 +215,7 @@ CREATE TABLE IF NOT EXISTS `dataset_log`(
     `type` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
+    PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -230,8 +228,7 @@ CREATE TABLE IF NOT EXISTS `classificator_log`(
     `type` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
+    PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -245,8 +242,7 @@ CREATE TABLE IF NOT EXISTS `association_rule_log`(
     `type` VARCHAR(64) NOT NULL,
     `start_date` DATETIME,
     `end_date` DATETIME,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `start_end_date` (`start_date`, `end_date`)
+    PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
