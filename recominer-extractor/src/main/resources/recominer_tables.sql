@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS {0}.contextual_metrics(
     id INT(11) NOT NULL AUTO_INCREMENT,
     commit_id INT(11) NOT NULL,
     file_id INT(11) NOT NULL,
-    network_metrics_id_id INT(11) NOT NULL, 
+    network_metrics_id INT(11) NOT NULL, 
     issue_metrics_id INT(11) NOT NULL, 
     commit_metrics_id INT(11) NOT NULL, 
     file_metrics_id INT(11) NOT NULL, 
