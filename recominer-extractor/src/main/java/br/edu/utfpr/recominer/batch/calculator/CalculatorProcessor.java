@@ -71,7 +71,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Inject
     private CommitMetricsRepository commitMetricsRepository;
 
-    @Value("#{jobParameters[filenameFilter]}")
+    @Value("#{jobParameters[filenameFilter]:}")
     private String filter;
 
     @Override

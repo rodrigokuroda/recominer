@@ -211,27 +211,9 @@ public class CochangeApriori {
 
     @Override
     public String toString() {
-//        if (file2.equals(getFileWithHighestConfidence())) {
-//            return new StringBuilder()
-//                    .append(file2).append(SEPARATOR)
-//                    .append(file).append(SEPARATOR)
-//                    .append(file2Issues).append(SEPARATOR)
-//                    .append(fileIssues).append(SEPARATOR)
-//                    .append(issues).append(SEPARATOR)
-//                    .append(allIssues).append(SEPARATOR)
-//                    .append(supportFile2).append(SEPARATOR)
-//                    .append(supportFile).append(SEPARATOR)
-//                    .append(supportFilePair).append(SEPARATOR)
-//                    .append(confidence2).append(SEPARATOR)
-//                    .append(confidence).append(SEPARATOR)
-//                    .append(lift).append(SEPARATOR)
-//                    .append(conviction2).append(SEPARATOR)
-//                    .append(conviction).append(SEPARATOR)
-//                    .toString();
-//        }
         return new StringBuilder()
-                .append(file).append(SEPARATOR)
-                .append(file2).append(SEPARATOR)
+                .append(file)
+                .append(file2)
                 .append(fileIssues).append(SEPARATOR)
                 .append(file2Issues).append(SEPARATOR)
                 .append(issues).append(SEPARATOR)
@@ -245,6 +227,28 @@ public class CochangeApriori {
                 .append(conviction).append(SEPARATOR)
                 .append(conviction2).append(SEPARATOR)
                 .toString();
+    }
+
+    public String toStringHighConfidenceOnLeft() {
+        if (file2.equals(getFileWithHighestConfidence())) {
+            return new StringBuilder()
+                    .append(file2)
+                    .append(file)
+                    .append(file2Issues).append(SEPARATOR)
+                    .append(fileIssues).append(SEPARATOR)
+                    .append(issues).append(SEPARATOR)
+                    .append(allIssues).append(SEPARATOR)
+                    .append(supportFile2).append(SEPARATOR)
+                    .append(supportFile).append(SEPARATOR)
+                    .append(supportFilePair).append(SEPARATOR)
+                    .append(confidence2).append(SEPARATOR)
+                    .append(confidence).append(SEPARATOR)
+                    .append(lift).append(SEPARATOR)
+                    .append(conviction2).append(SEPARATOR)
+                    .append(conviction).append(SEPARATOR)
+                    .toString();
+        }
+        return toString();
     }
 
     public String toStringPairFileApriori() {
