@@ -13,7 +13,7 @@ md-list-item.md-3-line {
     }
 }
 
-// Round avatar
+/* Round avatar */
 .md-avatar {
     &>svg {
         border-radius: 50%;
