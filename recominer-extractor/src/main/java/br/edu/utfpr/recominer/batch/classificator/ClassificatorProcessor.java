@@ -2,14 +2,14 @@ package br.edu.utfpr.recominer.batch.classificator;
 
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
-import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
+import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
-import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepository;
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import br.edu.utfpr.recominer.filter.FileFilter;
+import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -51,6 +52,9 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
     @Value("#{jobParameters[workingDir]}")
     private String workingDir;
+    
+    @Value("#{jobParameters[issueKey]}")
+    private String issueKey;
 
     @Override
     public ClassificatorLog process(Project project) throws Exception {
@@ -62,7 +66,13 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         ClassificatorLog classificatorLog = new ClassificatorLog(project, "RandomForest");
         classificatorLog.start();
 
-        final List<Commit> newCommits = commitRepository.selectNewCommitsForClassification();
+        final List<Commit> newCommits;
+        if (StringUtils.isBlank(issueKey)) {
+            newCommits = commitRepository.selectNewCommitsForCalculator();
+        } else {
+            newCommits = commitRepository.selectCommitsOf(issueKey);
+        }
+        
         int processedCommits = 0;
         for (Commit newCommit : newCommits) {
             LOG.info(++processedCommits + " of " + newCommits.size() + " commits processed.");

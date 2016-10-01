@@ -161,6 +161,13 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 Long.class);
     }
 
+    /**
+     * Find all issues where file was changed before the specified commit.
+     * 
+     * @param changedFile The file
+     * @param until The commit
+     * @return 
+     */
     public List<Issue> selectFixedIssuesOf(File changedFile, Commit until) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(

@@ -51,11 +51,13 @@ public class DatasetStepIT {
     @Before
     public void setUp() throws IOException {
         test = testFolder.newFolder("test");
+        template.update("UPDATE recominer.project SET schema_prefix = 'avro_test' WHERE id = 1");
     }
 
     @After
     public void tearDown() throws IOException {
         testFolder.delete();
+        template.update("UPDATE recominer.project SET schema_prefix = 'avro' WHERE id = 1");
     }
 
     @Test

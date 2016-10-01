@@ -61,7 +61,7 @@ public class BatchConfiguration {
     public JobLauncherTestUtils jobLauncherTestUtils() {
         return new JobLauncherTestUtils();
     }
-    
+
     @Bean
     public Job job(@Qualifier("extractorStep") Step extractorStep,
             @Qualifier("calculatorStep") Step calculatorStep,
@@ -70,7 +70,7 @@ public class BatchConfiguration {
             @Qualifier("associationRuleStep") Step associationRuleStep) {
         return jobs.get("extractorJob")
                 .incrementer(runIdIncrementer)
-                //                .start(extractorStep)
+//                .start(extractorStep)
                 .start(calculatorStep)
                 .next(datasetStep)
                 .next(classificationStep)

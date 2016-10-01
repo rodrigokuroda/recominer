@@ -28,8 +28,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -38,6 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
+@StepScope
 public class AssociationRuleProcessor implements ItemProcessor<Project, AssociationRuleLog> {
 
     private final Logger log = LoggerFactory.getLogger(AssociationRuleProcessor.class);
@@ -66,11 +69,14 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
     @Inject
     private AssociationRulePredictionRepository predictionRepository;
 
-    @Value("${jobParameters[filenameFilter]:}")
+    @Value("#{jobParameters[filenameFilter]}")
     private String filter;
 
-    @Value("${jobParameters[topAssociationRules]:3}")
-    private Integer topAssociationRules;
+    @Value("#{jobParameters[topAssociationRules]}")
+    private Integer topAssociationRules = 3;
+    
+    @Value("#{jobParameters[issueKey]}")
+    private String issueKey;
 
     @Override
     public AssociationRuleLog process(Project project) throws Exception {
@@ -91,7 +97,13 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         long countFixedIssues = issueRepository.countFixedIssues();
         
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommitsForAssociationRule();
+        final List<Commit> newCommits;
+        if (StringUtils.isBlank(issueKey)) {
+            newCommits = commitRepository.selectNewCommitsForCalculator();
+        } else {
+            newCommits = commitRepository.selectCommitsOf(issueKey);
+        }
+        
         for (Commit newCommit : newCommits) {
         
             log.info("Computing metrics for changed files on commit " + newCommit.getId());

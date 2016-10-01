@@ -4,6 +4,7 @@ import br.edu.utfpr.recominer.Application;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.CommitRepository;
+import br.edu.utfpr.recominer.filter.FileFilter;
 import br.edu.utfpr.recominer.model.IssuesMetrics;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import java.util.List;
@@ -16,6 +17,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -49,6 +52,8 @@ public class CalculatorStepIT {
     public void shouldCalculateMetricsForNewCommit() {
         final Integer issueId = 1644;
         final Integer commitId = 1519;
+        
+        template.update("UPDATE recominer.project SET schema_prefix = 'avro_test' WHERE id = 1");
 
         // Delete to recalculate
         int rowsAffected = template.update(
@@ -63,8 +68,14 @@ public class CalculatorStepIT {
                 commitId);
         assertTrue(metrics.isEmpty());
 
+        final JobParameters params = new JobParametersBuilder()
+                .addString("spring.batch.job.enabled", "false")
+                .addString("issueKey", "AVRO-680")
+                .addString("filenameFilter", "CHANGES.txt")
+                .toJobParameters();
+
         // Running calculation job step.
-        JobExecution calculationJob = jobLauncherTestUtils.launchStep("calculatorStep");
+        JobExecution calculationJob = jobLauncherTestUtils.launchStep("calculatorStep", params);
         assertEquals("COMPLETED", calculationJob.getExitStatus().getExitCode());
 
         IssuesMetrics metric = template.queryForObject(
@@ -75,8 +86,10 @@ public class CalculatorStepIT {
         assertNotNull(metric);
 
         repository.setProject(project);
-        List<Commit> commits = repository.selectNewCommitsForCalculator();
+        List<Commit> commits = repository.selectNewCommitsForCalculator(FileFilter.getFiltersFromString("CHANGES.txt"));
         assertTrue(commits.isEmpty());
+        
+        template.update("UPDATE recominer.project SET schema_prefix = 'avro' WHERE id = 1");
     }
 
 }

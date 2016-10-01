@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -71,8 +72,11 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Inject
     private CommitMetricsRepository commitMetricsRepository;
 
-    @Value("#{jobParameters[filenameFilter]:}")
+    @Value("#{jobParameters[filenameFilter]}")
     private String filter;
+    
+    @Value("#{jobParameters[issueKey]}")
+    private String issueKey;
 
     @Override
     public CalculatorLog process(Project project) throws Exception {
@@ -88,7 +92,12 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
         commitMetricsRepository.setProject(project);
 
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommitsForCalculator();
+        final List<Commit> newCommits;
+        if (StringUtils.isBlank(issueKey)) {
+            newCommits = commitRepository.selectNewCommitsForCalculator(FileFilter.getFiltersFromString(filter));
+        } else {
+            newCommits = commitRepository.selectCommitsOf(issueKey);
+        }
         log.info(newCommits.size() + " new commits to be processed.");
         
         for (Commit newCommit : newCommits) {
@@ -104,8 +113,8 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
                     .collect(Collectors.toList())) {
 
                 log.info("Computing metrics for file " + changedFile.getId() + " in the past.");
-                // find all issues/commits where file was changed
-                List<Issue> issuesOfFile = issueRepository.selectIssuesOf(changedFile);
+                
+                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {

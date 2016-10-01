@@ -26,6 +26,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
@@ -52,6 +53,7 @@ public abstract class ReadOnlyJdbcRepository<T extends Persistable<ID>, ID exten
     protected SqlGenerator sqlGenerator = new SqlGenerator();
     protected BeanFactory beanFactory;
     protected JdbcOperations jdbcOperations;
+    protected NamedParameterJdbcTemplate namedJdbcOperations;
 
     public ReadOnlyJdbcRepository(RowMapper<T> rowMapper, SqlGenerator sqlGenerator, TableDescription table) {
         Assert.notNull(rowMapper);
@@ -90,6 +92,7 @@ public abstract class ReadOnlyJdbcRepository<T extends Persistable<ID>, ID exten
     @Override
     public void afterPropertiesSet() throws Exception {
         obtainJdbcTemplate();
+        obtainNamedJdbcTemplate();
         if (sqlGenerator == null) {
             obtainSqlGenerator();
         }
@@ -129,6 +132,15 @@ public abstract class ReadOnlyJdbcRepository<T extends Persistable<ID>, ID exten
         } catch (NoSuchBeanDefinitionException e) {
             final DataSource dataSource = beanFactory.getBean(DataSource.class);
             jdbcOperations = new JdbcTemplate(dataSource);
+        }
+    }
+
+    private void obtainNamedJdbcTemplate() {
+        try {
+            namedJdbcOperations = beanFactory.getBean(NamedParameterJdbcTemplate.class);
+        } catch (NoSuchBeanDefinitionException e) {
+            final DataSource dataSource = beanFactory.getBean(DataSource.class);
+            namedJdbcOperations = new NamedParameterJdbcTemplate(dataSource);
         }
     }
 

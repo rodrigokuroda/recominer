@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -72,6 +73,12 @@ public class DataSourceConfiguration {
         return new JdbcTemplate(dataSource);
     }
 
+    @Bean
+    @Primary
+    public NamedParameterJdbcTemplate namedJdbcTemplate(@Qualifier("dataSource") final DataSource dataSource) {
+        return new NamedParameterJdbcTemplate(dataSource);
+    }
+
 //    @Bean
 //    @Primary
 //    public DataSource hsqldbDataSource() throws SQLException {
@@ -109,7 +116,7 @@ public class DataSourceConfiguration {
     private DatabasePopulator databasePopulator() {
         final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(testSchemas);
-        populator.addScript(testRecominerScript);
+//        populator.addScript(testRecominerScript);
         populator.addScript(testIssuesScript);
         populator.addScript(testScript);
         populator.addScript(testVcsScript);

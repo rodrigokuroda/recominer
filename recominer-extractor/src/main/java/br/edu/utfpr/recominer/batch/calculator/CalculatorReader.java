@@ -1,14 +1,15 @@
 package br.edu.utfpr.recominer.batch.calculator;
 
 import br.edu.utfpr.recominer.core.model.Project;
-import br.edu.utfpr.recominer.repository.IssueTrackerRepository;
 import br.edu.utfpr.recominer.core.repository.ProjectRepository;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
+import br.edu.utfpr.recominer.repository.IssueTrackerRepository;
 import java.util.Date;
 import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -17,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Named
+@StepScope
 public class CalculatorReader implements ItemReader<Project> {
 
     @Inject

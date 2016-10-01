@@ -10,7 +10,9 @@ import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -70,8 +72,8 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
 
     /**
      * Gets all commits associated with non-fixed issues and commits that have
-     * not Dataset generated yet. The commits must have a number of
-     * maximum files configured in 'recominer.configuration' table, as key
+     * not Dataset generated yet. The commits must have a number of maximum
+     * files configured in 'recominer.configuration' table, as key
      * 'max_files_per_commit'.
      *
      * @return Commits of non-fixed issues.
@@ -99,6 +101,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
      * files configured in 'recominer.configuration' table, as key
      * 'max_files_per_commit'.
      *
+     * @param filenameFilter
      * @return Commits of non-fixed issues.
      */
     public List<Commit> selectNewCommitsForCalculator() {
@@ -118,6 +121,41 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         project),
                 ROW_MAPPER,
                 "max_files_per_commit");
+    }
+
+    /**
+     * Gets all commits associated with non-fixed issues and commits that have
+     * not metrics calculated yet. The commits must have a number of maximum
+     * files configured in 'recominer.configuration' table, as key
+     * 'max_files_per_commit'.
+     *
+     * @param filenameFilter
+     * @return Commits of non-fixed issues.
+     */
+    public List<Commit> selectNewCommitsForCalculator(Set<String> filenameFilter) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("filenames", filenameFilter);
+        parameters.addValue("max_files_per_commit", "max_files_per_commit");
+        return namedJdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT DISTINCT c.commit_id, c.rev, c.committer_id, c.date"
+                        + "  FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + "  JOIN {0}.files_commits fc ON fc.commit_id = c.commit_id"
+                        + "  JOIN {0}.files f ON f.id = fc.file_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = :max_files_per_commit)"
+                        + "   AND f.file_path NOT IN (:filenames)"
+                        + "   AND i.fixed_on IS NULL"
+                        + "   AND (c.commit_id NOT IN (SELECT DISTINCT(cm.commit_id) FROM {0}.commit_metrics cm) "
+                        + "     OR c.commit_id NOT IN (SELECT DISTINCT(fm.commit_id) FROM {0}.file_metrics fm) "
+                        + "     OR c.commit_id NOT IN (SELECT DISTINCT(im.commit_id) FROM {0}.issues_metrics im)) "
+                        + " ORDER BY c.date DESC",
+                        project),
+                parameters,
+                ROW_MAPPER
+        );
     }
 
     /**
@@ -180,6 +218,18 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "   AND i2s.issue_id = ?", project),
                 ROW_MAPPER,
                 "max_files_per_commit", issue.getId());
+    }
+
+    public List<Commit> selectCommitsOf(String issueKey) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
+                        + "   AND i2s.issue_id = (SELECT iej.issue_id FROM {0}_issues.issues_ext_jira iej WHERE iej.issue_key = ?)", project),
+                ROW_MAPPER,
+                "max_files_per_commit", issueKey);
     }
 
     public List<Commit> selectCommitsOf(Issue issue, File file) {
