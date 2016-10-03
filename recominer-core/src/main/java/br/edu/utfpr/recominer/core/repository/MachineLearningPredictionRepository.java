@@ -61,6 +61,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                         + "  JOIN {0}.files f ON f.id = mlp.predicted_file_id "
                         + " WHERE mlp.file_id = ? "
                         + "   AND mlp.commit_id = ? "
+                        + "   AND mlp.prediction_result = \"C\" "
                         + " ORDER BY mlp.prediction_result"),
                 rowMapper,
                 file.getId(), commit.getId());

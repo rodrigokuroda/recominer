@@ -133,6 +133,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                         + "  LEFT JOIN {0}.files pf ON pf.id = pfs.file_id "
                         + " WHERE fs.file_id = ? "
                         + "   AND arp.commit_id = ? "
+                        + "   AND arp.prediction_result = \"C\" "
                         + " ORDER BY rank ASC "),
                 (ResultSet rs, int rowNum) -> {
                     AssociationRulePrediction associationRulePrediction = new AssociationRulePrediction();
