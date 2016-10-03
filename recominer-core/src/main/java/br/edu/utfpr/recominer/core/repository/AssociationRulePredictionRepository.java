@@ -2,10 +2,10 @@ package br.edu.utfpr.recominer.core.repository;
 
 import br.edu.utfpr.recominer.core.model.AssociationRule;
 import br.edu.utfpr.recominer.core.model.AssociationRulePrediction;
-import br.edu.utfpr.recominer.core.model.Cochange;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.Fileset;
+import br.edu.utfpr.recominer.core.model.PredictionFeedback;
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import java.sql.ResultSet;
@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -126,11 +125,16 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
     public List<AssociationRulePrediction> selectPredictedCochangesFor(Commit commit, File file) {
         List<AssociationRulePrediction> predictions = jdbcOperations.query(
                 getQueryForSchema(
-                        "SELECT arp.*, pfs.file_id, pf.file_path "
+                        "SELECT arp.*, "
+                        + "     pfs.file_id, "
+                        + "     pf.file_path, "
+                        + "     pfb.changed, "
+                        + "     pfb.justification "
                         + "  FROM {0}.ar_prediction arp "
                         + "  JOIN {0}.fileset fs ON fs.id = arp.fileset_id "
                         + "  LEFT JOIN {0}.fileset pfs ON pfs.id = arp.predicted_fileset_id "
                         + "  LEFT JOIN {0}.files pf ON pf.id = pfs.file_id "
+                        + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_id = arp.id "
                         + " WHERE fs.file_id = ? "
                         + "   AND arp.commit_id = ? "
                         + "   AND arp.prediction_result = \"C\" "
@@ -151,6 +155,13 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                     predictedFileset.setFile(predictedFiles);
 
                     associationRulePrediction.setPredictedFileset(predictedFileset);
+
+                    final int feedbackId = rs.getInt("feedback_id");
+                    final PredictionFeedback predictionFeedback = new PredictionFeedback(feedbackId == 0 ? null : feedbackId);
+                    predictionFeedback.setChanged(rs.getBoolean("changed"));
+                    predictionFeedback.setPredictionId(rs.getInt("id"));
+                    predictionFeedback.setJustification(rs.getString("justification"));
+                    associationRulePrediction.setFeedback(predictionFeedback);
 
                     return associationRulePrediction;
                 },

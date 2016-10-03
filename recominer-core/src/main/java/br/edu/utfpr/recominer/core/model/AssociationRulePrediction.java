@@ -15,6 +15,7 @@ public class AssociationRulePrediction implements Persistable<Integer> {
     private Integer rank;
     private Fileset predictedFileset;
     private String predictionResult;
+    private PredictionFeedback feedback;
 
     public AssociationRulePrediction() {
     }
@@ -83,6 +84,14 @@ public class AssociationRulePrediction implements Persistable<Integer> {
 
     public void setPredictionResult(String predictionResult) {
         this.predictionResult = predictionResult;
+    }
+
+    public PredictionFeedback getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(PredictionFeedback feedback) {
+        this.feedback = feedback;
     }
 
     @Override

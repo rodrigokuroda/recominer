@@ -15,6 +15,7 @@ public class MachineLearningPrediction implements Persistable<Integer> {
     private File predictedFile;
     private String predictionResult;
     private String algorithmType;
+    private PredictionFeedback feedback;
 
     public MachineLearningPrediction(Integer id) {
         this.id = id;
@@ -80,6 +81,14 @@ public class MachineLearningPrediction implements Persistable<Integer> {
 
     public void setAlgorithmType(String algorithmType) {
         this.algorithmType = algorithmType;
+    }
+
+    public PredictionFeedback getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(PredictionFeedback feedback) {
+        this.feedback = feedback;
     }
 
     @Override

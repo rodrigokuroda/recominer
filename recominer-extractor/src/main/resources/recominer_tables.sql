@@ -165,3 +165,11 @@ CREATE TABLE IF NOT EXISTS {0}.ml_prediction(
     PRIMARY KEY (id),
     UNIQUE KEY (commit_id, file_id, predicted_file_id)
 );
+
+CREATE TABLE IF NOT EXISTS {0}.prediction_feedback(
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    prediction_id INT(11) NOT NULL,
+    changed BOOLEAN NOT NULL,
+    justification VARCHAR(4096) NOT NULL,
+    PRIMARY KEY (id)
+);
