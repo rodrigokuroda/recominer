@@ -14,7 +14,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         .then(function(response) {
                 $scope.projects = response.data;
             },
-            function(response) { // optional
+            function(response) {
                 $scope.projects = null;
             }
         );
@@ -45,7 +45,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             .then(function(response) {
                     $scope.commits = response.data;
                 },
-                function(response) { // optional
+                function(response) {
                     $scope.commits = null;
                 }
             );
@@ -62,7 +62,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             .then(function(response) {
                     $scope.files = response.data;
                 },
-                function(response) { // optional
+                function(response) {
                     $scope.files = null;
                 }
             );
@@ -79,7 +79,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             .then(function(response) {
                     $scope.cochanges = response.data;
                 },
-                function(response) { // optional
+                function(response) {
                     $scope.cochanges = null;
                 }
             );
@@ -89,15 +89,12 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
     $scope.submitFeedback = function(cochange) {
         cochange.file.project = $scope.activeProject;
         $log.debug("Sending feedback of " + cochange.file.name + "...");
-        $log.debug("Feedback: Changed? " + cochange.feedback.changed + ", Justification: " + cochange.feedback.justification);
         $http.post("/saveFeedback", cochange)
             .then(function(response) {
-                    $log.debug(response.data);
                     $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
                 },
-                function(response) { // optional
-                    $log.debug("Failed");
-                    $mdToast.show($mdToast.simple().position('bottom right').textContent("Failed to submit feedback!"));
+                function(response) {
+                    $mdToast.show($mdToast.simple().position('bottom right').textContent("Failed to submit feedback! " + response.data.message));
                 }
             );
     };
