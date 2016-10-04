@@ -125,23 +125,47 @@
                             </div>
                         </md-list-item>
                     </md-toolbar>
-                    <md-list>
-                        <md-list-item class="md-2-line" ng-repeat="cochange in cochanges">
+                    <md-card ng-repeat="cochange in cochanges track by $index">
+                        <md-card-header>
                             <md-icon
                                 md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}"
                                 hide-sm
                                 md-svg-icon="{{cochange.predictionResult == 'C' ? 'action:ic_done_24px' : 'content:ic_clear_24px'}}"
                                 aria-label="{{cochange.predictionResult == 'C' ? 'Probably change' : 'Probably not change'}}"
                                 alt="{{cochange.predictionResult == 'C' ? 'Probably change' : 'Probably not change'}}"></md-icon>
-                            <div class="md-list-item-text">
-                                <h3>{{ cochange.file.name }}</h3>
-                                <p>{{ cochange.rank == null ? '' : '(' + cochange.rank + ')' }}
-                                    {{ cochange.algorithmName }}</p>
+                            <md-card-header-text>
+                                <span class="md-title">{{ cochange.file.name }}</span>
+                                <span class="md-subhead">{{ cochange.rank == null ? '' : '(' + cochange.rank + ')' }}
+                                    {{ cochange.algorithmName }}</span>
+                            </md-card-header-text>
+                        </md-card-header>
+
+                        <md-card-content>
+                            <div layout="row" layout-wrap>
+                                <div layout="column" flex="20">
+                                    <md-checkbox ng-model="cochange.feedback.changed" aria-label="Changed?">
+                                        Changed?
+                                        <span ng-if="cochange.feedback.changed" md-colors="{color: 'green'}">Yes</span>
+                                        <span ng-if="!cochange.feedback.changed" md-colors="{color: 'red'}">No</span>
+
+                                        <md-tooltip md-direction="bottom">
+                                            Mark if you have changed this file.
+                                        </md-tooltip>
+                                    </md-checkbox>
+
+                                    <md-input-container class="md-block" flex="10">
+                                        <md-button type="button" class="md-raised md-primary"
+                                          ng-click="submitFeedback(cochange)">Submit</md-button>
+                                    </md-input-container>
+                                </div>
+
+                                <md-input-container class="md-block" flex="80">
+                                    <label>Justification</label>
+                                    <textarea ng-model="cochange.feedback.justification" required md-maxlength="4096" rows="3" />
+                                </md-input-container>
                             </div>
-                            <md-divider md-inset hide-sm></md-divider>
-                            <md-divider hide-gt-sm></md-divider>
-                        </md-list-item>
-                    </md-list>
+                        </md-card-content>
+                    </md-card>
                 </div>
             </div>
         </md-content>

@@ -1,5 +1,5 @@
-app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdSidenav',
-  function($scope, $log, $window, $http, $mdSidenav) {
+app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdSidenav', '$mdToast',
+  function($scope, $log, $window, $http, $mdSidenav, $mdToast) {
     $scope.projects = null;
     $scope.commits = null;
     $scope.files = null;
@@ -81,6 +81,23 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 },
                 function(response) { // optional
                     $scope.cochanges = null;
+                }
+            );
+    };
+
+    // Submit feedback
+    $scope.submitFeedback = function(cochange) {
+        cochange.file.project = $scope.activeProject;
+        $log.debug("Sending feedback of " + cochange.file.name + "...");
+        $log.debug("Feedback: Changed? " + cochange.feedback.changed + ", Justification: " + cochange.feedback.justification);
+        $http.post("/saveFeedback", cochange)
+            .then(function(response) {
+                    $log.debug(response.data);
+                    $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
+                },
+                function(response) { // optional
+                    $log.debug("Failed");
+                    $mdToast.show($mdToast.simple().position('bottom right').textContent("Failed to submit feedback!"));
                 }
             );
     };

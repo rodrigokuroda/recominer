@@ -58,6 +58,11 @@ md-content md-backdrop {
     color: purple;
 }
 
+/* Overrides margin */
+md-input-container {
+  margin: 0;
+}
+
 #license-footer {
     align-self: flex-end;
     padding: 8px 32px;

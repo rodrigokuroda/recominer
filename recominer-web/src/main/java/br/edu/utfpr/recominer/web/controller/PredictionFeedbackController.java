@@ -34,6 +34,6 @@ public class PredictionFeedbackController {
         PredictionFeedbackDTO feedback = cochange.getFeedback();
         feedback.setCochange(cochange);
         feedbackRepository.save(feedback.toEntity());
-        return new BusinessMessageDTO("0", "Sucesso");
+        return new BusinessMessageDTO("0", "The feedback was saved successfully.");
     }
 }
