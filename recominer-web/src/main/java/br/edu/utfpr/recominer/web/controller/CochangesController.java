@@ -43,7 +43,7 @@ public class CochangesController {
     }
 
     @RequestMapping(value = "/predictedCochanges", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<CochangeDTO> listCommis(@RequestBody FileDTO fileDTO) {
+    public List<CochangeDTO> predictedCochanges(@RequestBody FileDTO fileDTO) {
         final Project project = projectRepository.findOne(fileDTO.getProject().getId());
 
         commitRepository.setProject(project);
@@ -60,6 +60,44 @@ public class CochangesController {
         }
         for (AssociationRulePrediction cochange : arPredictionRepository.selectPredictedCochangesFor(commit, file)) {
             cochanges.addAll(CochangeDTO.from(cochange));
+        }
+        return cochanges;
+    }
+    
+    @RequestMapping(value = "/arPredictedCochanges", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CochangeDTO> arPredictedCochanges(@RequestBody FileDTO fileDTO) {
+        final Project project = projectRepository.findOne(fileDTO.getProject().getId());
+
+        commitRepository.setProject(project);
+        fileRepository.setProject(project);
+        mlPredictionRepository.setProject(project);
+        arPredictionRepository.setProject(project);
+
+        final Commit commit = commitRepository.findOne(fileDTO.getCommit().getId());
+        final File file = fileRepository.findOne(fileDTO.getId());
+
+        List<CochangeDTO> cochanges = new ArrayList<>();
+        for (AssociationRulePrediction cochange : arPredictionRepository.selectPredictedCochangesFor(commit, file)) {
+            cochanges.addAll(CochangeDTO.from(cochange));
+        }
+        return cochanges;
+    }
+    
+    @RequestMapping(value = "/mlPredictedCochanges", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CochangeDTO> mlPredictedCochanges(@RequestBody FileDTO fileDTO) {
+        final Project project = projectRepository.findOne(fileDTO.getProject().getId());
+
+        commitRepository.setProject(project);
+        fileRepository.setProject(project);
+        mlPredictionRepository.setProject(project);
+        arPredictionRepository.setProject(project);
+
+        final Commit commit = commitRepository.findOne(fileDTO.getCommit().getId());
+        final File file = fileRepository.findOne(fileDTO.getId());
+
+        List<CochangeDTO> cochanges = new ArrayList<>();
+        for (MachineLearningPrediction cochange : mlPredictionRepository.selectPredictedCochangesFor(commit, file)) {
+            cochanges.add(CochangeDTO.from(cochange));
         }
         return cochanges;
     }

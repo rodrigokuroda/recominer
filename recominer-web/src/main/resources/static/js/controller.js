@@ -85,6 +85,38 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             );
     };
 
+    // Load cochanges predicted by AR
+    $scope.getArPredictedCochangesOf = function(file) {
+        $scope.activeFile = file;
+        $log.debug("Fetching predicted cochanges for file " + file.name + "...");
+        file.project = $scope.activeProject;
+        file.commit = $scope.activeCommit;
+        $http.post("/arPredictedCochanges", file)
+            .then(function(response) {
+                    $scope.cochanges = response.data;
+                },
+                function(response) {
+                    $scope.cochanges = null;
+                }
+            );
+    };
+
+    // Load cochanges predicted by ML
+    $scope.getMlPredictedCochangesOf = function(file) {
+        $scope.activeFile = file;
+        $log.debug("Fetching predicted cochanges for file " + file.name + "...");
+        file.project = $scope.activeProject;
+        file.commit = $scope.activeCommit;
+        $http.post("/mlPredictedCochanges", file)
+            .then(function(response) {
+                    $scope.cochanges = response.data;
+                },
+                function(response) {
+                    $scope.cochanges = null;
+                }
+            );
+    };
+
     // Submit feedback
     $scope.submitFeedback = function(cochange) {
         cochange.file.project = $scope.activeProject;
