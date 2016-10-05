@@ -17,6 +17,31 @@ public class AssociationRule<I> {
     private final Set<I> antecedentItems;
     private final Set<I> consequentItems;
     private final Set<Transaction<I>> transactions;
+    private long totalTransactions;
+
+    public AssociationRule(Set<I> antecedentItems, Set<I> consequentItems, long totalTransactions) {
+        this.antecedentItems = antecedentItems;
+        this.consequentItems = consequentItems;
+        this.transactions = new LinkedHashSet<>();
+        this.totalTransactions = totalTransactions;
+    }
+
+    public AssociationRule(I antecedentItem, Set<I> consequentItems, long totalTransactions) {
+        this.antecedentItems = new LinkedHashSet<>();
+        this.antecedentItems.add(antecedentItem);
+        this.consequentItems = consequentItems;
+        this.transactions = new LinkedHashSet<>();
+        this.totalTransactions = totalTransactions;
+    }
+
+    public AssociationRule(I antecedentItem, I consequentItems, long totalTransactions) {
+        this.antecedentItems = new LinkedHashSet<>();
+        this.antecedentItems.add(antecedentItem);
+        this.consequentItems = new LinkedHashSet<>();
+        this.consequentItems.add(consequentItems);
+        this.transactions = new LinkedHashSet<>();
+        this.totalTransactions = totalTransactions;
+    }
 
     public AssociationRule(Set<I> antecedentItems, Set<I> consequentItems) {
         this.antecedentItems = antecedentItems;
@@ -28,6 +53,14 @@ public class AssociationRule<I> {
         this.antecedentItems = new LinkedHashSet<>();
         this.antecedentItems.add(antecedentItem);
         this.consequentItems = consequentItems;
+        this.transactions = new LinkedHashSet<>();
+    }
+
+    public AssociationRule(I antecedentItem, I consequentItems) {
+        this.antecedentItems = new LinkedHashSet<>();
+        this.antecedentItems.add(antecedentItem);
+        this.consequentItems = new LinkedHashSet<>();
+        this.consequentItems.add(consequentItems);
         this.transactions = new LinkedHashSet<>();
     }
 
@@ -55,8 +88,16 @@ public class AssociationRule<I> {
         return transactions.size();
     }
 
-    public double getConfidence(final long allTransactions) {
-        return (double) transactions.size() / (double) allTransactions;
+    public double getConfidence() {
+        return (double) transactions.size() / (double) totalTransactions;
+    }
+
+    public long getTotalTransactions() {
+        return totalTransactions;
+    }
+
+    public void setTotalTransactions(long totalTransactions) {
+        this.totalTransactions = totalTransactions;
     }
 
     @Override

@@ -33,6 +33,7 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     t.extractNavigationAssociationRules().stream().forEach(ar -> {
+                        ar.setTotalTransactions(transactions.size());
                         if (associationRules.containsKey(ar)) {
                             associationRules.get(ar).addTransaction(t);
                         } else {
@@ -56,6 +57,7 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     t.extractPreventionAssociationRules().stream().forEach(ar -> {
+                        ar.setTotalTransactions(transactions.size());
                         if (associationRules.containsKey(ar)) {
                             associationRules.get(ar).addTransaction(t);
                         } else {
@@ -79,6 +81,7 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     final AssociationRule<I> ar = t.extractClosureAssociationRules();
+                    ar.setTotalTransactions(transactions.size());
                     if (associationRules.containsKey(ar)) {
                         associationRules.get(ar).addTransaction(t);
                     } else {
@@ -103,6 +106,7 @@ public class AssociationRuleExtractor<I> {
                 .filter(t -> t.getItems().containsAll(query))
                 .forEach(t -> {
                     AssociationRule<I> ar = t.queryRuleByAntecedent(query);
+                    ar.setTotalTransactions(transactions.size());
                     if (associationRules.containsKey(ar)) {
                         associationRules.get(ar).addTransaction(t);
                     } else {
@@ -115,7 +119,8 @@ public class AssociationRuleExtractor<I> {
     }
 
     /**
-     * Given a query A, extract all rules A -> ?.
+     * Given a query A, extract all rules A -> ?, where ? can be a set of items,
+     * i.e., a single item or multiple items.
      *
      * @param query
      *
@@ -126,11 +131,38 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     AssociationRule<I> ar = t.queryRuleByAntecedent(query);
+                    ar.setTotalTransactions(transactions.size());
                     if (associationRules.containsKey(ar)) {
                         associationRules.get(ar).addTransaction(t);
                     } else {
                         ar.addTransaction(t);
                         associationRules.put(ar, ar);
+                    }
+                });
+
+        return associationRules.keySet();
+    }
+
+    /**
+     * Given a query A, extract all rules A -> ?, where ? is a single item.
+     *
+     * @param query
+     *
+     * @return
+     */
+    public Set<AssociationRule<I>> queryAssociationRulesSingleConsequent(I query) {
+        final Map<AssociationRule<I>, AssociationRule<I>> associationRules = new LinkedHashMap<>();
+        transactions.stream()
+                .forEach(t -> {
+                    Set<AssociationRule<I>> arSet = t.queryRuleByAntecedentWithSingleConsequent(query);
+                    for (AssociationRule<I> ar : arSet) {
+                        ar.setTotalTransactions(transactions.size());
+                        if (associationRules.containsKey(ar)) {
+                            associationRules.get(ar).addTransaction(t);
+                        } else {
+                            ar.addTransaction(t);
+                            associationRules.put(ar, ar);
+                        }
                     }
                 });
 

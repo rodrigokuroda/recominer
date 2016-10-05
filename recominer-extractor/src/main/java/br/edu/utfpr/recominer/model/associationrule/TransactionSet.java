@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.model.associationrule;
 
-import br.edu.utfpr.recominer.core.model.Transaction;
 import br.edu.utfpr.recominer.core.model.AssociationRule;
+import br.edu.utfpr.recominer.core.model.Transaction;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,7 +33,7 @@ public class TransactionSet<I> {
                 .forEach(transaction -> {
                     transaction.getItems().stream()
                     .filter(item -> item.equals(antecedent))
-                    .map(item -> new AssociationRule<>(item, transaction.queryByAntecedent(item)))
+                    .map(item -> new AssociationRule<>(item, transaction.queryByAntecedent(item), transactions.size()))
                             .forEach(rule -> {
                                 if (rules.containsKey(rule)) {
                                     rules.get(rule).addTransaction(transaction);
@@ -44,7 +44,7 @@ public class TransactionSet<I> {
                 });
 
         return rules.keySet().stream()
-                .sorted((r1, r2) -> Double.compare(r1.getConfidence(transactions.size()), r2.getConfidence(transactions.size())) * -1)
+                .sorted((r1, r2) -> Double.compare(r1.getConfidence(), r2.getConfidence()) * -1)
                 .sorted((r1, r2) -> Integer.compare(r1.getSupport(), r2.getSupport()) * -1)
                 .collect(Collectors.toList());
     }

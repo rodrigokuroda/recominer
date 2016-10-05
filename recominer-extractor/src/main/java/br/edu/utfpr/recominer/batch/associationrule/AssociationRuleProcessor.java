@@ -73,7 +73,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
     private String filter;
 
     @Value("#{jobParameters[topAssociationRules]}")
-    private Integer topAssociationRules = 3;
+    private Integer topAssociationRules = 10;
     
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
@@ -94,12 +94,10 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
 
         final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
         
-        long countFixedIssues = issueRepository.countFixedIssues();
-        
         // select new commits
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
-            newCommits = commitRepository.selectNewCommitsForCalculator();
+            newCommits = commitRepository.selectNewCommitsForAssociationRule();
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
         }
@@ -122,23 +120,26 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
                 for (Issue issue : issuesOfFile) {
                     log.info(++issuesProcessed + " of " + issuesOfFile.size() + " past issues processed.");
 
-                    List<File> changedFilesInIssue = fileRepository.selectChangedFilesIn(issue);
-                    final Transaction<File> transaction
-                            = new Transaction<>(issue.getId().longValue(), new HashSet<>(changedFilesInIssue));
-                    transactions.add(transaction);
+                    List<Commit> commits = commitRepository.selectCommitsOf(issue);
+                    
+                    // Transaction is composed by files of commit
+                    for (Commit commit : commits) {
+                        final List<File> changedFilesInIssue = fileRepository.selectChangedFilesIn(commit);
+                        final Transaction<File> transaction
+                                = new Transaction<>(issue.getId().longValue(), new HashSet<>(changedFilesInIssue));
+                        transactions.add(transaction);
+                    }
                 }
 
                 AssociationRuleExtractor<File> extractor = new AssociationRuleExtractor<>(transactions);
 
-                final Set<AssociationRule<File>> navigationRules = extractor.queryAssociationRules(changedFile);
+                final Set<AssociationRule<File>> navigationRules = extractor.queryAssociationRulesSingleConsequent(changedFile);
 
                 AssociationRulePerformanceCalculator<File> calculatorNavigation
-                        = new AssociationRulePerformanceCalculator<>(countFixedIssues, navigationRules);
-
-//                Set<AssociationRule<File>> topAssociationRules
-//                        = calculatorNavigation.getAssociationRules();
-
-                predictions.addAll(calculatorNavigation.getAssociationRules());
+                        = new AssociationRulePerformanceCalculator<>(navigationRules);
+                
+                final Set<AssociationRule<File>> associationRules = calculatorNavigation.getAssociationRules();
+                predictions.addAll(associationRules);
             }
             
             predictionRepository.savePrediction(newCommit, predictions, topAssociationRules);

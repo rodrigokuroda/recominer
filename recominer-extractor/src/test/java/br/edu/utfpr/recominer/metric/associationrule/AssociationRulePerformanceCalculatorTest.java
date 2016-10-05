@@ -89,7 +89,7 @@ public class AssociationRulePerformanceCalculatorTest {
     public void testCalculeRecallPrecisionForNavigationRules() {
         final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> extractedNavigationRules = extractor.extractNavigationRules();
-        final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(transactions.size(), extractedNavigationRules);
+        final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(extractedNavigationRules);
 
         final Map<AssociationRule<String>, Double> associationRulesRecall = calculator.calculeRecall(3);
         final Map<AssociationRule<String>, Double> associationRulesPrecision = calculator.calculePrecision(3);
@@ -105,7 +105,7 @@ public class AssociationRulePerformanceCalculatorTest {
     public void testCalculeRecallPrecisionForNavigationRulesInBean() {
         final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> extractedNavigationRulesA = extractor.queryAssociationRules(navigationRuleA.getAntecedentItem());
-        final AssociationRulePerformanceCalculator<String> calculatorA = new AssociationRulePerformanceCalculator<>(transactions.size(), extractedNavigationRulesA);
+        final AssociationRulePerformanceCalculator<String> calculatorA = new AssociationRulePerformanceCalculator<>(extractedNavigationRulesA);
 
         final Map<AssociationRule<String>, AssociationRulePerformanceMeasure> associationRulesRecallA = calculatorA.calculePerformance(3);
 
@@ -115,7 +115,7 @@ public class AssociationRulePerformanceCalculatorTest {
         assertEquals(0.2777, associationRulePerformanceA.getPrecision(), 0.0001);
 
         final Set<AssociationRule<String>> extractedNavigationRulesB = extractor.queryAssociationRules(navigationRuleB.getAntecedentItem());
-        final AssociationRulePerformanceCalculator<String> calculatorB = new AssociationRulePerformanceCalculator<>(transactions.size(), extractedNavigationRulesB);
+        final AssociationRulePerformanceCalculator<String> calculatorB = new AssociationRulePerformanceCalculator<>(extractedNavigationRulesB);
 
         final Map<AssociationRule<String>, AssociationRulePerformanceMeasure> associationRulesRecallB = calculatorB.calculePerformance(3);
 
@@ -130,7 +130,7 @@ public class AssociationRulePerformanceCalculatorTest {
 
         final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactionsPrevention);
         final Set<AssociationRule<String>> extractedPreventionRules = extractor.queryAssociationRules(preventionRuleA.getAntecedentItem());
-        final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(transactionsPrevention.size(), extractedPreventionRules);
+        final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(extractedPreventionRules);
 
         final Map<AssociationRule<String>, Double> associationRulesRecall = calculator.calculeRecall(3);
         final Map<AssociationRule<String>, Double> associationRulesPrecision = calculator.calculePrecision(3);
@@ -144,7 +144,7 @@ public class AssociationRulePerformanceCalculatorTest {
         Set<Transaction<String>> transactionsPrevention = createTransactionsForPreventionRulesTest();
         final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactionsPrevention);
         final Set<AssociationRule<String>> extractedPreventionRules = extractor.queryAssociationRules(preventionRuleA.getAntecedentItem());
-        final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(transactionsPrevention.size(), extractedPreventionRules);
+        final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(extractedPreventionRules);
 
         final Map<AssociationRule<String>, AssociationRulePerformanceMeasure> associationRulesRecall = calculator.calculePerformance(3);
 
@@ -158,7 +158,7 @@ public class AssociationRulePerformanceCalculatorTest {
     public void testCalculeRecallPrecisionForClosureRules() {
         final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> extractedClosureRulesA = extractor.queryAssociationRules(closureRuleA.getAntecedentItem());
-        final AssociationRulePerformanceCalculator<String> calculatorA = new AssociationRulePerformanceCalculator<>(transactions.size(), extractedClosureRulesA);
+        final AssociationRulePerformanceCalculator<String> calculatorA = new AssociationRulePerformanceCalculator<>(extractedClosureRulesA);
 
         final Map<AssociationRule<String>, Double> associationRulesRecallA = calculatorA.calculeRecall(3);
         final Map<AssociationRule<String>, Double> associationRulesPrecisionA = calculatorA.calculePrecision(3);
@@ -167,7 +167,7 @@ public class AssociationRulePerformanceCalculatorTest {
         assertEquals(1.0000, associationRulesPrecisionA.get(closureRuleA), 0.0001);
 
         final Set<AssociationRule<String>> extractedClosureRulesB = extractor.queryAssociationRules(closureRuleB.getAntecedentItem());
-        final AssociationRulePerformanceCalculator<String> calculatorB = new AssociationRulePerformanceCalculator<>(transactions.size(), extractedClosureRulesB);
+        final AssociationRulePerformanceCalculator<String> calculatorB = new AssociationRulePerformanceCalculator<>(extractedClosureRulesB);
 
         final Map<AssociationRule<String>, Double> associationRulesRecallB = calculatorB.calculeRecall(3);
         final Map<AssociationRule<String>, Double> associationRulesPrecisionB = calculatorB.calculePrecision(3);

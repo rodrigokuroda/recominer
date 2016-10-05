@@ -55,6 +55,10 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                 associationRulePrediction.setRank(rs.getInt("rank"));
                 associationRulePrediction.setPredictionResult(rs.getString("prediction_result"));
                 associationRulePrediction.setPredictedFileset(new Fileset(rs.getLong("predicted_fileset_id")));
+                associationRulePrediction.setSupport(rs.getDouble("support"));
+                associationRulePrediction.setConfidence(rs.getDouble("confidence"));
+                associationRulePrediction.setTransactions(rs.getLong("transactions"));
+                associationRulePrediction.setTotalTransactions(rs.getLong("total_transactions"));
 
                 return associationRulePrediction;
             };
@@ -68,6 +72,10 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                 mapping.put("rank", associationRulePrediction.getRank());
                 mapping.put("prediction_result", associationRulePrediction.getPredictionResult());
                 mapping.put("predicted_fileset_id", associationRulePrediction.getPredictedFileset().getId());
+                mapping.put("support", associationRulePrediction.getSupport());
+                mapping.put("confidence", associationRulePrediction.getConfidence());
+                mapping.put("transactions", associationRulePrediction.getTransactions());
+                mapping.put("total_transactions", associationRulePrediction.getTotalTransactions());
                 return mapping;
             };
 
@@ -99,14 +107,18 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
             }
 
             AssociationRulePrediction prediction
-                    = new AssociationRulePrediction(forCommit, antecedentFileset, rank++, consequentFileset, predictionResult);
+                    = new AssociationRulePrediction(forCommit, antecedentFileset, rank++, 
+                            consequentFileset, predictionResult,
+                            (double) ar.getSupport(), ar.getConfidence(), 
+                            ar.getTotalTransactions(), (long) ar.getTransactions().size());
             save(prediction);
         }
     }
 
     public List<AssociationRulePrediction> selectPrediction(Commit forCommit) {
         List<AssociationRulePrediction> predictions = jdbcOperations.query(
-                "SELECT id, commit_id, fileset_id, rank, predicted_fileset_id FROM {0}.fileset "
+                "SELECT id, commit_id, fileset_id, rank, predicted_fileset_id, support, confidence, transactions, total_transactions "
+                + "  FROM {0}.fileset "
                 + " WHERE commit_id = ?",
                 ROW_MAPPER);
 
@@ -128,6 +140,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                         "SELECT arp.*, "
                         + "     pfs.file_id, "
                         + "     pf.file_path, "
+                        + "     pfb.id AS prediction_feedback_id, "
                         + "     pfb.changed, "
                         + "     pfb.justification "
                         + "  FROM {0}.ar_prediction arp "
@@ -140,13 +153,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                         + "   AND arp.prediction_result = \"C\" "
                         + " ORDER BY rank ASC "),
                 (ResultSet rs, int rowNum) -> {
-                    AssociationRulePrediction associationRulePrediction = new AssociationRulePrediction();
-
-                    associationRulePrediction.setId(rs.getInt("id"));
-                    associationRulePrediction.setCommit(new Commit(rs.getInt("commit_id")));
-                    associationRulePrediction.setFileset(new Fileset(rs.getLong("fileset_id")));
-                    associationRulePrediction.setPredictionResult(rs.getString("prediction_result"));
-                    associationRulePrediction.setRank(rs.getInt("rank"));
+                    AssociationRulePrediction associationRulePrediction = ROW_MAPPER.mapRow(rs, rowNum);
 
                     final Set<File> predictedFiles = new HashSet<>(1);
                     predictedFiles.add(new File(rs.getInt("file_id"), rs.getString("file_path")));
@@ -156,7 +163,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
 
                     associationRulePrediction.setPredictedFileset(predictedFileset);
 
-                    final int feedbackId = rs.getInt("feedback_id");
+                    final int feedbackId = rs.getInt("prediction_feedback_id");
                     final PredictionFeedback predictionFeedback = new PredictionFeedback(feedbackId == 0 ? null : feedbackId);
                     predictionFeedback.setChanged(rs.getBoolean("changed"));
                     predictionFeedback.setPredictionId(rs.getInt("id"));

@@ -1,6 +1,5 @@
 package br.edu.utfpr.recominer.core.model;
 
-import br.edu.utfpr.recominer.core.model.AssociationRule;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,6 +65,23 @@ public class Transaction<T> {
                 .filter(item -> !antecedentItem.equals(item))
                 .collect(Collectors.toSet());
         return new AssociationRule<>(antecedentItem, consequentItems);
+    }
+
+    /**
+     * Given an items I, returns the association rule for it, where the 
+     * consequent item is a single item.
+     *
+     * @param antecedentItem
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public Set<AssociationRule<T>> queryRuleByAntecedentWithSingleConsequent(T antecedentItem) {
+        return items.stream()
+                .filter(item -> !antecedentItem.equals(item))
+                .collect(Collectors.toSet())
+                .stream()
+                .map(consequentItem -> new AssociationRule<>(antecedentItem, consequentItem))
+                .collect(Collectors.toSet());
     }
 
     /**

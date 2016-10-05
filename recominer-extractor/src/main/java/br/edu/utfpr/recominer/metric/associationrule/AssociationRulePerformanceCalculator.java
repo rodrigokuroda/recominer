@@ -17,10 +17,10 @@ public class AssociationRulePerformanceCalculator<I> {
 
     private final Set<AssociationRule<I>> associationRules;
 
-    public AssociationRulePerformanceCalculator(final long transactions, final Set<AssociationRule<I>> associationRules) {
+    public AssociationRulePerformanceCalculator(final Set<AssociationRule<I>> associationRules) {
         // sorted by support (high priority) and confidence (low priority)
         this.associationRules = associationRules.stream()
-                .sorted((ar1, ar2) -> Double.compare(ar1.getConfidence(transactions), ar2.getConfidence(transactions)) * -1)
+                .sorted((ar1, ar2) -> Double.compare(ar1.getConfidence(), ar2.getConfidence()) * -1)
                 .sorted((ar1, ar2) -> Integer.compare(ar1.getSupport(), ar2.getSupport()) * -1)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }

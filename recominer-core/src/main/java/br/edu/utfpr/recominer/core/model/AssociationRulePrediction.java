@@ -16,6 +16,10 @@ public class AssociationRulePrediction implements Persistable<Integer> {
     private Fileset predictedFileset;
     private String predictionResult;
     private PredictionFeedback feedback;
+    private Double support;
+    private Double confidence;
+    private Long transactions;
+    private Long totalTransactions;
 
     public AssociationRulePrediction() {
     }
@@ -24,12 +28,17 @@ public class AssociationRulePrediction implements Persistable<Integer> {
         this.id = id;
     }
 
-    public AssociationRulePrediction(Commit commit, Fileset file, Integer rank, Fileset predictedFile, String predictionResult) {
+    public AssociationRulePrediction(Commit commit, Fileset file, Integer rank, Fileset predictedFile, 
+            String predictionResult, Double support, Double confidence, Long transactions, Long totalTransactions) {
         this.commit = commit;
         this.fileset = file;
         this.rank = rank;
         this.predictedFileset = predictedFile;
         this.predictionResult = predictionResult;
+        this.support = support;
+        this.confidence = confidence;
+        this.transactions = transactions;
+        this.totalTransactions = totalTransactions;
     }
     
     @Override
@@ -92,6 +101,38 @@ public class AssociationRulePrediction implements Persistable<Integer> {
 
     public void setFeedback(PredictionFeedback feedback) {
         this.feedback = feedback;
+    }
+
+    public Double getSupport() {
+        return support;
+    }
+
+    public void setSupport(Double support) {
+        this.support = support;
+    }
+
+    public Double getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(Double confidence) {
+        this.confidence = confidence;
+    }
+
+    public Long getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(Long transactions) {
+        this.transactions = transactions;
+    }
+
+    public Long getTotalTransactions() {
+        return totalTransactions;
+    }
+
+    public void setTotalTransactions(Long totalTransactions) {
+        this.totalTransactions = totalTransactions;
     }
 
     @Override

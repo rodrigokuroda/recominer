@@ -138,6 +138,10 @@ CREATE TABLE IF NOT EXISTS {0}.ar_prediction(
     predicted_fileset_id INT(11) NOT NULL, 
     prediction_result VARCHAR(2) NOT NULL,
     rank INT(11) NOT NULL,
+    support DOUBLE,
+    confidence DOUBLE,
+    transactions INT(11),
+    total_transactions INT(11),
     PRIMARY KEY (id),
     UNIQUE KEY (fileset_id, commit_id, predicted_fileset_id)
 );
