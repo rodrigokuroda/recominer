@@ -14,12 +14,10 @@ import br.edu.utfpr.recominer.core.repository.FileRepository;
 import br.edu.utfpr.recominer.core.repository.IssueRepository;
 import br.edu.utfpr.recominer.filter.FileFilter;
 import br.edu.utfpr.recominer.metric.associationrule.AssociationRuleExtractor;
-import br.edu.utfpr.recominer.metric.associationrule.AssociationRulePerformanceCalculator;
 import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
 import br.edu.utfpr.recominer.repository.FileMetricsRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -107,7 +105,8 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
             log.info("Computing metrics for changed files on commit " + newCommit.getId());
             // select changed files
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
-            final List<AssociationRule<File>> predictions = new ArrayList<>();
+            
+            final long totalTransactions = commitRepository.count();
             
             for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
 
@@ -131,18 +130,12 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
                     }
                 }
 
-                AssociationRuleExtractor<File> extractor = new AssociationRuleExtractor<>(transactions);
+                AssociationRuleExtractor<File> extractor = new AssociationRuleExtractor<>(transactions, totalTransactions);
 
                 final Set<AssociationRule<File>> navigationRules = extractor.queryAssociationRulesSingleConsequent(changedFile);
-
-                AssociationRulePerformanceCalculator<File> calculatorNavigation
-                        = new AssociationRulePerformanceCalculator<>(navigationRules);
-                
-                final Set<AssociationRule<File>> associationRules = calculatorNavigation.getAssociationRules();
-                predictions.addAll(associationRules);
+                final List<AssociationRule<File>> orderedPredictions = AssociationRuleOrdering.sortBySupportAndConfidence(navigationRules);
+                predictionRepository.savePrediction(newCommit, orderedPredictions, topAssociationRules);
             }
-            
-            predictionRepository.savePrediction(newCommit, predictions, topAssociationRules);
         }
         
         associationRuleLog.stop();

@@ -19,10 +19,7 @@ public class AssociationRulePerformanceCalculator<I> {
 
     public AssociationRulePerformanceCalculator(final Set<AssociationRule<I>> associationRules) {
         // sorted by support (high priority) and confidence (low priority)
-        this.associationRules = associationRules.stream()
-                .sorted((ar1, ar2) -> Double.compare(ar1.getConfidence(), ar2.getConfidence()) * -1)
-                .sorted((ar1, ar2) -> Integer.compare(ar1.getSupport(), ar2.getSupport()) * -1)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        this.associationRules = associationRules;
     }
 
     public Map<AssociationRule<I>, Double> calculePrecision(final int topK) {
@@ -65,7 +62,7 @@ public class AssociationRulePerformanceCalculator<I> {
     }
 
     public Set<AssociationRule<I>> getAssociationRules() {
-        return associationRules.stream().collect(Collectors.toSet());
+        return associationRules.stream().collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**

@@ -17,9 +17,11 @@ import java.util.Set;
 public class AssociationRuleExtractor<I> {
 
     private final Set<Transaction<I>> transactions;
+    private final long totalTransactions;
 
-    public AssociationRuleExtractor(Set<Transaction<I>> transactions) {
+    public AssociationRuleExtractor(Set<Transaction<I>> transactions, long totalTransactions) {
         this.transactions = transactions;
+        this.totalTransactions = totalTransactions;
     }
 
     /**
@@ -33,7 +35,7 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     t.extractNavigationAssociationRules().stream().forEach(ar -> {
-                        ar.setTotalTransactions(transactions.size());
+                        ar.setTotalTransactions(totalTransactions);
                         if (associationRules.containsKey(ar)) {
                             associationRules.get(ar).addTransaction(t);
                         } else {
@@ -57,7 +59,7 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     t.extractPreventionAssociationRules().stream().forEach(ar -> {
-                        ar.setTotalTransactions(transactions.size());
+                        ar.setTotalTransactions(totalTransactions);
                         if (associationRules.containsKey(ar)) {
                             associationRules.get(ar).addTransaction(t);
                         } else {
@@ -81,7 +83,7 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     final AssociationRule<I> ar = t.extractClosureAssociationRules();
-                    ar.setTotalTransactions(transactions.size());
+                    ar.setTotalTransactions(totalTransactions);
                     if (associationRules.containsKey(ar)) {
                         associationRules.get(ar).addTransaction(t);
                     } else {
@@ -106,7 +108,7 @@ public class AssociationRuleExtractor<I> {
                 .filter(t -> t.getItems().containsAll(query))
                 .forEach(t -> {
                     AssociationRule<I> ar = t.queryRuleByAntecedent(query);
-                    ar.setTotalTransactions(transactions.size());
+                    ar.setTotalTransactions(totalTransactions);
                     if (associationRules.containsKey(ar)) {
                         associationRules.get(ar).addTransaction(t);
                     } else {
@@ -131,7 +133,7 @@ public class AssociationRuleExtractor<I> {
         transactions.stream()
                 .forEach(t -> {
                     AssociationRule<I> ar = t.queryRuleByAntecedent(query);
-                    ar.setTotalTransactions(transactions.size());
+                    ar.setTotalTransactions(totalTransactions);
                     if (associationRules.containsKey(ar)) {
                         associationRules.get(ar).addTransaction(t);
                     } else {
@@ -156,7 +158,7 @@ public class AssociationRuleExtractor<I> {
                 .forEach(t -> {
                     Set<AssociationRule<I>> arSet = t.queryRuleByAntecedentWithSingleConsequent(query);
                     for (AssociationRule<I> ar : arSet) {
-                        ar.setTotalTransactions(transactions.size());
+                        ar.setTotalTransactions(totalTransactions);
                         if (associationRules.containsKey(ar)) {
                             associationRules.get(ar).addTransaction(t);
                         } else {
