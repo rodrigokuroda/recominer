@@ -5,7 +5,7 @@
 
     <groupId>br.edu.utfpr</groupId>
     <artifactId>recominer-extractor</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>Recominer Extractor</name>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>br.edu.utfpr</groupId>
         <artifactId>recominer</artifactId>
-        <version>0.1</version>
+        <version>0.2</version>
     </parent>
 
     <properties>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>br.edu.utfpr</groupId>
             <artifactId>recominer-core</artifactId>
-            <version>0.1</version>
+            <version>0.2</version>
         </dependency>
 
         <dependency>

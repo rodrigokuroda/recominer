@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>br.edu.utfpr</groupId>
     <artifactId>recominer-core</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>Recominer Core</name>
@@ -11,7 +11,7 @@
     <parent>
         <groupId>br.edu.utfpr</groupId>
         <artifactId>recominer</artifactId>
-        <version>0.1</version>
+        <version>0.2</version>
         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
 

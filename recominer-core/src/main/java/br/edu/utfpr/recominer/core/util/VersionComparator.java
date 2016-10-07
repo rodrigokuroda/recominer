@@ -1,6 +1,6 @@
-package br.edu.utfpr.recominer.batch.extractor;
+package br.edu.utfpr.recominer.core.util;
 
-import br.edu.utfpr.recominer.model.Version;
+import br.edu.utfpr.recominer.core.model.Version;
 import java.util.Comparator;
 
 /**

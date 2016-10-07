@@ -1,8 +1,9 @@
 package br.edu.utfpr.recominer.batch.extractor;
 
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.model.Version;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
-import br.edu.utfpr.recominer.model.Version;
+import br.edu.utfpr.recominer.core.util.VersionComparator;
 import java.sql.ResultSet;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,9 +20,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
-public class ExtractFixVersion {
+public class FixVersionExtractor {
 
-    private final Logger log = LoggerFactory.getLogger(ExtractFixVersion.class);
+    private final Logger log = LoggerFactory.getLogger(FixVersionExtractor.class);
 
     private final String insertIssueFixVersion;
     private final String deleteFixedVersionOrder;
@@ -31,13 +32,12 @@ public class ExtractFixVersion {
     private final String selectIssuesIdAndFixVersions;
     private final Project project;
 
-    private JdbcTemplate template;
+    private final JdbcTemplate template;
 
-    public ExtractFixVersion(final JdbcTemplate template, final Project project) {
+    public FixVersionExtractor(final JdbcTemplate template, final Project project) {
         this.template = template;
         this.project = project;
 
-        // TODO mover para um Repository
         this.insertIssueFixVersion
                 = QueryUtils.getQueryForDatabase(
                         "INSERT INTO "
@@ -51,7 +51,7 @@ public class ExtractFixVersion {
 
         this.selectExistingIssuesRelatedToFixVersion
                 = QueryUtils.getQueryForDatabase(
-                        "SELECT issue_id, fix_version "
+                        "SELECT DISTINCT issue_id, fix_version "
                         + "  FROM {0}.issues_fix_version", project);
 
         this.insertFixedVersionOrder
@@ -63,10 +63,9 @@ public class ExtractFixVersion {
         this.selectIssuesIdAndFixVersions
                 = QueryUtils.getQueryForDatabase(
                         "SELECT i.id, iej.fix_version "
-                        + "  FROM {0}.issues i"
+                        + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
-                        + " WHERE i.fixed_on IS NOT NULL"
-                        + "   AND i.updated_on > ?", project);
+                        + " WHERE i.id NOT IN (SELECT DISTINCT(issue_id) FROM {0}.issues_fix_version_order)", project);
 
         this.deleteFixedVersionOrder
                 = QueryUtils.getQueryForDatabase(
@@ -77,11 +76,11 @@ public class ExtractFixVersion {
 
         // group versions by issues
         final Map<Integer, Set<String>> existingIssuesRelatedToVersion
-                = template.query(selectIssuesIdAndFixVersions,
+                = template.query(selectExistingIssuesRelatedToFixVersion,
                         (ResultSet rs) -> {
                             Map<Integer, Set<String>> map = new HashMap<>();
                             while (rs.next()) {
-                                map.put(rs.getInt(1), new HashSet<>(Arrays.asList(rs.getString(2))));
+                                map.put(rs.getInt(1), new HashSet<>(Arrays.asList(rs.getString(2).split(","))));
                             }
                             return map;
                         }
@@ -89,8 +88,7 @@ public class ExtractFixVersion {
 
         final List<IssueAndFixVersions> issuesIdAndFixVersions
                 = template.query(selectIssuesIdAndFixVersions,
-                        (ResultSet rs, int rowNum) -> new IssueAndFixVersions(rs.getInt(1), Arrays.asList(rs.getString(2))),
-                        project.getLastIssueUpdateAnalyzedForVersion());
+                        (ResultSet rs, int rowNum) -> new IssueAndFixVersions(rs.getInt(1), Arrays.asList(rs.getString(2).split(","))));
 
         final Set<String> distincMinorVersion = new HashSet<>();
 
@@ -111,7 +109,6 @@ public class ExtractFixVersion {
                 }
                 for (String version : versions) {
                     final String minorVersion = getMinorVersion(version);
-//                        String majorVersion = getMajorVersion(version);
 
                     existingIssuesRelatedToVersion.get(issueId).add(minorVersion);
                     distincMinorVersion.add(minorVersion);
@@ -140,7 +137,7 @@ public class ExtractFixVersion {
                 template.execute(deleteFixedVersionOrder);
                 template.update(insertFixedVersionOrder,
                         minorVersion.getVersion(),
-                        minorVersion.getVersion(),
+                        getMajorVersion(minorVersion.getVersion()),
                         order++);
             }
         }

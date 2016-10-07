@@ -1,4 +1,4 @@
-package br.edu.utfpr.recominer.model;
+package br.edu.utfpr.recominer.core.model;
 
 import java.util.Objects;
 
