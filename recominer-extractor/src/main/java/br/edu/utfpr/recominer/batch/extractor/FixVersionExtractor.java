@@ -25,7 +25,7 @@ public class FixVersionExtractor {
     private final Logger log = LoggerFactory.getLogger(FixVersionExtractor.class);
 
     private final String insertIssueFixVersion;
-    private final String deleteFixedVersionOrder;
+//    private final String deleteFixedVersionOrder;
     private final String selectFixedVersionOrder;
     private final String selectExistingIssuesRelatedToFixVersion;
     private final String insertFixedVersionOrder;
@@ -33,6 +33,17 @@ public class FixVersionExtractor {
     private final Project project;
 
     private final JdbcTemplate template;
+
+    FixVersionExtractor() {
+        this.insertIssueFixVersion = null;
+//        this.deleteFixedVersionOrder = null;
+        this.selectFixedVersionOrder = null;
+        this.selectExistingIssuesRelatedToFixVersion = null;
+        this.insertFixedVersionOrder = null;
+        this.selectIssuesIdAndFixVersions = null;
+        this.project = null;
+        this.template = null;
+    }
 
     public FixVersionExtractor(final JdbcTemplate template, final Project project) {
         this.template = template;
@@ -67,9 +78,9 @@ public class FixVersionExtractor {
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id"
                         + " WHERE i.id NOT IN (SELECT DISTINCT(issue_id) FROM {0}.issues_fix_version_order)", project);
 
-        this.deleteFixedVersionOrder
-                = QueryUtils.getQueryForDatabase(
-                        "DELETE FROM {0}.issues_fix_version_order", project);
+//        this.deleteFixedVersionOrder
+//                = QueryUtils.getQueryForDatabase(
+//                        "DELETE FROM {0}.issues_fix_version_order", project);
     }
 
     public void extract() {
@@ -109,10 +120,11 @@ public class FixVersionExtractor {
                 }
                 for (String version : versions) {
                     final String minorVersion = getMinorVersion(version);
+                    final String majorVersion = getMajorVersion(version);
 
                     existingIssuesRelatedToVersion.get(issueId).add(minorVersion);
                     distincMinorVersion.add(minorVersion);
-                    template.update(insertIssueFixVersion, issueId, version, minorVersion, minorVersion);
+                    template.update(insertIssueFixVersion, issueId, version, minorVersion, majorVersion);
                 }
             }
         }
@@ -134,7 +146,7 @@ public class FixVersionExtractor {
 
             int order = 1;
             for (Version minorVersion : minorVersionsOrdered) {
-                template.execute(deleteFixedVersionOrder);
+                //template.execute(deleteFixedVersionOrder);
                 template.update(insertFixedVersionOrder,
                         minorVersion.getVersion(),
                         getMajorVersion(minorVersion.getVersion()),
@@ -145,7 +157,7 @@ public class FixVersionExtractor {
     }
 
     // 1.1.1 > 1
-    private String getMajorVersion(String version) {
+    String getMajorVersion(String version) {
         String majorVersion;
         String[] versionsSplited = version.split("[.]");
         if (versionsSplited.length > 1) {
@@ -157,7 +169,7 @@ public class FixVersionExtractor {
     }
 
     // 1.1.1 > 1.1
-    private String getMinorVersion(String version) {
+    String getMinorVersion(String version) {
         String minorVersion;
         String[] versionsSplited = version.split("[.]");
         if (versionsSplited.length > 2) {

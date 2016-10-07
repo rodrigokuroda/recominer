@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
@@ -25,6 +26,9 @@ public class ExtractorProcessor implements ItemProcessor<Project, ExtractorLog> 
     
     @Inject
     private AssociationProcessor associationProcessor;
+    
+    @Inject
+    private JdbcTemplate template;
 
     @Override
     public ExtractorLog process(Project project) throws Exception {
@@ -57,6 +61,9 @@ public class ExtractorProcessor implements ItemProcessor<Project, ExtractorLog> 
         log.setAssociationProcessStartDate(new Date());
 
         associationProcessor.process(project);
+        
+        FixVersionExtractor extractor = new FixVersionExtractor(template, project);
+        extractor.extract();
 
         log.setAssociationProcessEndDate(new Date());
 
