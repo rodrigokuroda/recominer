@@ -74,10 +74,10 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
 
     @Value("#{jobParameters[filenameFilter]}")
     private String filter;
-    
+
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
-
+    
     @Override
     public CalculatorLog process(Project project) throws Exception {
         CalculatorLog calculatorLog = new CalculatorLog(project, "AllMetrics");
@@ -99,7 +99,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
             newCommits = commitRepository.selectCommitsOf(issueKey);
         }
         log.info(newCommits.size() + " new commits to be processed.");
-        
+
         for (Commit newCommit : newCommits) {
 
             log.info("Computing metrics for changed files on commit " + newCommit.getId());
@@ -113,8 +113,8 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
                     .collect(Collectors.toList())) {
 
                 log.info("Computing metrics for file " + changedFile.getId() + " in the past.");
-                
-                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
+
+                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {

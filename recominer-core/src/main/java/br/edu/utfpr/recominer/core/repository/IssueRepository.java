@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -56,7 +57,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "    OR im.updated_on < (SELECT MAX(c.changed_on) FROM {0}_issues.changes c WHERE c.issue_id = i.id))"
                         + "   AND (im.comments_updated_on IS NULL "
                         + "    OR im.comments_updated_on < (SELECT MAX(comments.submitted_on) FROM {0}_issues.comments comments WHERE comments.issue_id = i.id))",
-                         project),
+                        project),
                 ROW_MAPPER, commit.getId());
     }
 
@@ -69,7 +70,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
                         + "  LEFT JOIN {0}.issues_metrics im ON im.issue_id = i.id"
                         + " WHERE i2s.scmlog_id = ? ",
-                         project),
+                        project),
                 ROW_MAPPER, commit.getId());
     }
 
@@ -87,7 +88,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "    OR im.updated_on < (SELECT MAX(c.changed_on) FROM {0}_issues.changes c WHERE c.issue_id = i.id))"
                         + "   AND (im.comments_updated_on IS NULL "
                         + "    OR im.comments_updated_on < (SELECT MAX(comments.submitted_on) FROM {0}_issues.comments comments WHERE comments.issue_id = i.id))",
-                         project),
+                        project),
                 ROW_MAPPER, issue.getId());
     }
 
@@ -104,7 +105,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "   AND i.fixed_on IS NOT NULL "
                         + "   AND (im.updated_on IS NULL "
                         + "    OR im.updated_on < (SELECT MAX(c.changed_on) FROM {0}_issues.changes c WHERE c.issue_id = i.id))",
-                         project),
+                        project),
                 ROW_MAPPER, file.getId());
     }
 
@@ -120,7 +121,40 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND fc.file_id = ? "
                         + "   AND i.fixed_on IS NOT NULL ",
-                         project),
+                        project),
+                ROW_MAPPER,
+                "max_files_per_commit", file.getId());
+    }
+
+    public List<Issue> selectIssuesFromLastVersionOf(File file) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT DISTINCT " + FIELDS
+                        + "  FROM {0}_issues.issues i"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
+                        + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
+                        + "  JOIN {0}_vcs.scmlog s ON i2s.scmlog_id = s.id "
+                        + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
+                        + "  JOIN {0}.issues_fix_version ifv ON i2s.issue_id = ifv.issue_id "
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?) "
+                        + "   AND fc.file_id = ? "
+                        + "   AND i.fixed_on IS NOT NULL "
+                        + "    AND (ifvo.version_order IN "
+                        + "          (SELECT ifvo2.version_order "
+                        + "             FROM {0}.issues_fix_version_order ifvo2 "
+                        + "             JOIN {0}.issues_fix_version ifv2 ON ifvo2.minor_fix_version = ifv2.minor_fix_version "
+                        + "			 JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
+                        + "            WHERE i2s.scmlog_id = s.id "
+                        + "          )  "
+                        + "          OR ifvo.version_order = "
+                        + "          (SELECT MIN(ifvo2.version_order) - 1 "
+                        + "             FROM {0}.issues_fix_version_order ifvo2 "
+                        + "             JOIN {0}.issues_fix_version ifv2 ON ifvo2.minor_fix_version = ifv2.minor_fix_version "
+                        + "			 JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
+                        + "            WHERE i2s.scmlog_id = s.id "
+                        + "          ) "
+                        + "        )",
+                        project),
                 ROW_MAPPER,
                 "max_files_per_commit", file.getId());
     }
@@ -136,7 +170,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND i.fixed_on IS NOT NULL ",
-                         project),
+                        project),
                 ROW_MAPPER,
                 "max_files_per_commit");
     }
@@ -146,7 +180,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 QueryUtils.getQueryForDatabase(
                         "SELECT COUNT(DISTINCT(im.issue_id)) "
                         + "  FROM {0}.issues_metrics im",
-                         project),
+                        project),
                 Long.class);
     }
 
@@ -157,16 +191,16 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  FROM {0}.issues_scmlog i2s "
                         + "  JOIN {0}_issues.issues i ON i2s.issue_id = i.id "
                         + " WHERE i.fixed_on IS NOT NULL ",
-                         project),
+                        project),
                 Long.class);
     }
 
     /**
      * Find all issues where file was changed before the specified commit.
-     * 
+     *
      * @param changedFile The file
      * @param until The commit
-     * @return 
+     * @return
      */
     public List<Issue> selectFixedIssuesOf(File changedFile, Commit until) {
         return jdbcOperations.query(
@@ -181,8 +215,54 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + " WHERE fc.file_id = ? "
                         + "   AND s.date < (SELECT s2.date FROM {0}_vcs.scmlog s2 WHERE s2.id = ?)"
                         + "   AND i.fixed_on IS NOT NULL ",
-                         project),
+                        project),
                 ROW_MAPPER, changedFile.getId(), until.getId());
+    }
+
+    /**
+     * Find all issues where file was changed before the specified commit.
+     *
+     * @param changedFile The file
+     * @param until The commit
+     * @return
+     */
+    public List<Issue> selectFixedIssuesFromLastVersionOf(File changedFile, Commit until) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("commit", until.getId());
+        params.addValue("file", changedFile.getId());
+        
+        return namedJdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT DISTINCT  i.id, i.type, iej.issue_key, i.submitted_on, i.fixed_on "
+                        + "   FROM {0}_issues.issues i "
+                        + "   JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
+                        + "   JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
+                        + "   JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
+                        + "  LEFT JOIN {0}.issues_metrics im ON im.issue_id = i.id "
+                        + "  LEFT JOIN {0}.issues_fix_version ifv ON i2s.issue_id = ifv.issue_id "
+                        + "  LEFT JOIN {0}.issues_fix_version_order ifvo ON ifvo.minor_fix_version = ifv.minor_fix_version "
+                        + "  WHERE fc.file_id = :file "
+                        + "    AND s.date < (SELECT s2.date FROM {0}_vcs.scmlog s2 WHERE s2.id = :commit) "
+                        + "    AND i.fixed_on IS NOT NULL "
+                        + "    AND (ifvo.version_order IN "
+                        + "          (SELECT ifvo2.version_order "
+                        + "             FROM {0}.issues_fix_version_order ifvo2 "
+                        + "             JOIN {0}.issues_fix_version ifv2 ON ifvo2.minor_fix_version = ifv2.minor_fix_version "
+                        + "			 JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
+                        + "            WHERE i2s.scmlog_id = :commit "
+                        + "          )  "
+                        + "          OR ifvo.version_order = "
+                        + "          (SELECT MIN(ifvo2.version_order) - 1 "
+                        + "             FROM {0}.issues_fix_version_order ifvo2 "
+                        + "             JOIN {0}.issues_fix_version ifv2 ON ifvo2.minor_fix_version = ifv2.minor_fix_version "
+                        + "			 JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
+                        + "            WHERE i2s.scmlog_id = :commit "
+                        + "          ) "
+                        + "        )",
+                        project),
+                params,
+                ROW_MAPPER);
     }
 
 }

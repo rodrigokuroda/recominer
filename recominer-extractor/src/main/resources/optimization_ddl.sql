@@ -9,8 +9,9 @@ ALTER TABLE {0}_issues.issues_ext_jira ADD INDEX (issue_key(32));
 -- ALTER TABLE {0}_issues.issues ADD INDEX (issue(255));
 -- ALTER TABLE {0}_issues.changes ADD INDEX (changed_on) ;
 
--- Inserts number of file in commit
+-- Inserts number of file in commit and issue
 ALTER TABLE {0}_vcs.scmlog ADD COLUMN num_files INT(11);
+ALTER TABLE {0}_issues.issues ADD COLUMN num_files INT(11);
 
 -- Sets 1 (one) to authors that are developers (committers) too
 -- if the name or user are same in both issue tracker and version control.

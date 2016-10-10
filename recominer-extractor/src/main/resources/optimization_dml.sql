@@ -112,3 +112,15 @@ SELECT distinct fil.id, a.commit_id, a.type, a.branch_id, filcl.added, filcl.rem
 WHERE NOT EXISTS (SELECT 1 FROM {0}.files_commits fc WHERE fc.file_id = fil.id AND fc.commit_id = a.commit_id)
 WHERE_SCMLOG
  ORDER BY a.commit_id;
+
+-- count files for issues
+UPDATE {0}_issues.issues i SET 
+i.num_files =
+(SELECT COUNT(DISTINCT(fc.file_id))
+  FROM {0}.issues_scmlog i2s
+  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id
+  JOIN {0}.files_commits fc ON fc.commit_id = i2s.scmlog_id
+  JOIN {0}.files f ON f.id = fc.file_id
+ WHERE i2s.issue_id = i.id)
+WHERE 1=1
+WHERE_ISSUE;
