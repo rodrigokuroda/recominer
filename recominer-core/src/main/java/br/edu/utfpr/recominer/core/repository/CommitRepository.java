@@ -97,11 +97,45 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
 
     /**
      * Gets all commits associated with non-fixed issues and commits that have
+     * not Dataset generated yet. The commits must have a number of maximum
+     * files configured in 'recominer.configuration' table, as key
+     * 'max_files_per_commit'.
+     * In addition, the commits that contains only the files with name will be 
+     * excluded from list.
+     *
+     * @param filenameFilter
+     * @return Commits of non-fixed issues.
+     */
+    public List<Commit> selectNewCommitsForDataset(Set<String> filenameFilter) {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("filenames", filenameFilter);
+        parameters.addValue("max_files_per_commit", "max_files_per_commit");
+        
+        return namedJdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT c.commit_id, c.rev, c.committer_id, c.date"
+                        + "  FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + "  JOIN {0}.files_commits fc ON fc.commit_id = c.commit_id"
+                        + "  JOIN {0}.files f ON f.id = fc.file_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = :max_files_per_commit)"
+                        + "   AND i.fixed_on IS NULL"
+                        + "   AND f.file_path NOT IN (:filenames)"
+                        + "   AND c.commit_id NOT IN (SELECT DISTINCT(cm.commit_id) FROM {0}.contextual_metrics cm) "
+                        + " ORDER BY c.date DESC",
+                        project),
+                parameters,
+                ROW_MAPPER);
+    }
+
+    /**
+     * Gets all commits associated with non-fixed issues and commits that have
      * not metrics calculated yet. The commits must have a number of maximum
      * files configured in 'recominer.configuration' table, as key
      * 'max_files_per_commit'.
      *
-     * @param filenameFilter
      * @return Commits of non-fixed issues.
      */
     public List<Commit> selectNewCommitsForCalculator() {
@@ -128,6 +162,8 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
      * not metrics calculated yet. The commits must have a number of maximum
      * files configured in 'recominer.configuration' table, as key
      * 'max_files_per_commit'.
+     * In addition, the commits that contains only the files with name will be 
+     * excluded from list.
      *
      * @param filenameFilter
      * @return Commits of non-fixed issues.
@@ -244,6 +280,35 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "   AND fc.file_id = ?", project),
                 ROW_MAPPER,
                 "max_files_per_commit", issue.getId(), file.getId());
+    }
+
+    public List<Commit> selectCommitsInLastVersionOf(Issue issue, File file, Commit commit) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id"
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + "  JOIN {0}.issues_fix_version ifv ON i2s.issue_id = ifv.issue_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
+                        + "   AND i2s.issue_id = ?"
+                        + "   AND fc.file_id = ?"
+                        + "   AND ifv.minor_version IN "
+                        + "       (SELECT ifvo2.version_order "
+                        + "          FROM {0}.issues_fix_version_order ifvo2 "
+                        + "         WHERE ifvo2.minor_fix_version = "
+                        + "           (SELECT ifv2.minor_fix_version "
+                        + "              FROM {0}.issues_fix_version ifv2"
+                        + "             WHERE ifv2.issue_id IN "
+                        + "               (SELECT i2s.issue_id "
+                        + "                  FROM {0}.issues_scmlog i2s "
+                        + "	            WHERE i2s.scmlog_id = ?"
+                        + "                    OR i2s.issue_id = ?"
+                        + "                )"
+                        + "	  ) "
+                        + ")", project),
+                ROW_MAPPER,
+                "max_files_per_commit", issue.getId(), file.getId(), commit.getId());
     }
 
     public Commit selectWithCommitter(Commit commit) {

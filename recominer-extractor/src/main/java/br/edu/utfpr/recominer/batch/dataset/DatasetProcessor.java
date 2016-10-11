@@ -98,7 +98,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
         metricsRepository.setProject(project);
 
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommitsForDataset();
+        final List<Commit> newCommits = commitRepository.selectNewCommitsForDataset(FileFilter.getFiltersFromString(filter));
         log.info(newCommits.size() + " new commits to be processed.");
 
         for (Commit newCommit : newCommits) {
@@ -157,7 +157,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
                 log.info("Getting issues where file " + changedFile.getId() + " was changed.");
                 // find all issues/commits where file was changed
-                List<Issue> issuesOfFile = issueRepository.selectIssuesOf(changedFile);
+                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {
