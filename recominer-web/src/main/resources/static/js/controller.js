@@ -40,6 +40,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         $scope.activeProject = project;
         $scope.activeCommit = null;
         $scope.activeFile = null;
+        $scope.cochanges = null;
         $log.debug("Fetching recent commits from project " + project.name + "...");
         $http.post("/commits", project)
             .then(function(response) {
@@ -56,6 +57,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
     $scope.getFilesOf = function(commit) {
         $scope.activeCommit = commit;
         $scope.activeFile = null;
+        $scope.cochanges = null;
         $log.debug("Fetching files from commit " + commit.revision + "...");
         commit.project = $scope.activeProject;
         $http.post("/files", commit)
@@ -72,6 +74,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
     // Load cochanges
     $scope.getPredictedCochangesOf = function(file) {
         $scope.activeFile = file;
+        $scope.cochanges = null;
         $log.debug("Fetching predicted cochanges for file " + file.name + "...");
         file.project = $scope.activeProject;
         file.commit = $scope.activeCommit;
