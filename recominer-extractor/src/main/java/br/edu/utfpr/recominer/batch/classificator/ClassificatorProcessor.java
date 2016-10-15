@@ -52,7 +52,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
     @Value("#{jobParameters[workingDir]}")
     private String workingDir;
-    
+
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
 
@@ -68,11 +68,11 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
-            newCommits = commitRepository.selectNewCommitsForCalculator();
+            newCommits = commitRepository.selectNewCommitsForClassification();
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
         }
-        
+
         int processedCommits = 0;
         for (Commit newCommit : newCommits) {
             LOG.info(++processedCommits + " of " + newCommits.size() + " commits processed.");
@@ -133,11 +133,13 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
                             File cochange = new File(Integer.valueOf(result[0]), result[1]);
                             String predictionResult = result[2].replace("\"", "");
+                            final String predictionProbabilityString = result[3].replace("NA", "0");
+                            Double predictionProbability = Double.valueOf(predictionProbabilityString);
 
                             MachineLearningPrediction prediction
                                     = new MachineLearningPrediction(
                                             changedFile, newCommit,
-                                            cochange, predictionResult, "RandomForest");
+                                            cochange, predictionResult, "RandomForest", predictionProbability);
 
                             try {
                                 predictionRepository.save(prediction);

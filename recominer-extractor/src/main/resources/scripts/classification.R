@@ -67,10 +67,11 @@ for(cochangeSubfolder in sub.folders) {
   # Has obs. in test?
   if (nrow(test) > 0) {
     predicted <- predict(rf_model, test)
+    probability <- predict(rf_model, test, type = "prob")
   } else {
     predicted <- NA
+    probability <- NA
   }
-  
-  output <- data.frame(file2Id, file2, predicted, stringsAsFactors=TRUE)
+  output <- data.frame(file2Id, file2, predicted, probability[1, predicted], stringsAsFactors=TRUE)
   write.table(output, "resultsTest.csv", append=TRUE, eol = "\n", sep=";", col.names = F, row.names = F)  
 }

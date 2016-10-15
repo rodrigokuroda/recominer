@@ -15,18 +15,20 @@ public class MachineLearningPrediction implements Persistable<Integer> {
     private File predictedFile;
     private String predictionResult;
     private String algorithmType;
+    private Double probability;
     private PredictionFeedback feedback;
 
     public MachineLearningPrediction(Integer id) {
         this.id = id;
     }
 
-    public MachineLearningPrediction(File file, Commit commit, File predictedFile, String predictionResult, String algorithmType) {
+    public MachineLearningPrediction(File file, Commit commit, File predictedFile, String predictionResult, String algorithmType, Double probability) {
         this.file = file;
         this.commit = commit;
         this.predictedFile = predictedFile;
         this.predictionResult = predictionResult;
         this.algorithmType = algorithmType;
+        this.probability = probability;
     }
 
     @Override
@@ -81,6 +83,14 @@ public class MachineLearningPrediction implements Persistable<Integer> {
 
     public void setAlgorithmType(String algorithmType) {
         this.algorithmType = algorithmType;
+    }
+
+    public Double getProbability() {
+        return probability;
+    }
+
+    public void setProbability(Double probability) {
+        this.probability = probability;
     }
 
     public PredictionFeedback getFeedback() {

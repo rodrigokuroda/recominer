@@ -77,7 +77,7 @@ public class AssociationRulePerformanceCalculatorTest {
         transactions.add(new Transaction<>(id++, t9));
 
         navigationRuleA = new AssociationRule<>("A", asSet("B", "C", "D"));
-        navigationRuleB = new AssociationRule<>("B", asSet("A", "C", "D"));
+        navigationRuleB = new AssociationRule<>("B", asSet("A", "C", "D")); // 1/5
 
         preventionRuleA = new AssociationRule<>(asSet("A", "B", "C"), asSet("D"));
 
@@ -97,7 +97,7 @@ public class AssociationRulePerformanceCalculatorTest {
         assertEquals(0.3333, associationRulesRecall.get(navigationRuleA), 0.0001);
         assertEquals(0.2777, associationRulesPrecision.get(navigationRuleA), 0.0001);
 
-        assertEquals(0.4444, associationRulesRecall.get(navigationRuleB), 0.0001);
+        assertEquals(0.6666, associationRulesRecall.get(navigationRuleB), 0.0001);
         assertEquals(0.6388, associationRulesPrecision.get(navigationRuleB), 0.0001);
     }
 
@@ -120,7 +120,7 @@ public class AssociationRulePerformanceCalculatorTest {
         final Map<AssociationRule<String>, AssociationRulePerformanceMeasure> associationRulesRecallB = calculatorB.calculePerformance(3);
 
         final AssociationRulePerformanceMeasure associationRulePerformanceB = associationRulesRecallB.get(navigationRuleB);
-        assertEquals(0.4444, associationRulePerformanceB.getRecall(), 0.0001);
+        assertEquals(0.6666, associationRulePerformanceB.getRecall(), 0.0001);
         assertEquals(0.6388, associationRulePerformanceB.getPrecision(), 0.0001);
     }
 

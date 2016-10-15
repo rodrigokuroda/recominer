@@ -34,6 +34,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                 machineLearningPrediction.setPredictedFile(new File(rs.getInt("predicted_file_id"), rs.getString("file_path")));
                 machineLearningPrediction.setPredictionResult(rs.getString("prediction_result"));
                 machineLearningPrediction.setAlgorithmType(rs.getString("algorithm_name"));
+                machineLearningPrediction.setProbability(rs.getDouble("probability"));
                 return machineLearningPrediction;
             };
 
@@ -46,6 +47,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                 mapping.put("predicted_file_id", machineLearningPrediction.getPredictedFile().getId());
                 mapping.put("prediction_result", machineLearningPrediction.getPredictionResult());
                 mapping.put("algorithm_name", machineLearningPrediction.getAlgorithmType());
+                mapping.put("probability", machineLearningPrediction.getProbability());
                 return mapping;
             };
 
@@ -57,6 +59,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                         + "     mlp.predicted_file_id, "
                         + "     mlp.prediction_result, "
                         + "     mlp.algorithm_name, "
+                        + "     mlp.probability, "
                         + "     pfb.id AS prediction_feedback_id, "
                         + "     pfb.changed, "
                         + "     pfb.justification, "

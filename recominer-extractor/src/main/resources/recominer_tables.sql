@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS {0}.ml_prediction(
     predicted_file_id INT(11) NOT NULL,
     prediction_result VARCHAR(2) NOT NULL,
     algorithm_name VARCHAR(64) NOT NULL,
+    probability DOUBLE NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY (commit_id, file_id, predicted_file_id)
 );
