@@ -1,10 +1,12 @@
 app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdSidenav', '$mdToast',
   function($scope, $log, $window, $http, $mdSidenav, $mdToast) {
     $scope.projects = null;
+    $scope.issues = null;
     $scope.commits = null;
     $scope.files = null;
     $scope.cochanges = null;
     $scope.activeProject = null;
+    $scope.activeIssue = null;
     $scope.activeCommit = null;
     $scope.activeFile = null;
     $scope.tabIndex = 0;
@@ -23,6 +25,9 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
     $scope.toggleSearchProjects = function(element) {
         $scope.showSearchProjects = !$scope.showSearchProjects;
     };
+    $scope.toggleSearchIssues = function(element) {
+        $scope.showSearchIssues = !$scope.showSearchIssues;
+    };
     $scope.toggleSearchCommits = function(element) {
         $scope.showSearchCommits = !$scope.showSearchCommits;
     };
@@ -35,14 +40,34 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         $mdSidenav(menuId).toggle();
     };
 
-    // Load commits
-    $scope.getRecentCommitsOf = function(project) {
+    // Load issues
+    $scope.getIssuesOf = function(project) {
         $scope.activeProject = project;
+        $scope.activeIssue = null;
         $scope.activeCommit = null;
         $scope.activeFile = null;
         $scope.cochanges = null;
-        $log.debug("Fetching recent commits from project " + project.name + "...");
-        $http.post("/commits", project)
+        $log.debug("Fetching opened issues from project " + project.name + "...");
+        $http.post("/issues", project)
+            .then(function(response) {
+                    $scope.issues = response.data;
+                },
+                function(response) {
+                    $scope.issues = null;
+                }
+            );
+        $scope.tabIndex = 1;
+    };
+
+    // Load commits
+    $scope.getCommitsOf = function(issue) {
+        $scope.activeIssue = issue;
+        $scope.activeCommit = null;
+        $scope.activeFile = null;
+        $scope.cochanges = null;
+        $log.debug("Fetching commits from issue " + issue.key + "...");
+        issue.project = $scope.activeProject;
+        $http.post("/commits", issue)
             .then(function(response) {
                     $scope.commits = response.data;
                 },
@@ -50,7 +75,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                     $scope.commits = null;
                 }
             );
-        $scope.tabIndex = 1;
+        $scope.tabIndex = 2;
     };
 
     // Load files
@@ -68,7 +93,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                     $scope.files = null;
                 }
             );
-        $scope.tabIndex = 2;
+        $scope.tabIndex = 3;
     };
 
     // Load cochanges

@@ -30,7 +30,7 @@ public class IssuesController {
     public List<IssueDTO> listIssues(@RequestBody ProjectDTO project) {
         repository.setProject(projectRepository.findOne(project.getId()));
         List<IssueDTO> issues = new ArrayList<>();
-        for (Issue issue : repository.selectIssuesOfProject()) {
+        for (Issue issue : repository.selectOpenedIssuesOfProject()) {
             issues.add(new IssueDTO(issue));
         }
         return issues;
