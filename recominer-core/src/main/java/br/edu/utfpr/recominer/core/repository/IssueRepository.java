@@ -160,7 +160,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 "max_files_per_commit", file.getId());
     }
 
-    public List<Issue> selectIssuesOfProject() {
+    public List<Issue> selectFixedIssuesOfProject() {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT DISTINCT " + FIELDS
@@ -171,6 +171,22 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND i.fixed_on IS NOT NULL ",
+                        project),
+                ROW_MAPPER,
+                "max_files_per_commit");
+    }
+    
+    public List<Issue> selectOpenedIssuesOfProject() {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT DISTINCT " + FIELDS
+                        + "  FROM {0}_issues.issues i"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
+                        + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
+                        + "  JOIN {0}_vcs.scmlog s ON i2s.scmlog_id = s.id "
+                        + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
+                        + "   AND i.fixed_on IS NULL ",
                         project),
                 ROW_MAPPER,
                 "max_files_per_commit");

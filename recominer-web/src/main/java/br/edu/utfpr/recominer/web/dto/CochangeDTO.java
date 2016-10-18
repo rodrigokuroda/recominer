@@ -23,6 +23,7 @@ public class CochangeDTO {
     private String predictionResult;
     private String algorithmName;
     private PredictionFeedbackDTO feedback;
+    private String probability;
 
     public CochangeDTO() {
     }
@@ -38,6 +39,7 @@ public class CochangeDTO {
         dto.predictionResult = cochange.getPredictionResult();
         dto.algorithmName = cochange.getAlgorithmType();
         dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
+        dto.probability = "Probability: " + cochange.getProbability().toString();
         
         return dto;
     }
@@ -56,6 +58,7 @@ public class CochangeDTO {
             dto.predictionResult = cochange.getPredictionResult();
             dto.algorithmName = ASSOCIATION_RULE;
             dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
+            dto.probability = "Probability: " + (cochange.getConfidence() * 100) + "% (Changed " + cochange.getSupport() + " / " + cochange.getTotalTransactions() + ")";
             cochanges.add(dto);
         }
         
@@ -108,6 +111,14 @@ public class CochangeDTO {
 
     public void setFeedback(PredictionFeedbackDTO feedback) {
         this.feedback = feedback;
+    }
+
+    public String getProbability() {
+        return probability;
+    }
+
+    public void setProbability(String probability) {
+        this.probability = probability;
     }
 
     @Override

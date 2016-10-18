@@ -167,8 +167,11 @@
                                 alt="{{cochange.predictionResult == 'C' ? 'Probably change' : 'Probably not change'}}"></md-icon>
                             <md-card-header-text>
                                 <span class="md-title">{{ cochange.file.name }}</span>
-                                <span class="md-subhead">{{ cochange.rank == null ? '' : '(' + cochange.rank + ')' }}
-                                    {{ cochange.algorithmName }}</span>
+                                <span class="md-subhead">
+                                    {{ cochange.algorithmName }}
+                                    {{ cochange.probability == null ? '' : '(' + cochange.probability + ')' }}
+                                  </span>
+                            </md-card-header-text>
                             </md-card-header-text>
                         </md-card-header>
 
