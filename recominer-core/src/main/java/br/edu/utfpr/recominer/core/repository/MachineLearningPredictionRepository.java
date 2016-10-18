@@ -72,12 +72,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                         + "   AND mlp.prediction_result = \"C\" "
                         + " ORDER BY mlp.prediction_result"),
                 (ResultSet rs, int rowNum) -> {
-                    MachineLearningPrediction machineLearningPrediction = new MachineLearningPrediction(rs.getInt("id"));
-                    machineLearningPrediction.setFile(new File(rs.getInt("file_id")));
-                    machineLearningPrediction.setCommit(new Commit(rs.getInt("commit_id")));
-                    machineLearningPrediction.setPredictedFile(new File(rs.getInt("predicted_file_id"), rs.getString("file_path")));
-                    machineLearningPrediction.setPredictionResult(rs.getString("prediction_result"));
-                    machineLearningPrediction.setAlgorithmType(rs.getString("algorithm_name"));
+                    MachineLearningPrediction machineLearningPrediction = ROW_MAPPER.mapRow(rs, rowNum);
 
                     final int feedbackId = rs.getInt("prediction_feedback_id");
                     final PredictionFeedback predictionFeedback = new PredictionFeedback(feedbackId == 0 ? null : feedbackId);
