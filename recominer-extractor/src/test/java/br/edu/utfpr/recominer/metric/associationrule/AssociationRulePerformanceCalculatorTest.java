@@ -87,7 +87,7 @@ public class AssociationRulePerformanceCalculatorTest {
 
     @Test
     public void testCalculeRecallPrecisionForNavigationRules() {
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions, transactions.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> extractedNavigationRules = extractor.extractNavigationRules();
         final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(extractedNavigationRules);
 
@@ -103,7 +103,7 @@ public class AssociationRulePerformanceCalculatorTest {
 
     @Test
     public void testCalculeRecallPrecisionForNavigationRulesInBean() {
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions, transactions.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> extractedNavigationRulesA = extractor.queryAssociationRules(navigationRuleA.getAntecedentItem());
         final AssociationRulePerformanceCalculator<String> calculatorA = new AssociationRulePerformanceCalculator<>(extractedNavigationRulesA);
 
@@ -128,7 +128,7 @@ public class AssociationRulePerformanceCalculatorTest {
     public void testCalculeRecallPrecisionForPreventionRules() {
         Set<Transaction<String>> transactionsPrevention = createTransactionsForPreventionRulesTest();
 
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactionsPrevention, transactionsPrevention.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactionsPrevention);
         final Set<AssociationRule<String>> extractedPreventionRules = extractor.queryAssociationRules(preventionRuleA.getAntecedentItem());
         final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(extractedPreventionRules);
 
@@ -142,7 +142,7 @@ public class AssociationRulePerformanceCalculatorTest {
     @Test
     public void testCalculeRecallPrecisionForPreventionRulesInBean() {
         Set<Transaction<String>> transactionsPrevention = createTransactionsForPreventionRulesTest();
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactionsPrevention, transactionsPrevention.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactionsPrevention);
         final Set<AssociationRule<String>> extractedPreventionRules = extractor.queryAssociationRules(preventionRuleA.getAntecedentItem());
         final AssociationRulePerformanceCalculator<String> calculator = new AssociationRulePerformanceCalculator<>(extractedPreventionRules);
 
@@ -156,7 +156,7 @@ public class AssociationRulePerformanceCalculatorTest {
 
     @Test
     public void testCalculeRecallPrecisionForClosureRules() {
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions, transactions.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> extractedClosureRulesA = extractor.queryAssociationRules(closureRuleA.getAntecedentItem());
         final AssociationRulePerformanceCalculator<String> calculatorA = new AssociationRulePerformanceCalculator<>(extractedClosureRulesA);
 

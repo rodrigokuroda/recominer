@@ -34,7 +34,7 @@ public class AssociationRulePredictorTest {
 
     @Test
     public void testPredictNavigationRules() {
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions, transactions.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> navigationRules = new LinkedHashSet<>(extractor.extractNavigationRules());
 
         Set<AssociationRule<String>> expectedNavigationRules = new LinkedHashSet<>();
@@ -49,7 +49,7 @@ public class AssociationRulePredictorTest {
 
     @Test
     public void testPredictPreventionRules() {
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions, transactions.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> preventionRules = new LinkedHashSet<>(extractor.extractPreventionRules());
 
         Set<AssociationRule<String>> expectedPreventionRules = new LinkedHashSet<>();
@@ -64,7 +64,7 @@ public class AssociationRulePredictorTest {
 
     @Test
     public void testPredictClosureRules() {
-        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions, transactions.size());
+        final AssociationRuleExtractor<String> extractor = new AssociationRuleExtractor<>(transactions);
         final Set<AssociationRule<String>> closureRules = new LinkedHashSet<>(extractor.extractClosureRules());
 
         Set<AssociationRule<String>> expectedPreventionRules = new LinkedHashSet<>();

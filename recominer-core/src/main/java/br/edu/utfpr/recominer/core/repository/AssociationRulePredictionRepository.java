@@ -110,7 +110,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                     = new AssociationRulePrediction(forCommit, antecedentFileset, rank++, 
                             consequentFileset, predictionResult,
                             (double) ar.getSupport(), ar.getConfidence(), 
-                            ar.getTotalTransactions(), (long) ar.getTransactions().size());
+                            ar.getAntecedentTransactions(), (long) ar.getTransactions().size());
             save(prediction);
         }
     }

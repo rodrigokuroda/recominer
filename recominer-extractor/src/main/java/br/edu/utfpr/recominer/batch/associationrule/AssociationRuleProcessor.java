@@ -130,7 +130,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
                     }
                 }
 
-                AssociationRuleExtractor<File> extractor = new AssociationRuleExtractor<>(transactions, totalTransactions);
+                AssociationRuleExtractor<File> extractor = new AssociationRuleExtractor<>(transactions);
 
                 final Set<AssociationRule<File>> navigationRules = extractor.queryAssociationRulesSingleConsequent(changedFile);
                 final List<AssociationRule<File>> orderedPredictions = AssociationRuleOrdering.sortBySupportAndConfidence(navigationRules);

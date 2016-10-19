@@ -68,7 +68,7 @@ public class Transaction<T> {
     }
 
     /**
-     * Given an items I, returns the association rule for it, where the 
+     * Given an items I, returns the association rule for it, where the
      * consequent item is a single item.
      *
      * @param antecedentItem
@@ -76,12 +76,15 @@ public class Transaction<T> {
      */
     @SuppressWarnings("unchecked")
     public Set<AssociationRule<T>> queryRuleByAntecedentWithSingleConsequent(T antecedentItem) {
-        return items.stream()
-                .filter(item -> !antecedentItem.equals(item))
-                .collect(Collectors.toSet())
-                .stream()
-                .map(consequentItem -> new AssociationRule<>(antecedentItem, consequentItem))
-                .collect(Collectors.toSet());
+        if (items.contains(antecedentItem)) {
+            return items.stream()
+                    .filter(item -> !antecedentItem.equals(item))
+                    .collect(Collectors.toSet())
+                    .stream()
+                    .map(consequentItem -> new AssociationRule<>(antecedentItem, consequentItem))
+                    .collect(Collectors.toSet());
+        }
+        return Collections.EMPTY_SET;
     }
 
     /**

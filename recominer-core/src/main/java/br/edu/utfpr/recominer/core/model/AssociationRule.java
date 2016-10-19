@@ -17,13 +17,13 @@ public class AssociationRule<I> {
     private final Set<I> antecedentItems;
     private final Set<I> consequentItems;
     private final Set<Transaction<I>> transactions;
-    private long totalTransactions;
+    private long antecedentTransactions;
 
     public AssociationRule(Set<I> antecedentItems, Set<I> consequentItems, long totalTransactions) {
         this.antecedentItems = antecedentItems;
         this.consequentItems = consequentItems;
         this.transactions = new LinkedHashSet<>();
-        this.totalTransactions = totalTransactions;
+        this.antecedentTransactions = totalTransactions;
     }
 
     public AssociationRule(I antecedentItem, Set<I> consequentItems, long totalTransactions) {
@@ -31,7 +31,7 @@ public class AssociationRule<I> {
         this.antecedentItems.add(antecedentItem);
         this.consequentItems = consequentItems;
         this.transactions = new LinkedHashSet<>();
-        this.totalTransactions = totalTransactions;
+        this.antecedentTransactions = totalTransactions;
     }
 
     public AssociationRule(I antecedentItem, I consequentItems, long totalTransactions) {
@@ -40,7 +40,7 @@ public class AssociationRule<I> {
         this.consequentItems = new LinkedHashSet<>();
         this.consequentItems.add(consequentItems);
         this.transactions = new LinkedHashSet<>();
-        this.totalTransactions = totalTransactions;
+        this.antecedentTransactions = totalTransactions;
     }
 
     public AssociationRule(Set<I> antecedentItems, Set<I> consequentItems) {
@@ -89,15 +89,15 @@ public class AssociationRule<I> {
     }
 
     public double getConfidence() {
-        return (double) transactions.size() / (double) totalTransactions;
+        return (double) transactions.size() / (double) antecedentTransactions;
     }
 
-    public long getTotalTransactions() {
-        return totalTransactions;
+    public long getAntecedentTransactions() {
+        return antecedentTransactions;
     }
 
-    public void setTotalTransactions(long totalTransactions) {
-        this.totalTransactions = totalTransactions;
+    public void setAntecedentTransactions(long antecedentTransactions) {
+        this.antecedentTransactions = antecedentTransactions;
     }
 
     @Override
