@@ -3,6 +3,8 @@ package br.edu.utfpr.recominer.web.dto;
 import br.edu.utfpr.recominer.core.model.AssociationRulePrediction;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.MachineLearningPrediction;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +41,8 @@ public class CochangeDTO {
         dto.predictionResult = cochange.getPredictionResult();
         dto.algorithmName = cochange.getAlgorithmType();
         dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
-        dto.probability = "Probability: " + cochange.getProbability().toString();
+        final BigDecimal probability = BigDecimal.valueOf(cochange.getProbability()).setScale(2, RoundingMode.DOWN);
+        dto.probability = "Probability: " + probability + "%";
         
         return dto;
     }
@@ -58,7 +61,8 @@ public class CochangeDTO {
             dto.predictionResult = cochange.getPredictionResult();
             dto.algorithmName = ASSOCIATION_RULE;
             dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
-            dto.probability = "Probability: " + (cochange.getConfidence() * 100) + "% (Changed " + cochange.getSupport() + " / " + cochange.getTotalTransactions() + ")";
+            final BigDecimal probability = BigDecimal.valueOf(cochange.getConfidence() * 100).setScale(2, RoundingMode.DOWN);
+            dto.probability = "Probability: " + probability + "% (Changed " + cochange.getSupport() + " / " + cochange.getTransactions() + ")";
             cochanges.add(dto);
         }
         
