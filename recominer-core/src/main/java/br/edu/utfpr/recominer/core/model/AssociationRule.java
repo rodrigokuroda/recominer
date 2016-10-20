@@ -149,4 +149,10 @@ public class AssociationRule<I> {
         return sb.toString();
     }
 
+    public boolean hasSameSupportAndConfidenteOf(AssociationRule<File> anotherAr) {
+        return anotherAr != null
+                && getSupport() == anotherAr.getSupport()
+                        && getConfidence() == anotherAr.getConfidence();
+    }
+
 }

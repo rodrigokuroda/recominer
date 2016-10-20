@@ -95,17 +95,20 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
         filesetRepository.insert(antecedentFileset);
 
         int rank = 0;
+        AssociationRule<File> lastPositiveAr = null;
         for (AssociationRule<File> ar : associationRules) {
             Fileset consequentFileset = new Fileset(filesetSequence.getNext(), ar.getConsequentItems());
             filesetRepository.insert(consequentFileset);
 
             String predictionResult;
-            if (rank < topPredictions) {
+            if (rank < topPredictions 
+                    || ar.hasSameSupportAndConfidenteOf(lastPositiveAr)) {
                 predictionResult = "C";
+                lastPositiveAr = ar;
             } else {
                 predictionResult = "N";
             }
-
+            
             AssociationRulePrediction prediction
                     = new AssociationRulePrediction(forCommit, antecedentFileset, rank++, 
                             consequentFileset, predictionResult,
