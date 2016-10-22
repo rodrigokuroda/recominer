@@ -70,8 +70,8 @@ public class BatchConfiguration {
             @Qualifier("associationRuleStep") Step associationRuleStep) {
         return jobs.get("extractorJob")
                 .incrementer(runIdIncrementer)
-//                .start(extractorStep)
-                .start(calculatorStep)
+                .start(extractorStep)
+                .next(calculatorStep)
                 .next(datasetStep)
                 .next(classificationStep)
                 .next(associationRuleStep)
