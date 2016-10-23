@@ -107,6 +107,9 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
      * @return Commits of non-fixed issues.
      */
     public List<Commit> selectNewCommitsForDataset(Set<String> filenameFilter) {
+        if (filenameFilter.isEmpty()) {
+            return selectNewCommitsForDataset();
+        }
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("filenames", filenameFilter);
         parameters.addValue("max_files_per_commit", "max_files_per_commit");
@@ -169,6 +172,9 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
      * @return Commits of non-fixed issues.
      */
     public List<Commit> selectNewCommitsForCalculator(Set<String> filenameFilter) {
+        if (filenameFilter.isEmpty()) {
+            return selectNewCommitsForCalculator();
+        }
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("filenames", filenameFilter);
         parameters.addValue("max_files_per_commit", "max_files_per_commit");
