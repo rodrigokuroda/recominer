@@ -1,11 +1,11 @@
 package br.edu.utfpr.recominer.batch.calculator;
 
-import br.edu.utfpr.recominer.metric.discussion.LuceneUtil;
 import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.Issue;
-import br.edu.utfpr.recominer.model.IssuesMetrics;
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
+import br.edu.utfpr.recominer.metric.discussion.LuceneUtil;
+import br.edu.utfpr.recominer.model.IssuesMetrics;
 import com.google.common.base.Strings;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -132,7 +132,7 @@ public class IssueMetricCalculator {
                 + "                  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                 + "                  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                 + "                 WHERE i.id = ? "
-                + "                 GROUP BY i.id "
+                + "                 GROUP BY i.id, im.id "
                 + "                 ORDER BY i.submitted_on" 
                 ;
 
