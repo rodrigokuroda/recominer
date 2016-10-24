@@ -132,7 +132,7 @@ public class IssueMetricCalculator {
                 + "                  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
                 + "                  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id"
                 + "                 WHERE i.id = ? "
-                + "                 GROUP BY i.id, im.id "
+                + "                 GROUP BY i.id, im.id, s.date "
                 + "                 ORDER BY i.submitted_on" 
                 ;
 
