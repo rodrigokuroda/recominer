@@ -179,7 +179,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
      * @param resourceName The resource to copy outside
      * @return The path to the exported resource
      */
-    public static String exportResource(String resourceName) {
+    public String exportResource(String resourceName) {
         //note that each / is a directory down in the "jar tree" been the jar the root of the tree
         InputStream stream = ClassificatorProcessor.class.getResourceAsStream(resourceName);
         if (stream == null) {
