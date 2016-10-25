@@ -35,7 +35,8 @@ import org.springframework.beans.factory.annotation.Value;
 @StepScope
 public class ClassificatorProcessor implements ItemProcessor<Project, ClassificatorLog> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClassificatorProcessor.class);
+    private final Logger log = LoggerFactory.getLogger(ClassificatorProcessor.class);
+    private static final String DEFAULT_SCRIPT_LOCATION = "scripts/classification.R";
 
     @Inject
     private CommitRepository commitRepository;
@@ -77,10 +78,25 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
         }
+        
+        // Load script location
+        final String script;
+        if (classificationScript != null
+                && new java.io.File(classificationScript).exists()) {
+            // use parameterized script, if configured
+            script = classificationScript;
+        } else {
+            // copy script to external path outside jar, if necessary
+            if (new java.io.File(DEFAULT_SCRIPT_LOCATION).exists()) {
+                script = DEFAULT_SCRIPT_LOCATION;
+            } else {
+                script = exportResource("/" + DEFAULT_SCRIPT_LOCATION);
+            }
+        }
 
         int processedCommits = 0;
         for (Commit newCommit : newCommits) {
-            LOG.info(++processedCommits + " of " + newCommits.size() + " commits processed.");
+            log.info(++processedCommits + " of " + newCommits.size() + " commits processed.");
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 
             final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
@@ -88,7 +104,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
             int processedFile = 0;
             final List<File> filesToProcessed = changedFiles.stream().filter(fileFilter).collect(Collectors.toList());
             for (File changedFile : filesToProcessed) {
-                LOG.info(++processedFile + " of " + filesToProcessed.size() + " commits processed.");
+                log.info(++processedFile + " of " + filesToProcessed.size() + " commits processed.");
                 //List<FilePairIssueCommit> cochanges = filePairIssueCommitRepository.selectCochangesOf(changedFile, newCommit);
 
                 final java.io.File generationPath = getWorkingDirectory();
@@ -97,14 +113,6 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                         + newCommit.getId().toString() + "/"
                         + changedFile.getId().toString()
                 );
-
-                final String script;
-                if (classificationScript != null
-                        && new java.io.File(classificationScript).exists()) {
-                    script = classificationScript;
-                } else {
-                    script = exportResource("/scripts/classification.R");
-                }
 
                 RscriptCommand command = new RscriptCommand(project);
                 ExternalProcess ep = new ExternalProcess(command);
@@ -116,9 +124,9 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                 );
 
                 if (returnCode != 0) {
-                    LOG.warn("R return code " + returnCode);
+                    log.warn("R return code " + returnCode);
                 } else {
-                    LOG.debug("Classification executed successfully.");
+                    log.debug("Classification executed successfully.");
 
                     final java.io.File resultTest = new java.io.File(workingDirectory,
                             "resultsTest.csv"
@@ -144,11 +152,11 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                             try {
                                 predictionRepository.save(prediction);
                             } catch (org.springframework.dao.DuplicateKeyException ex) {
-                                LOG.warn("Duplicated key for commit " + newCommit.getId() + ", file " + changedFile.getId(), ex);
+                                log.warn("Duplicated key for commit " + newCommit.getId() + ", file " + changedFile.getId(), ex);
                             }
                         }
                     } else {
-                        LOG.warn("Results file does not exist.");
+                        log.warn("Results file does not exist.");
                     }
                 }
             }
@@ -202,7 +210,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         } catch (IOException ex) {
             throw new IllegalArgumentException("Cannot copy resource \"" + resourceName + "\" from jar file.", ex);
         }
-        LOG.info("Classification script copied to " + destination.getAbsolutePath());
+        log.info("Classification script copied to " + destination.getAbsolutePath());
         return destination.getAbsolutePath();
     }
 }
