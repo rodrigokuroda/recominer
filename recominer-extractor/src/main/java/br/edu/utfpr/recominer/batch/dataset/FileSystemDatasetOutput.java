@@ -22,7 +22,7 @@ public class FileSystemDatasetOutput implements DatasetOutput {
     public void write(File workingDir, Project project, Commit commit, Dataset dataset, String datasetName) {
 
         if (!workingDir.exists()) {
-            throw new IllegalArgumentException("Working directory does not exist.");
+            throw new IllegalArgumentException("Working directory " + workingDir.getAbsolutePath() + " does not exist.");
         }
         // Structure of folder: PROJECT/COMMIT/FILE/COCHANGE/train.csv
         //                      PROJECT/COMMIT/FILE/test.csv
