@@ -10,8 +10,10 @@ import br.edu.utfpr.recominer.core.repository.MachineLearningPredictionRepositor
 import br.edu.utfpr.recominer.externalprocess.ExternalProcess;
 import br.edu.utfpr.recominer.filter.FileFilter;
 import br.edu.utfpr.recominer.repository.FilePairIssueCommitRepository;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
@@ -56,6 +58,9 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
 
+    @Value("#{jobParameters[classificarionScript]}")
+    private String classificationScript;
+
     @Override
     public ClassificatorLog process(Project project) throws Exception {
         commitRepository.setProject(project);
@@ -93,17 +98,12 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                         + changedFile.getId().toString()
                 );
 
-                String script;
-                try {
-                    script = Paths.get(RscriptCommand.class
-                            .getClassLoader()
-                            .getResource("scripts/classification.R")
-                            .toURI())
-                            .toFile()
-                            .getAbsolutePath();
-                } catch (URISyntaxException ex) {
-                    LOG.error("Error to load R script for classification.", ex);
-                    throw ex;
+                final String script;
+                if (classificationScript != null
+                        && new java.io.File(classificationScript).exists()) {
+                    script = classificationScript;
+                } else {
+                    script = exportResource("/scripts/classification.R");
                 }
 
                 RscriptCommand command = new RscriptCommand(project);
@@ -163,5 +163,46 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
             workingDir = "generated";
         }
         return new java.io.File(workingDir);
+    }
+
+    /**
+     * Export a resource embedded into a Jar file to the local file path.
+     *
+     * @param resourceName The resource to copy outside
+     * @return The path to the exported resource
+     */
+    public static String exportResource(String resourceName) {
+        //note that each / is a directory down in the "jar tree" been the jar the root of the tree
+        InputStream stream = ClassificatorProcessor.class.getResourceAsStream(resourceName);
+        if (stream == null) {
+            throw new IllegalArgumentException("Cannot get resource \"" + resourceName + "\" from jar file.");
+        }
+
+        int readBytes;
+        byte[] buffer = new byte[4096];
+        OutputStream resStreamOut;
+        
+        final int firstIndexOfSeparator = resourceName.startsWith("/") ? 1 : 0;
+        final int lastIndexOfSeparator = resourceName.lastIndexOf("/");
+        final String parent = resourceName.substring(firstIndexOfSeparator, lastIndexOfSeparator);
+        final java.io.File folder = new java.io.File(parent); // export to same location outside
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        
+        final String name = resourceName.substring(lastIndexOfSeparator, resourceName.length());
+        final java.io.File destination = new java.io.File(folder, name);
+        try {
+            resStreamOut = new java.io.FileOutputStream(destination);
+            while ((readBytes = stream.read(buffer)) > 0) {
+                resStreamOut.write(buffer, 0, readBytes);
+            }
+        } catch (FileNotFoundException ex) {
+            throw new IllegalArgumentException("Cannot find file destination: " + destination.getAbsolutePath() + ".", ex);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Cannot copy resource \"" + resourceName + "\" from jar file.", ex);
+        }
+        LOG.info("Classification script copied to " + destination.getAbsolutePath());
+        return destination.getAbsolutePath();
     }
 }
