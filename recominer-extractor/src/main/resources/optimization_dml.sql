@@ -102,13 +102,22 @@ SELECT fill.id, fill.file_path, fil.id, fil.file_name
         WHERE_SCMLOG)
  WHERE NOT EXISTS (SELECT 1 FROM {0}.files f WHERE f.fl_id = fill.id AND f.f_id = fil.id);
 
+-- Insert id for file_links
+UPDATE {0}_vcs.commits_files_lines filcl SET filcl.file_link_id =
+(SELECT DISTINCT fil.fl_id
+   FROM {0}.files fil
+   JOIN {0}_vcs.actions a ON fil.f_id = a.file_id
+   JOIN {0}_vcs.file_links fl ON fil.fl_id = fl.id AND fl.commit_id = a.commit_id AND fl.file_id = fil.f_id
+  WHERE filcl.commit = a.commit_id AND filcl.path = fil.file_path)
+WHERE filcl.file_link_id IS NULL;
+
 -- relationship between file and commit
 INSERT INTO {0}.files_commits (file_id, commit_id, change_type, branch_id, lines_added, lines_removed)
 SELECT distinct fil.id, a.commit_id, a.type, a.branch_id, filcl.added, filcl.removed
   FROM {0}.files fil
   JOIN {0}_vcs.actions a ON fil.f_id = a.file_id
   JOIN {0}_vcs.scmlog s ON s.id = a.commit_id
-  JOIN {0}_vcs.commits_files_lines filcl ON filcl.commit = a.commit_id AND filcl.path = fil.file_path
+  JOIN {0}_vcs.commits_files_lines filcl ON filcl.file_link_id = fil.fl_id
 WHERE NOT EXISTS (SELECT 1 FROM {0}.files_commits fc WHERE fc.file_id = fil.id AND fc.commit_id = a.commit_id)
 WHERE_SCMLOG
  ORDER BY a.commit_id;

@@ -29,6 +29,13 @@ ALTER TABLE {0}_issues.issues ADD COLUMN fixed_on DATETIME;
 ALTER TABLE {0}_issues.issues ADD COLUMN updated_on DATETIME;
 ALTER TABLE {0}_issues.issues ADD COLUMN comments_updated_on DATETIME;
 
+-- Workaround for Bicho
+ALTER TABLE {0}_issues.issues_ext_jira CHANGE COLUMN environment environment MEDIUMTEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL;
+ALTER TABLE {0}_issues.comments CHANGE COLUMN text text MEDIUMTEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL ;
+
+-- Insert id for file_links
+ALTER TABLE {0}_vcs.commits_files_lines ADD COLUMN file_link_id INT(11);
+
 -- Denormalize vcs schema
 CREATE SCHEMA IF NOT EXISTS {0} CHARACTER SET utf8 COLLATE utf8_general_ci;
 
