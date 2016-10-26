@@ -42,7 +42,7 @@ public class CochangeDTO {
         dto.algorithmName = cochange.getAlgorithmType();
         dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
         final BigDecimal probability = BigDecimal.valueOf(cochange.getProbability()).setScale(2, RoundingMode.DOWN);
-        dto.probability = "Probability: " + probability + "%";
+        dto.probability = probability + "%";
         
         return dto;
     }
@@ -62,11 +62,16 @@ public class CochangeDTO {
             dto.algorithmName = ASSOCIATION_RULE;
             dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
             final BigDecimal probability = BigDecimal.valueOf(cochange.getConfidence() * 100).setScale(2, RoundingMode.DOWN);
-            dto.probability = "Probability: " + probability + "% (Changed " + cochange.getSupport() + " / " + cochange.getTransactions() + ")";
+            dto.probability = probability + "% (Changed " + cochange.getSupport().intValue() + " / " + cochange.getTransactions().intValue() + ")";
             cochanges.add(dto);
         }
         
         return cochanges;
+    }
+
+    public void append(CochangeDTO cochangeDTO) {
+        algorithmName += " / " + cochangeDTO.getAlgorithmName();
+        probability += " / " + cochangeDTO.getProbability();
     }
 
     public Integer getId() {
@@ -128,7 +133,7 @@ public class CochangeDTO {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 37 * hash + Objects.hashCode(this.id);
+        hash = 37 * hash + Objects.hashCode(this.file);
         return hash;
     }
 
@@ -144,7 +149,7 @@ public class CochangeDTO {
             return false;
         }
         final CochangeDTO other = (CochangeDTO) obj;
-        if (!Objects.equals(this.id, other.id)) {
+        if (!Objects.equals(this.file, other.file)) {
             return false;
         }
         return true;

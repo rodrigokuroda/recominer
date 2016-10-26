@@ -13,7 +13,9 @@ import br.edu.utfpr.recominer.core.repository.ProjectRepository;
 import br.edu.utfpr.recominer.web.dto.CochangeDTO;
 import br.edu.utfpr.recominer.web.dto.FileDTO;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,7 +37,7 @@ public class CochangesController {
 
     @Inject
     private MachineLearningPredictionRepository mlPredictionRepository;
-    
+
     @Inject
     private AssociationRulePredictionRepository arPredictionRepository;
 
@@ -54,16 +56,24 @@ public class CochangesController {
         final Commit commit = commitRepository.findOne(fileDTO.getCommit().getId());
         final File file = fileRepository.findOne(fileDTO.getId());
 
-        List<CochangeDTO> cochanges = new ArrayList<>();
+        Map<CochangeDTO, CochangeDTO> cochanges = new LinkedHashMap<>();
         for (MachineLearningPrediction cochange : mlPredictionRepository.selectPredictedCochangesFor(commit, file)) {
-            cochanges.add(CochangeDTO.from(cochange));
+            final CochangeDTO cochangeDTO = CochangeDTO.from(cochange);
+            cochanges.put(cochangeDTO, cochangeDTO);
         }
         for (AssociationRulePrediction cochange : arPredictionRepository.selectPredictedCochangesFor(commit, file)) {
-            cochanges.addAll(CochangeDTO.from(cochange));
+            final List<CochangeDTO> cochangeDTOList = CochangeDTO.from(cochange);
+            for (CochangeDTO cochangeDTO : cochangeDTOList) {
+                if (cochanges.containsKey(cochangeDTO)) {
+                    cochanges.get(cochangeDTO).append(cochangeDTO);
+                } else {
+                    cochanges.put(cochangeDTO, cochangeDTO);
+                }
+            }
         }
-        return cochanges;
+        return new ArrayList<>(cochanges.keySet());
     }
-    
+
     @RequestMapping(value = "/arPredictedCochanges", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CochangeDTO> arPredictedCochanges(@RequestBody FileDTO fileDTO) {
         final Project project = projectRepository.findOne(fileDTO.getProject().getId());
@@ -82,7 +92,7 @@ public class CochangesController {
         }
         return cochanges;
     }
-    
+
     @RequestMapping(value = "/mlPredictedCochanges", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CochangeDTO> mlPredictedCochanges(@RequestBody FileDTO fileDTO) {
         final Project project = projectRepository.findOne(fileDTO.getProject().getId());
