@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.batch.extractor;
 
-import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import java.io.File;
 
 /**
@@ -22,7 +22,7 @@ public class GitCloneCommand implements ExternalCommand {
 
     @Override
     public String[] getCommand(String... parameters) {
-        final File projectRepositoryPath = new File(project.getRepositoryPath(), project.getProjectName());
+        final File projectRepositoryPath = new File(project.getRepositoryPath());
         return new String[]{GIT, CLONE, project.getVersionControlUrl(), projectRepositoryPath.getAbsolutePath()};
     }
 
