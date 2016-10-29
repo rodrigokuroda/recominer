@@ -89,13 +89,21 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
  ORDER BY date ASC;
 
 -- Insert id for file_links
+-- The file_links table stores the path to file only in the commits that the path changes
 UPDATE {0}_vcs.commits_files_lines fcl SET fcl.file_link_id =
 (SELECT DISTINCT fl.id
    FROM {0}_vcs.files f
    JOIN {0}_vcs.actions a ON f.id = a.file_id
-   JOIN {0}_vcs.file_links fl ON f.fl_id = fl.id AND fl.commit_id = a.commit_id AND fl.file_id = fil.id
-  WHERE a.commit_id = fcl.commit AND fcl.path = f.file_path)
-WHERE fcl.file_link_id IS NULL;
+   JOIN {0}_vcs.file_links fl ON fl.file_id = f.id
+   AND fl.commit_id =
+    (SELECT MAX(afill.commit_id)
+       FROM {0}_vcs.file_links afill
+       JOIN {0}_vcs.scmlog s ON s.id = afill.commit_id
+      WHERE afill.file_id = f.id
+        AND afill.file_path LIKE CONCAT("%", f.file_name)
+        AND afill.commit_id <= a.commit_id)
+  WHERE a.commit_id = fcl.commit AND fcl.path = fl.file_path)
+ WHERE fcl.file_link_id IS NULL;
 
 -- relationship between file and commit
 INSERT INTO {0}.files_commits (file_id, file_link_id, file_path, file_name, commit_id, change_type, branch_id, lines_added, lines_removed)
