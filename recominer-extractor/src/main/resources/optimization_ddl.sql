@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS {0}.commits (
     KEY branch_id (branch_id)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
-CREATE TABLE IF NOT EXISTS {0}.files_commits (
-    id INT(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS {0}.files_commits ( 
+	id INT(11) NOT NULL AUTO_INCREMENT,
     file_id INT(11) NOT NULL,
     file_link_id INT(11) NOT NULL,
     file_path VARCHAR(4096) NOT NULL,
@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS {0}.files_commits (
     branch_id INT(11) NOT NULL,
     lines_added INT(11) NOT NULL,
     lines_removed INT(11) NOT NULL,
-    PRIMARY KEY file_commit_id (file_id, commit_id)
+    PRIMARY KEY id (id),
+    UNIQUE KEY file_filelink_commit_id (file_id, file_link_id, commit_id)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 CREATE TABLE IF NOT EXISTS {0}.file_pair_issue_commit (

@@ -89,13 +89,13 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
  ORDER BY date ASC;
 
 -- Insert id for file_links
-UPDATE {0}_vcs.commits_files_lines filcl SET filcl.file_link_id =
-(SELECT DISTINCT fil.fl_id
-   FROM {0}_vcs.files fil
-   JOIN {0}_vcs.actions a ON fil.id = a.file_id
-   JOIN {0}_vcs.file_links fl ON fil.fl_id = fl.id AND fl.commit_id = a.commit_id AND fl.file_id = fil.id
-  WHERE filcl.commit = a.commit_id AND filcl.path = fil.file_path)
-WHERE filcl.file_link_id IS NULL;
+UPDATE {0}_vcs.commits_files_lines fcl SET fcl.file_link_id =
+(SELECT DISTINCT fl.id
+   FROM {0}_vcs.files f
+   JOIN {0}_vcs.actions a ON f.id = a.file_id
+   JOIN {0}_vcs.file_links fl ON f.fl_id = fl.id AND fl.commit_id = a.commit_id AND fl.file_id = fil.id
+  WHERE a.commit_id = fcl.commit AND fcl.path = f.file_path)
+WHERE fcl.file_link_id IS NULL;
 
 -- relationship between file and commit
 INSERT INTO {0}.files_commits (file_id, file_link_id, file_path, file_name, commit_id, change_type, branch_id, lines_added, lines_removed)
