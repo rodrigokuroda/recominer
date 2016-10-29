@@ -88,36 +88,30 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
  WHERE_SCMLOG
  ORDER BY date ASC;
 
--- denormalize absolute file path
-INSERT INTO {0}.files (fl_id, file_path, f_id, file_name)
-SELECT fill.id, fill.file_path, fil.id, fil.file_name
+-- Insert id for file_links
+UPDATE {0}_vcs.commits_files_lines filcl SET filcl.file_link_id =
+(SELECT DISTINCT fil.fl_id
+   FROM {0}_vcs.files fil
+   JOIN {0}_vcs.actions a ON fil.id = a.file_id
+   JOIN {0}_vcs.file_links fl ON fil.fl_id = fl.id AND fl.commit_id = a.commit_id AND fl.file_id = fil.id
+  WHERE filcl.commit = a.commit_id AND filcl.path = fil.file_path)
+WHERE filcl.file_link_id IS NULL;
+
+-- relationship between file and commit
+INSERT INTO {0}.files_commits (file_id, file_link_id, file_path, file_name, commit_id, change_type, branch_id, lines_added, lines_removed)
+SELECT DISTINCT fil.id, fill.id, fill.file_path, fil.file_name, a.commit_id, a.type, a.branch_id, filcl.added, filcl.removed
   FROM {0}_vcs.files fil
   JOIN {0}_vcs.file_links fill ON fill.file_id = fil.id 
-    AND fill.commit_id IN
+   AND fill.commit_id IN
     (SELECT afill.commit_id
        FROM {0}_vcs.file_links afill
        JOIN {0}_vcs.scmlog s ON s.id = afill.commit_id
       WHERE afill.file_id = fil.id
         AND afill.file_path LIKE CONCAT("%", fil.file_name)
         WHERE_SCMLOG)
- WHERE NOT EXISTS (SELECT 1 FROM {0}.files f WHERE f.fl_id = fill.id AND f.f_id = fil.id);
-
--- Insert id for file_links
-UPDATE {0}_vcs.commits_files_lines filcl SET filcl.file_link_id =
-(SELECT DISTINCT fil.fl_id
-   FROM {0}.files fil
-   JOIN {0}_vcs.actions a ON fil.f_id = a.file_id
-   JOIN {0}_vcs.file_links fl ON fil.fl_id = fl.id AND fl.commit_id = a.commit_id AND fl.file_id = fil.f_id
-  WHERE filcl.commit = a.commit_id AND filcl.path = fil.file_path)
-WHERE filcl.file_link_id IS NULL;
-
--- relationship between file and commit
-INSERT INTO {0}.files_commits (file_id, commit_id, change_type, branch_id, lines_added, lines_removed)
-SELECT distinct fil.id, a.commit_id, a.type, a.branch_id, filcl.added, filcl.removed
-  FROM {0}.files fil
-  JOIN {0}_vcs.actions a ON fil.f_id = a.file_id
+  JOIN {0}_vcs.actions a ON fil.id = a.file_id
   JOIN {0}_vcs.scmlog s ON s.id = a.commit_id
-  JOIN {0}_vcs.commits_files_lines filcl ON filcl.file_link_id = fil.fl_id
+  JOIN {0}_vcs.commits_files_lines filcl ON filcl.file_link_id = fil.id
 WHERE NOT EXISTS (SELECT 1 FROM {0}.files_commits fc WHERE fc.file_id = fil.id AND fc.commit_id = a.commit_id)
 WHERE_SCMLOG
  ORDER BY a.commit_id;
@@ -125,11 +119,10 @@ WHERE_SCMLOG
 -- count files for issues
 UPDATE {0}_issues.issues i SET 
 i.num_files =
-(SELECT COUNT(DISTINCT(fc.file_id))
+(SELECT COUNT(DISTINCT(f.file_path))
   FROM {0}.issues_scmlog i2s
   JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id
-  JOIN {0}.files_commits fc ON fc.commit_id = i2s.scmlog_id
-  JOIN {0}.files f ON f.id = fc.file_id
+  JOIN {0}.files_commits f ON f.commit_id = i2s.scmlog_id
  WHERE i2s.issue_id = i.id)
 WHERE 1=1
 WHERE_ISSUE;

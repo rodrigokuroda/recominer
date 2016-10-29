@@ -379,9 +379,8 @@ public class FileRepository extends JdbcRepository<File, Integer> {
 
         SELECT_FILES_PATH_BY_COMMIT_ID
                 = "SELECT f.id, f.file_path"
-                + "  FROM {0}.files f"
-                + "  JOIN {0}.files_commits fc ON fc.file_id = f.id"
-                + " WHERE fc.commit_id = ?";
+                + "  FROM {0}.files_commits f"
+                + " WHERE f.commit_id = ?";
 
         SELECT_COMMITTERS_OF_FILE_BY_DATE
                 = "SELECT DISTINCT p.id, p.name, p.email"
@@ -1848,9 +1847,8 @@ public class FileRepository extends JdbcRepository<File, Integer> {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT f.id, f.file_path"
-                        + "  FROM {0}.files f"
-                        + "  JOIN {0}.files_commits fc ON f.id = fc.file_id"
-                        + " WHERE fc.commit_id = ?", project),
+                        + "  FROM {0}.files_commits f"
+                        + " WHERE f.commit_id = ?", project),
                 (ResultSet rs, int rowNum) -> new File(rs.getInt("id"), rs.getString("file_path")),
                 commit.getId());
     }
@@ -1859,9 +1857,8 @@ public class FileRepository extends JdbcRepository<File, Integer> {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT DISTINCT f.id, f.file_path"
-                        + "  FROM {0}.files f"
-                        + "  JOIN {0}.files_commits fc ON f.id = fc.file_id"
-                        + " WHERE fc.commit_id = ?"
+                        + "  FROM {0}.files_commits f"
+                        + " WHERE f.commit_id = ?"
                         + "   AND f.id <> ?", project),
                 (ResultSet rs, int rowNum) -> new Cochange(new File(rs.getInt("id"), rs.getString("file_path")), commit),
                 commit.getId(), withFile.getId());
@@ -1885,8 +1882,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT DISTINCT f.id, f.file_path"
-                        + "  FROM {0}.files f"
-                        + "  JOIN {0}.files_commits fc ON f.id = fc.file_id"
+                        + "  FROM {0}.files_commits f"
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id"
                         + " WHERE i2s.issue_id = ?", project),
                 (ResultSet rs, int rowNum) -> new File(rs.getInt("id"), rs.getString("file_path")),
