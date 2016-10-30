@@ -1,7 +1,7 @@
 package br.edu.utfpr.recominer.batch.extractor;
 
-import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.externalprocess.ExternalCommand;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +26,11 @@ class CvsanalyCommand implements ExternalCommand {
     private static final String CVSANALY_METRICS_EXTENSIONS = "--extensions=CommitsLOCDet,FileTypes";
 
     private final Project project;
+    private final Boolean runCsvanalyExtension;
 
-    public CvsanalyCommand(Project project) {
+    public CvsanalyCommand(Project project, Boolean runCsvanalyExtension) {
         this.project = project;
+        this.runCsvanalyExtension = runCsvanalyExtension;
     }
 
     @Override
@@ -45,7 +47,9 @@ class CvsanalyCommand implements ExternalCommand {
 
         command.add(CVSANALY_METRICS_ALL);
         command.add(CVSANALY_METRICS_NOERR);
-        command.add(CVSANALY_METRICS_EXTENSIONS);
+        if (runCsvanalyExtension) {
+            command.add(CVSANALY_METRICS_EXTENSIONS);
+        }
 
         command.add(project.getRepositoryPath());
 
