@@ -18,13 +18,13 @@ public class CvsanalyProcessor {
     @Inject
     private JdbcTemplate template;
     
-    @Value("#{runCsvanalyExtension}")
-    private boolean runCsvanalyExtension;
+    @Value("${runCsvanalyExtension:true}")
+    private String runCsvanalyExtension;
 
     public int process(Project project) throws IOException, InterruptedException {
         template.execute("CREATE SCHEMA IF NOT EXISTS " + project.getProjectName().toLowerCase() + "_vcs CHARACTER SET utf8 COLLATE utf8_general_ci");
 
-        ExternalProcess ep = new ExternalProcess(new CvsanalyCommand(project, runCsvanalyExtension));
+        ExternalProcess ep = new ExternalProcess(new CvsanalyCommand(project, Boolean.valueOf(runCsvanalyExtension)));
         int processExitCode = ep.startAndWaitFor();
 
         return processExitCode;
