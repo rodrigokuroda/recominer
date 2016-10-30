@@ -56,10 +56,7 @@ public class AssociationProcessor {
         }
 
         if (!commitsToAnalyze.isEmpty()) {
-            if (project.getLastCommitDateAnalyzed() == null
-                    && project.getLastIssueUpdateAnalyzed() == null) {
-                executeSqlScript(project, OPTIMIZATION_DDL_SCRIPT_NAME);
-            }
+            executeSqlScript(project, OPTIMIZATION_DDL_SCRIPT_NAME);
             executeSqlScript(project, OPTIMIZATION_DML_SCRIPT_NAME);
 
             JiraAggregator jiraAggregation = new JiraAggregator(template, project);

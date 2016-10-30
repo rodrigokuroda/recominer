@@ -90,7 +90,7 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
 
 -- Insert id for file_links
 -- The file_links table stores the path to file only in the commits that the path changes
-UPDATE {0}_vcs.commits_files_lines fcl SET fcl.file_link_id =
+UPDATE IGNORE {0}_vcs.commits_files_lines fcl SET fcl.file_link_id =
 (SELECT DISTINCT fl.id
    FROM {0}_vcs.files f
    JOIN {0}_vcs.actions a ON f.id = a.file_id
@@ -106,7 +106,7 @@ UPDATE {0}_vcs.commits_files_lines fcl SET fcl.file_link_id =
  WHERE fcl.file_link_id IS NULL;
 
 -- relationship between file and commit
-INSERT INTO {0}.files_commits (file_id, file_link_id, file_path, file_name, commit_id, change_type, branch_id, lines_added, lines_removed)
+INSERT IGNORE INTO {0}.files_commits (file_id, file_link_id, file_path, file_name, commit_id, change_type, branch_id, lines_added, lines_removed)
 SELECT DISTINCT fil.id, fill.id, fill.file_path, fil.file_name, a.commit_id, a.type, a.branch_id, filcl.added, filcl.removed
   FROM {0}_vcs.files fil
   JOIN {0}_vcs.file_links fill ON fill.file_id = fil.id 
@@ -115,8 +115,7 @@ SELECT DISTINCT fil.id, fill.id, fill.file_path, fil.file_name, a.commit_id, a.t
        FROM {0}_vcs.file_links afill
        JOIN {0}_vcs.scmlog s ON s.id = afill.commit_id
       WHERE afill.file_id = fil.id
-        AND afill.file_path LIKE CONCAT("%", fil.file_name)
-        WHERE_SCMLOG)
+        AND afill.file_path LIKE CONCAT("%", fil.file_name))
   JOIN {0}_vcs.actions a ON fil.id = a.file_id
   JOIN {0}_vcs.scmlog s ON s.id = a.commit_id
   JOIN {0}_vcs.commits_files_lines filcl ON filcl.file_link_id = fil.id
