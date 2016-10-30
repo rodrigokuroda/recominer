@@ -19,7 +19,7 @@ public class CvsanalyProcessor {
     private JdbcTemplate template;
     
     @Value("#{runCsvanalyExtension}")
-    private Boolean runCsvanalyExtension;
+    private boolean runCsvanalyExtension;
 
     public int process(Project project) throws IOException, InterruptedException {
         template.execute("CREATE SCHEMA IF NOT EXISTS " + project.getProjectName().toLowerCase() + "_vcs CHARACTER SET utf8 COLLATE utf8_general_ci");
