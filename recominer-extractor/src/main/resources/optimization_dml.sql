@@ -113,5 +113,5 @@ i.num_files =
   JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id
   JOIN {0}.files_commits f ON f.commit_id = i2s.scmlog_id
  WHERE i2s.issue_id = i.id)
-WHERE 1=1
+WHERE i.num_files IS NULL
 WHERE_ISSUE;
