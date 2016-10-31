@@ -34,9 +34,6 @@ ALTER TABLE {0}_issues.issues_ext_jira MODIFY COLUMN environment MEDIUMTEXT CHAR
 ALTER TABLE {0}_issues.comments MODIFY COLUMN text MEDIUMTEXT CHARACTER SET 'utf8' COLLATE 'utf8_unicode_ci' NOT NULL;
 ALTER TABLE solr2_issues.issues MODIFY COLUMN description MEDIUMTEXT CHARACTER SET 'utf8' COLLATE 'utf8_general_ci' NOT NULL;
 
--- Insert id for file_links
-ALTER TABLE {0}_vcs.commits_files_lines ADD COLUMN file_link_id INT(11);
-
 -- Denormalize vcs schema
 CREATE SCHEMA IF NOT EXISTS {0} CHARACTER SET utf8 COLLATE utf8_general_ci;
 

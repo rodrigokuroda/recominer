@@ -88,37 +88,19 @@ SELECT DISTINCT s.id, s.rev, s.committer_id, s.date, s.message, s.repository_id,
  WHERE_SCMLOG
  ORDER BY date ASC;
 
--- Insert id for file_links
--- The file_links table stores the path to file only in the commits that the path changes
-UPDATE IGNORE {0}_vcs.commits_files_lines fcl SET fcl.file_link_id =
-(SELECT DISTINCT fl.id
-   FROM {0}_vcs.files f
-   JOIN {0}_vcs.actions a ON f.id = a.file_id
-   JOIN {0}_vcs.file_links fl ON fl.file_id = f.id
-   AND fl.commit_id =
-    (SELECT MAX(afill.commit_id)
-       FROM {0}_vcs.file_links afill
-       JOIN {0}_vcs.scmlog s ON s.id = afill.commit_id
-      WHERE afill.file_id = f.id
-        AND afill.file_path LIKE CONCAT("%", f.file_name)
-        AND afill.commit_id <= a.commit_id)
-  WHERE a.commit_id = fcl.commit AND fcl.path = fl.file_path)
- WHERE fcl.file_link_id IS NULL;
-
 -- relationship between file and commit
 INSERT IGNORE INTO {0}.files_commits (file_id, file_link_id, file_path, file_name, commit_id, change_type, branch_id, lines_added, lines_removed)
 SELECT DISTINCT fil.id, fill.id, fill.file_path, fil.file_name, a.commit_id, a.type, a.branch_id, filcl.added, filcl.removed
   FROM {0}_vcs.files fil
-  JOIN {0}_vcs.file_links fill ON fill.file_id = fil.id 
-   AND fill.commit_id IN
-    (SELECT afill.commit_id
-       FROM {0}_vcs.file_links afill
-       JOIN {0}_vcs.scmlog s ON s.id = afill.commit_id
-      WHERE afill.file_id = fil.id
-        AND afill.file_path LIKE CONCAT("%", fil.file_name))
   JOIN {0}_vcs.actions a ON fil.id = a.file_id
   JOIN {0}_vcs.scmlog s ON s.id = a.commit_id
-  JOIN {0}_vcs.commits_files_lines filcl ON filcl.file_link_id = fil.id
+  JOIN {0}_vcs.file_links fill ON fill.file_id = fil.id 
+   AND fill.commit_id =
+    (SELECT MAX(afill.commit_id)
+       FROM {0}_vcs.file_links afill
+      WHERE afill.file_id = fil.file_id
+        AND afill.commit_id <= a.commit_id)
+  JOIN {0}_vcs.commits_files_lines filcl ON filcl.path = fill.file_path AND filcl.commit = a.commit_id
 WHERE NOT EXISTS (SELECT 1 FROM {0}.files_commits fc WHERE fc.file_id = fil.id AND fc.commit_id = a.commit_id)
 WHERE_SCMLOG
  ORDER BY a.commit_id;
