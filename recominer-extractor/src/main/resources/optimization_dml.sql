@@ -98,7 +98,7 @@ SELECT DISTINCT fil.id, fill.id, fill.file_path, fil.file_name, a.commit_id, a.t
    AND fill.commit_id =
     (SELECT MAX(afill.commit_id)
        FROM {0}_vcs.file_links afill
-      WHERE afill.file_id = fil.file_id
+      WHERE afill.file_id = fil.id
         AND afill.commit_id <= a.commit_id)
   JOIN {0}_vcs.commits_files_lines filcl ON filcl.path = fill.file_path AND filcl.commit = a.commit_id
 WHERE NOT EXISTS (SELECT 1 FROM {0}.files_commits fc WHERE fc.file_id = fil.id AND fc.commit_id = a.commit_id)
