@@ -98,7 +98,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
         }
-        log.info(newCommits.size() + " new commits to be processed.");
+        log.info(newCommits.size() + " new commits from " + project.getProjectName() + " to be processed.");
 
         for (Commit newCommit : newCommits) {
 
