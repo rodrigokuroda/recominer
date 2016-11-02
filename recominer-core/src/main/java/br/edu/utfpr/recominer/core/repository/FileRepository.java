@@ -360,7 +360,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
     public List<File> selectChangedFilesIn(Commit commit) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT f.id, f.file_path"
+                        "SELECT f.file_id, f.file_path"
                         + "  FROM {0}.files_commits f"
                         + " WHERE f.commit_id = ?", project),
                 (ResultSet rs, int rowNum) -> new File(rs.getInt("id"), rs.getString("file_path")),
@@ -370,10 +370,10 @@ public class FileRepository extends JdbcRepository<File, Integer> {
     public List<Cochange> selectCochangedFilesIn(Commit commit, File withFile) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT DISTINCT f.id, f.file_path"
+                        "SELECT DISTINCT f.file_id, f.file_path"
                         + "  FROM {0}.files_commits f"
                         + " WHERE f.commit_id = ?"
-                        + "   AND f.id <> ?", project),
+                        + "   AND f.file_id <> ?", project),
                 (ResultSet rs, int rowNum) -> new Cochange(new File(rs.getInt("id"), rs.getString("file_path")), commit),
                 commit.getId(), withFile.getId());
     }
@@ -395,7 +395,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
     public List<File> selectChangedFilesIn(Issue issue) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT DISTINCT f.id, f.file_path"
+                        "SELECT DISTINCT f.file_id, f.file_path"
                         + "  FROM {0}.files_commits f"
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id"
                         + " WHERE i2s.issue_id = ?", project),
