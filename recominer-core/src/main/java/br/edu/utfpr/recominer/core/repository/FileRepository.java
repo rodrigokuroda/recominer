@@ -307,7 +307,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         + " FROM {0}.files_commits "
                         + "WHERE file_id = ? "
                         + "  AND commit_id = ?"
-                        + " GROUP BY CASE WHEN change_type = 'V' THEN change_type ELSE id END", project),
+                        + " GROUP BY CASE WHEN change_type = \"V\" THEN change_type ELSE id END", project),
                 (ResultSet rs, int rowNum)
                 -> new CodeChurn(
                         file,
