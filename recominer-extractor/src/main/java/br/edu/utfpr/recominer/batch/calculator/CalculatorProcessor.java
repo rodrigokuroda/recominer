@@ -112,9 +112,6 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
                     .filter(fileFilter)
                     .collect(Collectors.toList())) {
 
-                if (changedFile.getId().equals(3578)) {
-                    System.out.println("3578");
-                }
                 log.info("Computing metrics for file " + changedFile.getId() + " in the past.");
 
                 List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
