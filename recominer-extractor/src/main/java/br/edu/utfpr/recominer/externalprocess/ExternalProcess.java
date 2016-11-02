@@ -34,7 +34,7 @@ public class ExternalProcess {
      */
     public int startAndWaitFor(String... params) throws IOException, InterruptedException {
         String[] commandArray = command.getCommand(params);
-        LOG.info("Executing " + String.join(" ", commandArray));
+        LOG.info("Executing external command {} ", String.join(" ", commandArray));
         
         ProcessBuilder processBuilder = new ProcessBuilder(commandArray);
         processBuilder.redirectErrorStream(true);
@@ -43,7 +43,7 @@ public class ExternalProcess {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null) {
-            LOG.info(line);
+            LOG.debug(line);
         }
         process.waitFor();
         exitValue = process.exitValue();

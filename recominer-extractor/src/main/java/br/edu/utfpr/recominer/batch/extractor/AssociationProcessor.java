@@ -73,7 +73,7 @@ public class AssociationProcessor {
     }
 
     private void executeSqlScript(Project project, String resourceFileName) {
-        LOG.info("Executing " + resourceFileName);
+        LOG.info("Executing script {}.", resourceFileName);
         // loads script from resource folder in project
         final InputStream script = this.getClass().getClassLoader().getResourceAsStream(resourceFileName);
 
@@ -122,11 +122,11 @@ public class AssociationProcessor {
 
                     template.update(replace, params.toArray());
                 } catch (Exception e) {
-                    LOG.warn(sql);
+                    LOG.warn("SQL executed with errors: {}", sql);
                     if (e != null && e.getMessage() != null
                             && (e.getMessage().contains("Duplicate column name")
                             || e.getMessage().contains("Duplicate entry"))) {
-                        LOG.warn(e.getMessage());
+                        LOG.warn("Script was already executed: {}.", e.getMessage());
                     } else {
                         throw e;
                     }

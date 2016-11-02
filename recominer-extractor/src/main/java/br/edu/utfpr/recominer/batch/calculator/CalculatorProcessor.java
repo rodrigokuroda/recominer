@@ -98,11 +98,11 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
         }
-        log.info(newCommits.size() + " new commits from " + project.getProjectName() + " to be processed.");
+        log.info("{} new commits from {} to be processed.", newCommits.size(), project.getProjectName());
 
         for (Commit newCommit : newCommits) {
 
-            log.info("Computing metrics for changed files on commit " + newCommit.getId());
+            log.info("Computing metrics for changed files on commit {}.", newCommit.getId());
             // select changed files
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 
@@ -112,45 +112,45 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
                     .filter(fileFilter)
                     .collect(Collectors.toList())) {
 
-                log.info("Computing metrics for file " + changedFile.getId() + " in the past.");
+                log.info("Computing metrics for file {} in the past.", changedFile.getId());
 
                 List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {
-                    log.info(++issuesProcessed + " of " + issuesOfFile.size() + " past issues processed.");
+                    log.info("{} of {} past issues processed.", ++issuesProcessed, issuesOfFile.size());
 
                     List<Commit> commitsOfFile = commitRepository.selectCommitsOf(issue, changedFile);
                     long commitProcessed = 0;
                     for (Commit commit : commitsOfFile) {
-                        log.info(++commitProcessed + " of " + commitsOfFile.size() + " past commits processed.");
-                        log.info("Computing metrics for file " + changedFile.getId() + " of commit " + commit.getId());
+                        log.info("{} of {} past commits processed.", ++commitProcessed, commitsOfFile.size());
+                        log.info("Computing metrics for file {} of commit {}.", changedFile.getId(), commit.getId());
 
                         CommitMetrics historicalCommitMetrics = commitMetricsRepository.selectMetricsOf(commit);
 
                         if (historicalCommitMetrics == null) {
-                            log.info("Computing metrics of past commit " + commit.getId());
+                            log.info("Computing metrics of past commit {}.", commit.getId());
                             historicalCommitMetrics = commitMetricCalculator.calculeFor(project, commit);
                             commitMetricsRepository.save(historicalCommitMetrics);
                         } else {
-                            log.info("Metrics for commit " + commit.getId() + " has already computed.");
+                            log.info("Metrics for commit {} has already computed.", commit.getId());
                         }
 
                         FileMetrics historicalFileMetrics = fileMetricsRepository.selectMetricsOf(changedFile, commit);
 
                         if (historicalFileMetrics == null) {
-                            log.info("Computing metrics for file " + changedFile.getId() + " in past commit " + commit.getId());
+                            log.info("Computing metrics for file {} in past commit {}.", changedFile.getId(), commit.getId());
                             historicalFileMetrics = fileMetricCalculator.calcule(project, changedFile, commit);
                             fileMetricsRepository.save(historicalFileMetrics);
                         } else {
-                            log.info("Metrics for file " + changedFile.getId() + " in past commit " + commit.getId() + " has already computed.");
+                            log.info("Metrics for file {} in past commit {} has already computed.", changedFile.getId(), commit.getId());
                         }
 
-                        log.info("Computing metrics for file " + changedFile.getId() + " of issue " + issue.getId());
+                        log.info("Computing metrics for file {}of issue {}.", changedFile.getId(), issue.getId());
                         final IssuesMetrics issueMetrics = issueMetricCalculator.calculeIssueMetrics(project, issue, commit);
                         issuesMetricsRepository.save(issueMetrics);
 
-                        log.info("Computing network metrics for file " + changedFile.getId() + " of issue " + issue.getId());
+                        log.info("Computing network metrics for file {} of issue {}.", changedFile.getId(), issue.getId());
                         final NetworkMetrics networkMetrics = communicationMetricProcessor.process(project, issue, commit);
                         networkMetricsRepository.save(networkMetrics);
                     }
@@ -160,34 +160,34 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
 
                 if (fileMetrics == null) {
 
-                    log.info("Computing metrics for file " + changedFile.getId());
+                    log.info("Computing metrics for file {}.", changedFile.getId());
                     fileMetrics = fileMetricCalculator.calcule(project, changedFile, newCommit);
                     fileMetricsRepository.save(fileMetrics);
                 } else {
-                    log.info("Metrics for file " + changedFile.getId() + " already computed.");
+                    log.info("Metrics for file {} already computed.", changedFile.getId());
                 }
             }
 
-            log.info("Computing metrics of new commit " + newCommit.getId());
+            log.info("Computing metrics of new commit {}.", newCommit.getId());
             CommitMetrics newCommitMetrics = commitMetricsRepository.selectMetricsOf(newCommit);
 
             if (newCommitMetrics == null) {
                 newCommitMetrics = commitMetricCalculator.calculeFor(project, newCommit);
                 commitMetricsRepository.save(newCommitMetrics);
             } else {
-                log.info("Metrics for new commit " + newCommit.getId() + " already computed.");
+                log.info("Metrics for new commit {} already computed.", newCommit.getId());
             }
 
             // select issues associated to new commit
             final List<Issue> issues = issueRepository.selectIssuesRelatedTo(newCommit);
 
-            log.info("Computing metrics of issues associated with new commit " + newCommit.getId());
+            log.info("Computing metrics of issues associated with new commit {}.", newCommit.getId());
             for (Issue issue : issues) {
-                log.info("Computing metrics of issue " + issue.getId());
+                log.info("Computing metrics of issue {}.", issue.getId());
                 final IssuesMetrics issuesMetrics = issueMetricCalculator.calculeIssueMetrics(project, issue, newCommit);
                 issuesMetricsRepository.save(issuesMetrics);
 
-                log.info("Computing network metrics of issue " + issue.getId());
+                log.info("Computing network metrics of issue {}.", issue.getId());
                 final NetworkMetrics networkMetrics = communicationMetricProcessor.process(project, issue, newCommit);
                 networkMetricsRepository.save(networkMetrics);
             }

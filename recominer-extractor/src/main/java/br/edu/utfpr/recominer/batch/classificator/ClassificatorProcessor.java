@@ -75,8 +75,10 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
             newCommits = commitRepository.selectNewCommitsForClassification();
+            log.info("Running classification for issue {}", issueKey);
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
+            log.info("{} new commits to be processed.", newCommits.size());
         }
         
         // Load script location
@@ -96,7 +98,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
         int processedCommits = 0;
         for (Commit newCommit : newCommits) {
-            log.info(++processedCommits + " of " + newCommits.size() + " commits processed.");
+            log.info("{} of {} commits processed.", ++processedCommits, newCommits.size());
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 
             final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
@@ -104,7 +106,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
             int processedFile = 0;
             final List<File> filesToProcessed = changedFiles.stream().filter(fileFilter).collect(Collectors.toList());
             for (File changedFile : filesToProcessed) {
-                log.info(++processedFile + " of " + filesToProcessed.size() + " commits processed.");
+                log.info("{} of {} commits processed.", ++processedFile, filesToProcessed.size());
                 //List<FilePairIssueCommit> cochanges = filePairIssueCommitRepository.selectCochangesOf(changedFile, newCommit);
 
                 final java.io.File generationPath = getWorkingDirectory();
@@ -124,7 +126,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                 );
 
                 if (returnCode != 0) {
-                    log.warn("R return code " + returnCode);
+                    log.warn("R has returned code {}.", returnCode);
                 } else {
                     log.debug("Classification executed successfully.");
 
@@ -152,11 +154,12 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                             try {
                                 predictionRepository.save(prediction);
                             } catch (org.springframework.dao.DuplicateKeyException ex) {
-                                log.warn("Duplicated key for commit " + newCommit.getId() + ", file " + changedFile.getId(), ex);
+                                log.warn("Duplicated key for commit {}, file {}", newCommit.getId(),changedFile.getId());
+                                log.warn("Exception was: ", ex);
                             }
                         }
                     } else {
-                        log.warn("Results file does not exist.");
+                        log.warn("Results file {} does not exist.", resultTest.getAbsolutePath());
                     }
                 }
             }
@@ -210,7 +213,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         } catch (IOException ex) {
             throw new IllegalArgumentException("Cannot copy resource \"" + resourceName + "\" from jar file.", ex);
         }
-        log.info("Classification script copied to " + destination.getAbsolutePath());
+        log.info("Classification script copied to {}.", destination.getAbsolutePath());
         return destination.getAbsolutePath();
     }
 }

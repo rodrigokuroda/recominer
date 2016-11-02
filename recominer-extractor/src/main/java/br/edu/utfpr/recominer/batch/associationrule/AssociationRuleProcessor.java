@@ -96,28 +96,28 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
             newCommits = commitRepository.selectNewCommitsForAssociationRule();
+            log.info("{} new commits to be processed.", newCommits.size());
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
+            log.info("Running classification for issue {}", issueKey);
         }
         
         for (Commit newCommit : newCommits) {
         
-            log.info("Computing metrics for changed files on commit " + newCommit.getId());
+            log.info("Computing metrics for changed files on commit {}.", newCommit.getId());
             // select changed files
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
             
-            final long totalTransactions = commitRepository.count();
-            
             for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
 
-                log.info("Computing association rule for file " + changedFile.getId() + " in the past.");
+                log.info("Computing association rule for file {} in the past.", changedFile.getId());
                 // find all issues/commits where file was changed
                 final List<Issue> issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
                 final Set<Transaction<File>> transactions = new LinkedHashSet<>();
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {
-                    log.info(++issuesProcessed + " of " + issuesOfFile.size() + " past issues processed.");
+                    log.info("{} of {} past issues processed.", ++issuesProcessed, issuesOfFile.size());
 
                     List<Commit> commits = commitRepository.selectCommitsOf(issue);
                     

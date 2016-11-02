@@ -108,7 +108,7 @@ public class FixVersionExtractor {
             final List<String> versions = raw.getFixVersions();
 
             if (versions.isEmpty() || versions.get(0).isEmpty()) {
-                log.info("Issue " + issueId + " has no fix version.");
+                log.info("Issue {} has no fix version.", issueId);
             } else {
                 //                log.info("Issue " + issueId + " is fixed in " + versions.size() + " versions.");
 

@@ -30,6 +30,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -81,6 +82,9 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     
     @Value("#{jobParameters[filenameFilter]}")
     private String filter;
+    
+    @Value("#{jobParameters[issueKey]}")
+    private String issueKey;
 
     @Override
     public DatasetLog process(Project project) throws Exception {
@@ -98,12 +102,21 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
         metricsRepository.setProject(project);
 
         // select new commits
-        final List<Commit> newCommits = commitRepository.selectNewCommitsForDataset(FileFilter.getFiltersFromString(filter));
-        log.info(newCommits.size() + " new commits to be processed.");
+        // select new commits
+        final List<Commit> newCommits;
+        if (StringUtils.isBlank(issueKey)) {
+            newCommits = commitRepository.selectNewCommitsForDataset(FileFilter.getFiltersFromString(filter));
+            log.info("{} new commits to be processed.", newCommits.size());
+        } else {
+            newCommits = commitRepository.selectCommitsOf(issueKey);
+            log.info("Running classification for issue {}", issueKey);
+        }
+        
+        final java.io.File workingDirectory = getWorkingDirectory();
 
         for (Commit newCommit : newCommits) {
 
-            log.info("Computing metrics of new commit " + newCommit.getId());
+            log.info("Computing metrics of new commit {}.", newCommit.getId());
             CommitMetrics newCommitMetrics = commitMetricsRepository.selectMetricsOf(newCommit);
 
             // select issues associated to new commit
@@ -112,18 +125,18 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
             Map<IssueCommit, IssuesMetrics> issuesMetricsCache = new HashMap<>();
             Map<IssueCommit, NetworkMetrics> networkMetricsCache = new HashMap<>();
 
-            log.info("Getting metrics of issues associated with new commit " + newCommit.getId());
+            log.info("Getting metrics of issues associated with new commit {}.", newCommit.getId());
             for (Issue issue : issues) {
-                log.info("Getting metrics of issue " + issue.getId());
+                log.info("Getting metrics of issue {}.", issue.getId());
                 final IssuesMetrics issuesMetrics = issuesMetricsRepository.selectMetricsOf(issue, newCommit);
                 issuesMetricsCache.put(new IssueCommit(issue, newCommit), issuesMetrics);
 
-                log.info("Getting network metrics of issue " + issue.getId());
+                log.info("Getting network metrics of issue {}.", issue.getId());
                 final NetworkMetrics networkMetrics = networkMetricsRepository.selectMetricsOf(issue, newCommit);
                 networkMetricsCache.put(new IssueCommit(issue, newCommit), networkMetrics);
             }
 
-            log.info("Getting changed files on commit " + newCommit.getId());
+            log.info("Getting changed files on commit {}.", newCommit.getId());
             // select changed files
             final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
 
@@ -155,22 +168,22 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
                 // stores all cochanged occurred with changed file in the new issue
                 Set<Cochange> cochanges = new HashSet<>();
 
-                log.info("Getting issues where file " + changedFile.getId() + " was changed.");
+                log.info("Getting issues where file {} was changed.", changedFile.getId());
                 // find all issues/commits where file was changed
                 List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {
 
-                    log.info(++issuesProcessed + " of " + issuesOfFile.size() + " past issues processed.");
+                    log.info("{} of {} past issues processed.", ++issuesProcessed, issuesOfFile.size());
 
-                    log.info("Getting commits in issue " + issue.getId() + " where file " + changedFile.getId() + " was changed.");
+                    log.info("Getting commits in issue {} where file {} was changed.", issue.getId(), changedFile.getId());
                     List<Commit> commitsOfFile = commitRepository.selectCommitsOf(issue, changedFile);
 
                     long commitProcessed = 0;
                     for (Commit commit : commitsOfFile) {
-                        log.info(++commitProcessed + " of " + commitsOfFile.size() + " past commits processed.");
-                        log.info("Getting metrics for file " + changedFile.getId() + " of commit " + commit.getId());
+                        log.info("{} of {} past commits processed.", ++commitProcessed, commitsOfFile.size());
+                        log.info("Getting metrics for file {} of commit {}.", changedFile.getId(), commit.getId());
                         
                         final List<Cochange> cochangedFilesInCommit = fileRepository.selectCochangedFilesIn(commit, changedFile);
                         cochanges.addAll(cochangedFilesInCommit);
@@ -181,10 +194,10 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
                         FileMetrics historicalFileMetrics = fileMetricsRepository.selectMetricsOf(changedFile, commit);
 
-                        log.info("Getting metrics for file " + changedFile.getId() + " of issue " + issue.getId());
+                        log.info("Getting metrics for file {} of issue {}.", changedFile.getId(), issue.getId());
                         IssuesMetrics issuesMetrics = issuesMetricsRepository.selectMetricsOf(issue, commit);
 
-                        log.info("Getting network metrics for file " + changedFile.getId() + " of issue " + issue.getId());
+                        log.info("Getting network metrics for file {} of issue {}.", changedFile.getId(), issue.getId());
                         NetworkMetrics networkMetrics = networkMetricsRepository.selectMetricsOf(issue, commit);
 
                         // creates a dataset's instance (one line)
@@ -222,14 +235,14 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
                     final Dataset trainDataset = new Dataset(changedFile, cochange, train, commits);
                     
-                    datasetOutput.write(getWorkingDirectory(), project, newCommit, trainDataset, "train");
+                    datasetOutput.write(workingDirectory, project, newCommit, trainDataset, "train");
                 }
 
                 metricsRepository.save(train);
 
                 final Dataset testDataset = new Dataset(changedFile, test, newCommit);
                 
-                datasetOutput.write(getWorkingDirectory(), project, newCommit, testDataset, "test");
+                datasetOutput.write(workingDirectory, project, newCommit, testDataset, "test");
                 metricsRepository.save(test);
             }
         }
@@ -242,7 +255,10 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     private java.io.File getWorkingDirectory() {
         if (workingDir == null) {
             workingDir = "generated";
+            log.info("No working directory was definied by parameter. Using default {}.", workingDir);
         }
-        return new java.io.File(workingDir);
+        final java.io.File file = new java.io.File(workingDir);
+        log.info("Working directory path is {}.", file.getAbsolutePath());
+        return file;
     }
 }

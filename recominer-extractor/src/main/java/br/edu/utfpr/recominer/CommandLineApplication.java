@@ -13,15 +13,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  *
@@ -66,10 +61,10 @@ public class CommandLineApplication implements CommandLineRunner {
             JobExecution jobExecution = jobLauncher.run(extractorJob, jobParametersBuilder.toJobParameters());
             final ExitStatus exitStatus = jobExecution.getExitStatus();
 
-            LOG.info("Job completed with exit status " + exitStatus.getExitCode() + ": " + exitStatus.getExitDescription());
-        } catch (JobInstanceAlreadyCompleteException e) {
+            LOG.info("Job completed with exit status {}: {}", exitStatus.getExitCode(), exitStatus.getExitDescription());
+        } catch (JobInstanceAlreadyCompleteException ex) {
             // there are no job in execution or executed.
-            LOG.warn("The job has been run before with the same parameters and completed successfully.");
+            LOG.warn("The job has been run before with the same parameters and completed successfully.", ex);
         } catch (JobRestartException ex) {
             LOG.error("The job has been run before and circumstances that preclude a restart.", ex);
         } catch (JobParametersInvalidException ex) {
