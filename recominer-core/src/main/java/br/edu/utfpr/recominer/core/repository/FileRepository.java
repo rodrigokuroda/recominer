@@ -303,10 +303,11 @@ public class FileRepository extends JdbcRepository<File, Integer> {
     public CodeChurn calculeCodeChurn(File file, Commit commit) {
         return jdbcOperations.queryForObject(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT lines_added, lines_removed "
+                        "SELECT SUM(lines_added), SUM(lines_removed) " // when change type is V, it is a moving action (2 records)
                         + " FROM {0}.files_commits "
                         + "WHERE file_id = ? "
-                        + "  AND commit_id = ?", project),
+                        + "  AND commit_id = ?"
+                        + " GROUP BY CASE WHEN change_type = 'V' THEN change_type ELSE id END", project),
                 (ResultSet rs, int rowNum)
                 -> new CodeChurn(
                         file,
