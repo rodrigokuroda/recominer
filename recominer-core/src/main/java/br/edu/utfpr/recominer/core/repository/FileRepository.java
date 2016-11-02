@@ -363,7 +363,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         "SELECT f.file_id, f.file_path"
                         + "  FROM {0}.files_commits f"
                         + " WHERE f.commit_id = ?", project),
-                (ResultSet rs, int rowNum) -> new File(rs.getInt("id"), rs.getString("file_path")),
+                ROW_MAPPER,
                 commit.getId());
     }
 
@@ -374,7 +374,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         + "  FROM {0}.files_commits f"
                         + " WHERE f.commit_id = ?"
                         + "   AND f.file_id <> ?", project),
-                (ResultSet rs, int rowNum) -> new Cochange(new File(rs.getInt("id"), rs.getString("file_path")), commit),
+                (ResultSet rs, int rowNum) -> new Cochange(new File(rs.getInt("file_id"), rs.getString("file_path")), commit),
                 commit.getId(), withFile.getId());
     }
 
@@ -399,7 +399,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         + "  FROM {0}.files_commits f"
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id"
                         + " WHERE i2s.issue_id = ?", project),
-                (ResultSet rs, int rowNum) -> new File(rs.getInt("id"), rs.getString("file_path")),
+                (ResultSet rs, int rowNum) -> new File(rs.getInt("file_id"), rs.getString("file_path")),
                 issue.getId());
     }
 
