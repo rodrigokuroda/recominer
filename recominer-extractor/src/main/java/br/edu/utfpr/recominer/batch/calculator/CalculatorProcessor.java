@@ -94,11 +94,12 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
         // select new commits
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
-            newCommits = commitRepository.selectNewCommitsForCalculator(FileFilter.getFiltersFromString(filter));
+            newCommits = commitRepository.selectNewCommitsForAssociationRule();
+            log.info("{} new commits to be processed.", newCommits.size());
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
+            log.info("Running classification for issue {}", issueKey);
         }
-        log.info("{} new commits from {} to be processed.", newCommits.size(), project.getProjectName());
 
         for (Commit newCommit : newCommits) {
 

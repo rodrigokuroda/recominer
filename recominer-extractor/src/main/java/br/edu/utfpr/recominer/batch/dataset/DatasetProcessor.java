@@ -102,7 +102,6 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
         metricsRepository.setProject(project);
 
         // select new commits
-        // select new commits
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
             newCommits = commitRepository.selectNewCommitsForDataset(FileFilter.getFiltersFromString(filter));
