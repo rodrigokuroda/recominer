@@ -26,11 +26,11 @@ class CvsanalyCommand implements ExternalCommand {
     private static final String CVSANALY_METRICS_EXTENSIONS = "--extensions=CommitsLOCDet,FileTypes";
 
     private final Project project;
-    private final Boolean runCsvanalyExtension;
+    private final boolean skipExtesion;
 
-    public CvsanalyCommand(Project project, Boolean runCsvanalyExtension) {
+    public CvsanalyCommand(Project project, boolean skipExtension) {
         this.project = project;
-        this.runCsvanalyExtension = runCsvanalyExtension;
+        this.skipExtesion = skipExtension;
     }
 
     @Override
@@ -47,7 +47,7 @@ class CvsanalyCommand implements ExternalCommand {
 
         command.add(CVSANALY_METRICS_ALL);
         command.add(CVSANALY_METRICS_NOERR);
-        if (runCsvanalyExtension) {
+        if (!skipExtesion) {
             command.add(CVSANALY_METRICS_EXTENSIONS);
         }
 

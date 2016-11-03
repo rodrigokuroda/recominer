@@ -33,7 +33,7 @@ public class ProjectItemReader implements ItemReader<Project> {
     @Inject
     private JdbcTemplate template;
 
-    @Value("${projectName}")
+    @Value("${projectName:}")
     private String projectName;
 
     private Iterator<Project> projects;
