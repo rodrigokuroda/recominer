@@ -20,7 +20,7 @@ public class CvsanalyProcessor {
     @Inject
     private JdbcTemplate template;
     
-    @Value("#{jobParameters[runCsvanalyExtension]}")
+    @Value("#{jobParameters[runCsvanalyExtension] ?: true}")
     private String runCsvanalyExtension;
 
     public int process(Project project) throws IOException, InterruptedException {

@@ -17,16 +17,13 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
-//@SpringBootApplication
-//@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-//@org.springframework.context.annotation.Configuration
-//@EnableBatchProcessing
-//@ComponentScan("br.edu.utfpr.recominer")
+@Component
 public class CommandLineApplication implements CommandLineRunner {
     private static final Logger LOG = LoggerFactory.getLogger(CommandLineApplication.class);
 
