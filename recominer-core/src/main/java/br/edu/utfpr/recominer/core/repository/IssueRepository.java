@@ -191,6 +191,22 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 ROW_MAPPER,
                 "max_files_per_commit");
     }
+    
+    public List<Issue> selectProcessedIssuesOfProject() {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT DISTINCT " + FIELDS
+                        + "  FROM {0}_issues.issues i"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
+                        + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
+                        + "  JOIN {0}_vcs.scmlog s ON i2s.scmlog_id = s.id "
+                        + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
+                        + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
+                        + " WHERE s.id IN (SELECT commit_id FROM {0}.ml_predictions UNION SELECT commit_id FROM {0}.ar_predictions)",
+                        project),
+                ROW_MAPPER,
+                "max_files_per_commit");
+    }
 
     public Long countComputedIssues() {
         return jdbcOperations.queryForObject(

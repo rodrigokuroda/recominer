@@ -108,7 +108,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
             log.info("{} new commits to be processed.", newCommits.size());
         } else {
             newCommits = commitRepository.selectCommitsOf(issueKey);
-            log.info("Running classification for issue {}", issueKey);
+            log.info("Running dataset processor for issue {}", issueKey);
         }
         
         final java.io.File workingDirectory = getWorkingDirectory();
