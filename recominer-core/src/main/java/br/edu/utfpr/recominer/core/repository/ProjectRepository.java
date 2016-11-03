@@ -6,6 +6,7 @@ import br.edu.utfpr.recominer.core.model.VersionControl;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import java.sql.ResultSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -16,18 +17,18 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class ProjectRepository extends JdbcRepository<Project, Integer> {
-    
+
     private static final String SCHEMA_NAME = "recominer";
     private static final String TABLE_NAME = "project";
     private static final String ID_COLUMN = "id";
-    
+
     public ProjectRepository() {
         super(ROW_MAPPER, ROW_UNMAPPER, SCHEMA_NAME, TABLE_NAME, ID_COLUMN);
     }
 
     @Override
     public void setProject(Project project) {
-        throw new IllegalArgumentException("The schema for this repository is already set statically.");
+        throw new IllegalArgumentException("The schema for this repository is already set statically (recominer).");
     }
 
     public static final RowMapper<Project> ROW_MAPPER
@@ -58,5 +59,12 @@ public class ProjectRepository extends JdbcRepository<Project, Integer> {
 
                 return mapping;
             };
+
+    public List<Project> selectProjectByName(String projectName) {
+        return jdbcOperations.query(
+                "SELECT * FROM " + SCHEMA_NAME + "." + TABLE_NAME + " WHERE project_name = ?",
+                ROW_MAPPER,
+                projectName);
+    }
 
 }

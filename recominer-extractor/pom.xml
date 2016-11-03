@@ -5,7 +5,7 @@
 
     <groupId>br.edu.utfpr</groupId>
     <artifactId>recominer-extractor</artifactId>
-    <version>0.4</version>
+    <version>0.5</version>
     <packaging>jar</packaging>
 
     <name>Recominer Extractor</name>
