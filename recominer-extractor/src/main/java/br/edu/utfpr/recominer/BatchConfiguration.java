@@ -28,6 +28,7 @@ import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ public class BatchConfiguration {
 
     @Autowired
     private StepBuilderFactory steps;
+    
+    @Autowired
+    private ConfigurationValues config;
 
     private final RunIdIncrementer runIdIncrementer = new RunIdIncrementer();
 
@@ -63,15 +67,27 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Job job(@Qualifier("extractorStep") Step extractorStep,
+    public Job job(
+            @Qualifier("extractorStep") Step extractorStep,
             @Qualifier("calculatorStep") Step calculatorStep,
             @Qualifier("datasetStep") Step datasetStep,
             @Qualifier("classificationStep") Step classificationStep,
             @Qualifier("associationRuleStep") Step associationRuleStep) {
-        return jobs.get("extractorJob")
-                .incrementer(runIdIncrementer)
-                .start(extractorStep)
-                .next(calculatorStep)
+
+        final SimpleJobBuilder job;
+
+        if (config.skipExtractor()) {
+            job = jobs.get("extractorJob")
+                    .incrementer(runIdIncrementer)
+                    .start(calculatorStep);
+        } else {
+            job = jobs.get("extractorJob")
+                    .incrementer(runIdIncrementer)
+                    .start(extractorStep)
+                    .next(calculatorStep);
+        }
+
+        return job
                 .next(datasetStep)
                 .next(classificationStep)
                 .next(associationRuleStep)

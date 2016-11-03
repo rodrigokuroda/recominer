@@ -70,7 +70,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
     @Value("#{jobParameters[filenameFilter]}")
     private String filter;
 
-    @Value("#{jobParameters[topAssociationRules ?: 10]}")
+    @Value("#{jobParameters[topAssociationRules] ?: 10}")
     private Integer topAssociationRules;
     
     @Value("#{jobParameters[issueKey]}")
