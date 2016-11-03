@@ -46,6 +46,7 @@ public class FileSystemDatasetOutput implements DatasetOutput {
         File datasetFile = new File(dir, datasetName + ".csv");
 
         try (FileWriter fw = new FileWriter(datasetFile)) {
+            log.info("Writting dataset file to {}.", datasetFile.getAbsolutePath());
             fw.append(dataset.toString());
             fw.flush();
         } catch (IOException ex) {
