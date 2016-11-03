@@ -101,7 +101,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
             filesetRepository.insert(consequentFileset);
 
             String predictionResult;
-            if (rank < topPredictions 
+            if (topPredictions > rank
                     || ar.hasSameSupportAndConfidenteOf(lastPositiveAr)) {
                 predictionResult = "C";
                 lastPositiveAr = ar;
