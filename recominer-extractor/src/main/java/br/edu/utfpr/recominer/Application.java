@@ -15,7 +15,6 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-@org.springframework.context.annotation.Configuration
 @EnableBatchProcessing
 @ComponentScan("br.edu.utfpr.recominer")
 public class Application {
