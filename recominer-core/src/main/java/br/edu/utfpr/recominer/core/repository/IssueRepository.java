@@ -175,7 +175,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 ROW_MAPPER,
                 "max_files_per_commit");
     }
-    
+
     public List<Issue> selectOpenedIssuesOfProject() {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
@@ -191,7 +191,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 ROW_MAPPER,
                 "max_files_per_commit");
     }
-    
+
     public List<Issue> selectProcessedIssuesOfProject() {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
@@ -201,7 +201,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
                         + "  JOIN {0}_vcs.scmlog s ON i2s.scmlog_id = s.id "
                         + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
-                        + " WHERE s.id IN (SELECT commit_id FROM {0}.ml_prediction UNION SELECT commit_id FROM {0}.ar_prediction)",
+                        + "  JOIN (SELECT commit_id FROM cxf.ml_prediction UNION SELECT commit_id FROM cxf.ar_prediction) t ON t.commit_id = s.id",
                         project),
                 ROW_MAPPER);
     }
@@ -261,7 +261,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("commit", until.getId());
         params.addValue("file", changedFile.getId());
-        
+
         return namedJdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT DISTINCT  i.id, i.type, iej.issue_key, i.submitted_on, i.fixed_on "
