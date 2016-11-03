@@ -1,18 +1,10 @@
 options(echo=TRUE) # if you want see commands in output file / , warn=2
-#install.packages("caret")
-#install.packages("mlbench")
-#install.packages("AppliedPredictiveModeling")
-#install.packages("ROCR")
-#install.packages("pROC")
-#install.packages("randomForest")
-#install.packages('e1071', dependencies=TRUE)
 
 library("caret")
 library("mlbench")
 library("AppliedPredictiveModeling")
-library("ROCR")
-library("pROC")
 library("randomForest")
+library("e1071")
 
 set.seed(10)
 
