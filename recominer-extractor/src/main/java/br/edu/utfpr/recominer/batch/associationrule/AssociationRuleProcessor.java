@@ -98,7 +98,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
             newCommits = commitRepository.selectNewCommitsForAssociationRule();
             log.info("{} new commits to be processed.", newCommits.size());
         } else {
-            newCommits = commitRepository.selectCommitsOf(issueKey);
+            newCommits = commitRepository.selectCommitsForAssociationRuleOf(issueKey);
             log.info("Running association rules processor for issue {}", issueKey);
         }
         

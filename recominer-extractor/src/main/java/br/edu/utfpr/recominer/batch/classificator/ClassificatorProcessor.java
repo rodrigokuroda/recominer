@@ -77,7 +77,7 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
             newCommits = commitRepository.selectNewCommitsForClassification();
             log.info("Running classification for issue {}", issueKey);
         } else {
-            newCommits = commitRepository.selectCommitsOf(issueKey);
+            newCommits = commitRepository.selectCommitsForClassificationOf(issueKey);
             log.info("{} new commits to be processed.", newCommits.size());
         }
         

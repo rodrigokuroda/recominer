@@ -99,9 +99,8 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
      * Gets all commits associated with non-fixed issues and commits that have
      * not Dataset generated yet. The commits must have a number of maximum
      * files configured in 'recominer.configuration' table, as key
-     * 'max_files_per_commit'.
-     * In addition, the commits that contains only the files with name will be 
-     * excluded from list.
+     * 'max_files_per_commit'. In addition, the commits that contains only the
+     * files with name will be excluded from list.
      *
      * @param filenameFilter
      * @return Commits of non-fixed issues.
@@ -113,7 +112,7 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("filenames", filenameFilter);
         parameters.addValue("max_files_per_commit", "max_files_per_commit");
-        
+
         return namedJdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT c.commit_id, c.rev, c.committer_id, c.date"
@@ -163,9 +162,8 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
      * Gets all commits associated with non-fixed issues and commits that have
      * not metrics calculated yet. The commits must have a number of maximum
      * files configured in 'recominer.configuration' table, as key
-     * 'max_files_per_commit'.
-     * In addition, the commits that contains only the files with name will be 
-     * excluded from list.
+     * 'max_files_per_commit'. In addition, the commits that contains only the
+     * files with name will be excluded from list.
      *
      * @param filenameFilter
      * @return Commits of non-fixed issues.
@@ -268,6 +266,32 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
                         + "   AND i2s.issue_id = (SELECT iej.issue_id FROM {0}_issues.issues_ext_jira iej WHERE iej.issue_key = ?)", project),
+                ROW_MAPPER,
+                "max_files_per_commit", issueKey);
+    }
+
+    public List<Commit> selectCommitsForAssociationRuleOf(String issueKey) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
+                        + "   AND i2s.issue_id = (SELECT iej.issue_id FROM {0}_issues.issues_ext_jira iej WHERE iej.issue_key = ?)"
+                        + "   AND i2s.scmlog_id NOT IN (SELECT commit_id FROM {0}.ar_prediction)", project),
+                ROW_MAPPER,
+                "max_files_per_commit", issueKey);
+    }
+
+    public List<Commit> selectCommitsForClassificationOf(String issueKey) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
+                        + "   AND i2s.issue_id = (SELECT iej.issue_id FROM {0}_issues.issues_ext_jira iej WHERE iej.issue_key = ?)"
+                        + "   AND i2s.scmlog_id NOT IN (SELECT commit_id FROM {0}.ml_prediction)", project),
                 ROW_MAPPER,
                 "max_files_per_commit", issueKey);
     }
