@@ -150,7 +150,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                         + "  JOIN {0}.fileset fs ON fs.id = arp.fileset_id "
                         + "  LEFT JOIN {0}.fileset pfs ON pfs.id = arp.predicted_fileset_id "
                         + "  LEFT JOIN {0}.files_commits pf ON pf.file_id = pfs.file_id AND pf.commit_id = "
-                        + "      (SELECT MAX(pf.commit_id) FROM {0}.files_commits ifc WHERE ifc.file_id = pfs.file_id AND ifc.commit_id < arp.commit_id) "
+                        + "      (SELECT MAX(ifc.commit_id) FROM {0}.files_commits ifc WHERE ifc.file_id = pfs.file_id AND ifc.commit_id < arp.commit_id) "
                         + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_id = arp.id "
                         + " WHERE fs.file_id = ? "
                         + "   AND arp.commit_id = ? "
