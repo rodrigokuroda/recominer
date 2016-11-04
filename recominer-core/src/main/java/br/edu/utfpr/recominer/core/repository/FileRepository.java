@@ -28,7 +28,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class FileRepository extends JdbcRepository<File, Integer> {
 
-    private static final String ID_COLUMN = "id";
+    private static final String ID_COLUMN = "file_id";
     private static final String TABLE_NAME = "files_commits";
 
     public static final RowMapper<File> ROW_MAPPER

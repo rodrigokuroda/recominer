@@ -169,7 +169,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
                 log.info("Getting issues where file {} was changed.", changedFile.getId());
                 // find all issues/commits where file was changed
-                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
+                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {

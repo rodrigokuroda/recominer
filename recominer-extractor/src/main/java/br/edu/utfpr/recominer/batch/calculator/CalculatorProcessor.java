@@ -115,7 +115,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
 
                 log.info("Computing metrics for file {} in the past.", changedFile.getId());
 
-                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
+                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {

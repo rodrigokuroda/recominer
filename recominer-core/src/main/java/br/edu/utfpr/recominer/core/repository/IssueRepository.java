@@ -276,6 +276,45 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  WHERE fc.file_id = :file "
                         + "    AND s.date < (SELECT s2.date FROM {0}_vcs.scmlog s2 WHERE s2.id = :commit) "
                         + "    AND i.fixed_on IS NOT NULL "
+                        + "    AND (ifvo.version_order = "
+                        + "          (SELECT MIN(ifvo2.version_order) - 1 "
+                        + "             FROM {0}.issues_fix_version_order ifvo2 "
+                        + "             JOIN {0}.issues_fix_version ifv2 ON ifvo2.minor_fix_version = ifv2.minor_fix_version "
+                        + "             JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
+                        + "            WHERE i2s.scmlog_id = :commit "
+                        + "          ) "
+                        + "        )",
+                        project),
+                params,
+                ROW_MAPPER);
+    }
+
+    /**
+     * Find all issues where file was changed before the specified commit.
+     *
+     * @param changedFile The file
+     * @param until The commit
+     * @return
+     */
+    public List<Issue> selectFixedIssuesFromCurrentAndLastVersionOf(File changedFile, Commit until) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("commit", until.getId());
+        params.addValue("file", changedFile.getId());
+
+        return namedJdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT DISTINCT  i.id, i.type, iej.issue_key, i.submitted_on, i.fixed_on "
+                        + "   FROM {0}_issues.issues i "
+                        + "   JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
+                        + "   JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
+                        + "   JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = i2s.scmlog_id "
+                        + "  LEFT JOIN {0}.issues_metrics im ON im.issue_id = i.id "
+                        + "  LEFT JOIN {0}.issues_fix_version ifv ON i2s.issue_id = ifv.issue_id "
+                        + "  LEFT JOIN {0}.issues_fix_version_order ifvo ON ifvo.minor_fix_version = ifv.minor_fix_version "
+                        + "  WHERE fc.file_id = :file "
+                        + "    AND s.date < (SELECT s2.date FROM {0}_vcs.scmlog s2 WHERE s2.id = :commit) "
+                        + "    AND i.fixed_on IS NOT NULL "
                         + "    AND (ifvo.version_order IN "
                         + "          (SELECT ifvo2.version_order "
                         + "             FROM {0}.issues_fix_version_order ifvo2 "
