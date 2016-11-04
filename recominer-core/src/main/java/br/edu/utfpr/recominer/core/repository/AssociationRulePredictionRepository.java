@@ -94,14 +94,14 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
         Fileset antecedentFileset = new Fileset(filesetSequence.getNext(), associationRules.get(0).getAntecedentItem());
         filesetRepository.insert(antecedentFileset);
 
-        int rank = 0;
+        int rank = 1;
         AssociationRule<File> lastPositiveAr = null;
         for (AssociationRule<File> ar : associationRules) {
             Fileset consequentFileset = new Fileset(filesetSequence.getNext(), ar.getConsequentItems());
             filesetRepository.insert(consequentFileset);
 
             String predictionResult;
-            if (topPredictions > rank
+            if (rank < topPredictions
                     || ar.hasSameSupportAndConfidenteOf(lastPositiveAr)) {
                 predictionResult = "C";
                 lastPositiveAr = ar;
@@ -140,7 +140,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
     public List<AssociationRulePrediction> selectPredictedCochangesFor(Commit commit, File file) {
         List<AssociationRulePrediction> predictions = jdbcOperations.query(
                 getQueryForSchema(
-                        "SELECT arp.*, "
+                        "SELECT DISTINCT arp.*, "
                         + "     pfs.file_id, "
                         + "     pf.file_path, "
                         + "     pfb.id AS prediction_feedback_id, "
@@ -150,7 +150,7 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                         + "  JOIN {0}.fileset fs ON fs.id = arp.fileset_id "
                         + "  LEFT JOIN {0}.fileset pfs ON pfs.id = arp.predicted_fileset_id "
                         + "  LEFT JOIN {0}.files_commits pf ON pf.file_id = pfs.file_id AND pf.commit_id = "
-                        + "      (SELECT MAX(pf.commit_id) FROM {0}.files_commits ifc WHERE ifc.file_id = pfs.file_id AND ifc.commit_id < arp.comit_id) "
+                        + "      (SELECT MAX(pf.commit_id) FROM {0}.files_commits ifc WHERE ifc.file_id = pfs.file_id AND ifc.commit_id < arp.commit_id) "
                         + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_id = arp.id "
                         + " WHERE fs.file_id = ? "
                         + "   AND arp.commit_id = ? "
