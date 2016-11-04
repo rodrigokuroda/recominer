@@ -41,7 +41,7 @@ public class CochangeDTO {
         dto.predictionResult = cochange.getPredictionResult();
         dto.algorithmName = cochange.getAlgorithmType();
         dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
-        final BigDecimal probability = BigDecimal.valueOf(cochange.getProbability()).setScale(2, RoundingMode.DOWN);
+        final BigDecimal probability = BigDecimal.valueOf(cochange.getProbability() * 100).setScale(2, RoundingMode.DOWN);
         dto.probability = probability + "%";
         
         return dto;
