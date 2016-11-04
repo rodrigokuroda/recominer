@@ -258,6 +258,21 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                 "max_files_per_commit", issue.getId());
     }
 
+    public List<Commit> selectCommitsPerformedWhileIssueWasOpenedOf(Issue issue) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"
+                        + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
+                        + "  JOIN {0}_issues.issues i ON i.id = i2s.issue_id "
+                        + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
+                        + "   AND i2s.issue_id = ?"
+                        + "   AND s.date >= i.submitted_on"
+                        + "   AND s.date <= i.fixed_on ", project),
+                ROW_MAPPER,
+                "max_files_per_commit", issue.getId());
+    }
+
     public List<Commit> selectCommitsOf(String issueKey) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(

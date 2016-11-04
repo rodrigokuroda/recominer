@@ -32,7 +32,7 @@ public class CommitsController {
         final Project project = projectRepository.findOne(issueDTO.getProject().getId());
         repository.setProject(project);
         List<CommitDTO> commits = new ArrayList<>();
-        for (Commit commit : repository.selectCommitsOf(issueDTO.getIssue())) {
+        for (Commit commit : repository.selectCommitsPerformedWhileIssueWasOpenedOf(issueDTO.getIssue())) {
             commits.add(new CommitDTO(commit));
         }
         return commits;
