@@ -43,7 +43,7 @@ public class ExternalProcess {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null) {
-            LOG.debug(line);
+            LOG.info(line);
         }
         process.waitFor();
         exitValue = process.exitValue();
