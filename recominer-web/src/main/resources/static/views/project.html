@@ -172,51 +172,50 @@
                                     {{ cochange.probability == null ? '' : '(' + cochange.probability + ')' }}
                                 </span>
                             </md-card-header-text>
-                        </md-card-header-text>
-                    </md-card-header>
+                        </md-card-header>
 
-                    <md-card-content>
-                        <span class="md-headline">Feedback</span>
-                        <div layout="row" layout-wrap>
-                            <div layout="column" flex="20">
-                                <md-checkbox ng-model="cochange.feedback.changed" aria-label="Changed?">
-                                    Changed?
-                                    <span ng-if="cochange.feedback.changed" md-colors="{color: 'green'}">Yes</span>
-                                    <span ng-if="!cochange.feedback.changed" md-colors="{color: 'red'}">No</span>
+                        <md-card-content>
+                            <span class="md-headline">Feedback</span>
+                            <div layout="row" layout-wrap>
+                                <div layout="column" flex="20">
+                                    <md-checkbox ng-model="cochange.feedback.changed" aria-label="Changed?">
+                                        Changed?
+                                        <span ng-if="cochange.feedback.changed" md-colors="{color: 'green'}">Yes</span>
+                                        <span ng-if="!cochange.feedback.changed" md-colors="{color: 'red'}">No</span>
 
-                                    <md-tooltip md-direction="bottom">
-                                        Mark if you have changed this file.
-                                    </md-tooltip>
-                                </md-checkbox>
+                                        <md-tooltip md-direction="bottom">
+                                            Mark if you have changed this file.
+                                        </md-tooltip>
+                                    </md-checkbox>
 
-                                <md-input-container class="md-block" flex="10">
-                                    <md-button type="button" class="md-raised md-primary" ng-click="submitFeedback(cochange)">Submit</md-button>
+                                    <md-input-container class="md-block" flex="10">
+                                        <md-button type="button" class="md-raised md-primary" ng-click="submitFeedback(cochange)">Submit</md-button>
+                                    </md-input-container>
+                                </div>
+
+                                <md-input-container class="md-block" flex="80">
+                                    <label>Justification</label>
+                                    <textarea ng-model="cochange.feedback.justification" required md-maxlength="4096" rows="3"/>
                                 </md-input-container>
                             </div>
-
-                            <md-input-container class="md-block" flex="80">
-                                <label>Justification</label>
-                                <textarea ng-model="cochange.feedback.justification" required md-maxlength="4096" rows="3"/>
-                            </md-input-container>
-                        </div>
-                    </md-card-content>
-                </md-card>
+                        </md-card-content>
+                    </md-card>
+                </div>
+            </div>
+        </md-content>
+    </md-content>
+    <div layout="row" flex="noshrink" layout-align="center center" class="layout-align-center-center layout-row flex-noshrink">
+        <div id="license-footer" layout="row" layout-align="center center" layout-fill class="ng-binding flex">
+            <div flex="none">
+                <a href="https://www.utfpr.edu.br/" target="_blank"><img ng-src="/svg/utfpr-logo-b.svg" alt="UTFPR Logo" width="68" height="25"/></a>
+            </div>
+            <div flex class="md-body-2">
+                Recominer by Universidade Tecnológica Federal do Paraná - UTFPR © 2016. Developed by
+                <a href="mailto:rodrigokuroda@alunos.utfpr.edu.br">Rodrigo T. Kuroda.</a>
+            </div>
+            <div flex="none">
+                <a href="https://github.com/rodrigokuroda/recominer" target="_blank"><img ng-src="/svg/github-logo.svg" alt="GitHub Logo" width="92" height="25"/></a>
             </div>
         </div>
-    </md-content>
-</md-content>
-<div layout="row" flex="noshrink" layout-align="center center" class="layout-align-center-center layout-row flex-noshrink">
-    <div id="license-footer" layout="row" layout-align="center center" layout-fill class="ng-binding flex">
-        <div flex="none">
-            <a href="https://www.utfpr.edu.br/" target="_blank"><img ng-src="/svg/utfpr-logo-b.svg" alt="UTFPR Logo" width="68" height="25"/></a>
-        </div>
-        <div flex class="md-body-2">
-            Recominer by Universidade Tecnológica Federal do Paraná - UTFPR © 2016. Developed by
-            <a href="mailto:rodrigokuroda@alunos.utfpr.edu.br">Rodrigo T. Kuroda.</a>
-        </div>
-        <div flex="none">
-            <a href="https://github.com/rodrigokuroda/recominer" target="_blank"><img ng-src="/svg/github-logo.svg" alt="GitHub Logo" width="92" height="25"/></a>
-        </div>
     </div>
-</div>
 </md-content>
