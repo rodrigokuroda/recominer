@@ -65,7 +65,7 @@
                                 </md-button>
                                 <md-input-container md-theme="input" ng-show="showSearchIssues">
                                     <label>&nbsp;</label>
-                                    <input ng-model="searchIssue.revision" placeholder="Issue Key">
+                                    <input ng-model="searchIssue.key" placeholder="Issue Key">
                                 </md-input-container>
                             </div>
                         </md-toolbar>
@@ -151,9 +151,10 @@
                         <md-list-item class="md-3-line">
                             <md-icon class="md-avatar" hide-sm md-svg-icon="{{appIcon || 'navigation:ic_apps_24px'}}"></md-icon>
                             <div class="md-list-item-text">
-                                <div class="md-headline">{{activeProject.name || 'Select one project'}}</div>
-                                <div class="md-title">{{activeCommit.revision || 'Select one commit'}}</div>
-                                <div class="md-subhead">{{activeFile.name || 'Select one file'}}</div>
+                                <div class="md-headline">{{activeProject.name || 'Select a project'}}</div>
+                                <div class="md-title">{{activeIssue.key || 'Select a issue'}}</div>
+                                <div class="md-title">{{activeCommit.revision || 'Select a commit'}}</div>
+                                <div class="md-subhead">{{activeFile.name || 'Select a file'}}</div>
                             </div>
                         </md-list-item>
                     </md-toolbar>
