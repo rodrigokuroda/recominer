@@ -74,6 +74,19 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 ROW_MAPPER, commit.getId());
     }
 
+    public List<Issue> selectIssue(String key) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT DISTINCT " + FIELDS
+                        + "  FROM {0}_issues.issues i"
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id"
+                        + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
+                        + "  LEFT JOIN {0}.issues_metrics im ON im.issue_id = i.id"
+                        + " WHERE iej.issue_key = ? ",
+                        project),
+                ROW_MAPPER, key);
+    }
+
     public List<Issue> selectIssuesWithNewCommentsOf(Issue issue) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(

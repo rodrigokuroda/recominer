@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -85,6 +86,9 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
+    
+    @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
+    private String onlyOneRandomFileFromIssue;
 
     @Override
     public DatasetLog process(Project project) throws Exception {
@@ -107,11 +111,12 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
             newCommits = commitRepository.selectNewCommitsForDataset(FileFilter.getFiltersFromString(filter));
             log.info("{} new commits to be processed.", newCommits.size());
         } else {
-            newCommits = commitRepository.selectCommitsOf(issueKey);
+            newCommits = commitRepository.selectFirstCommitsOf(issueKey);
             log.info("Running dataset processor for issue {}", issueKey);
         }
         
         final java.io.File workingDirectory = getWorkingDirectory();
+        final Random randomizer = new Random();
 
         for (Commit newCommit : newCommits) {
 
@@ -119,7 +124,12 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
             CommitMetrics newCommitMetrics = commitMetricsRepository.selectMetricsOf(newCommit);
 
             // select issues associated to new commit
-            final List<Issue> issues = issueRepository.selectIssuesRelatedTo(newCommit);
+            final List<Issue> issues;
+            if (StringUtils.isBlank(issueKey)) {
+                issues = issueRepository.selectIssuesRelatedTo(newCommit);
+            } else {
+                issues = issueRepository.selectIssue(issueKey);
+            }
 
             Map<IssueCommit, IssuesMetrics> issuesMetricsCache = new HashMap<>();
             Map<IssueCommit, NetworkMetrics> networkMetricsCache = new HashMap<>();
@@ -137,7 +147,15 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
             log.info("Getting changed files on commit {}.", newCommit.getId());
             // select changed files
-            final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            final List<File> changedFiles;
+            if (StringUtils.isBlank(onlyOneRandomFileFromIssue)) {
+                changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            } else {
+                final List<File> files = fileRepository.selectChangedFilesIn(newCommit);
+                changedFiles = new ArrayList<>(1);
+                final File randomFile = files.get(randomizer.nextInt(files.size()));
+                changedFiles.add(randomFile);
+            }
 
             final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
 

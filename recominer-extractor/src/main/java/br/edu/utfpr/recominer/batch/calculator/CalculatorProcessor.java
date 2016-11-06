@@ -17,7 +17,9 @@ import br.edu.utfpr.recominer.repository.CommitMetricsRepository;
 import br.edu.utfpr.recominer.repository.FileMetricsRepository;
 import br.edu.utfpr.recominer.repository.IssuesMetricsRepository;
 import br.edu.utfpr.recominer.repository.NetworkMetricsRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -78,6 +80,9 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
     
+    @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
+    private String onlyOneRandomFileFromIssue;
+    
     @Override
     public CalculatorLog process(Project project) throws Exception {
         CalculatorLog calculatorLog = new CalculatorLog(project, "AllMetrics");
@@ -97,15 +102,24 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
             newCommits = commitRepository.selectNewCommitsForCalculator();
             log.info("{} new commits to be processed.", newCommits.size());
         } else {
-            newCommits = commitRepository.selectCommitsOf(issueKey);
+            newCommits = commitRepository.selectFirstCommitsOf(issueKey);
             log.info("Running classification for issue {}", issueKey);
         }
+        final Random randomizer = new Random();
 
         for (Commit newCommit : newCommits) {
 
             log.info("Computing metrics for changed files on commit {}.", newCommit.getId());
             // select changed files
-            final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            final List<File> changedFiles;
+            if (StringUtils.isBlank(onlyOneRandomFileFromIssue)) {
+                changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            } else {
+                final List<File> files = fileRepository.selectChangedFilesIn(newCommit);
+                changedFiles = new ArrayList<>(1);
+                final File randomFile = files.get(randomizer.nextInt(files.size()));
+                changedFiles.add(randomFile);
+            }
 
             final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
 
@@ -180,7 +194,12 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
             }
 
             // select issues associated to new commit
-            final List<Issue> issues = issueRepository.selectIssuesRelatedTo(newCommit);
+            final List<Issue> issues;
+            if (StringUtils.isBlank(issueKey)) {
+                issues = issueRepository.selectIssuesRelatedTo(newCommit);
+            } else {
+                issues = issueRepository.selectIssue(issueKey);
+            }
 
             log.info("Computing metrics of issues associated with new commit {}.", newCommit.getId());
             for (Issue issue : issues) {
