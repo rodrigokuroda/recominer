@@ -368,6 +368,21 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                 commit.getId());
     }
 
+    public List<File> selectProcessedChangedFilesIn(Commit commit) {
+        return jdbcOperations.query(
+                QueryUtils.getQueryForDatabase(
+                        "SELECT f.file_id, f.file_path"
+                        + "  FROM {0}.files_commits f"
+                        + "  JOIN (SELECT commit_id, file_id FROM {0}.ml_prediction  "
+                        + "         UNION "
+                        + "        SELECT commit_id, file_id FROM {0}.ar_prediction ap "
+                        + "          JOIN {0}.fileset fs ON fs.id = ap.fileset_id) t ON t.commit_id = f.commit_id"
+                        + "   AND t.file_id = f.file_id"
+                        + " WHERE f.commit_id = ?", project),
+                ROW_MAPPER,
+                commit.getId());
+    }
+
     public List<Cochange> selectCochangedFilesIn(Commit commit, File withFile) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(

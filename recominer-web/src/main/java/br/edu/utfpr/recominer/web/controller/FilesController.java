@@ -32,7 +32,7 @@ public class FilesController {
         final Project project = projectRepository.findOne(commit.getProject().getId());
         repository.setProject(project);
         List<FileDTO> files = new ArrayList<>();
-        for (File file : repository.selectChangedFilesIn(commit.getCommit())) {
+        for (File file : repository.selectProcessedChangedFilesIn(commit.getCommit())) {
             files.add(new FileDTO(file));
         }
         return files;
