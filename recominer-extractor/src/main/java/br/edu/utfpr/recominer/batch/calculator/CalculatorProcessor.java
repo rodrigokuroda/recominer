@@ -161,7 +161,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
                             log.info("Metrics for file {} in past commit {} has already computed.", changedFile.getId(), commit.getId());
                         }
 
-                        log.info("Computing metrics for file {}of issue {}.", changedFile.getId(), issue.getId());
+                        log.info("Computing metrics for file {} of issue {}.", changedFile.getId(), issue.getId());
                         final IssuesMetrics issueMetrics = issueMetricCalculator.calculeIssueMetrics(project, issue, commit);
                         issuesMetricsRepository.save(issueMetrics);
 
