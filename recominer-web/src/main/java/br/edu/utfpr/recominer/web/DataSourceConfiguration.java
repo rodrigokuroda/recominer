@@ -27,7 +27,7 @@ public class DataSourceConfiguration {
     public DataSource mysqlDataSource() throws SQLException {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriver(new com.mysql.jdbc.Driver());
-        dataSource.setUrl("jdbc:mysql://localhost:3306/");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/?autoReconnect=true&verifyServerCertificate=false&useSSL=false&requireSSL=false");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
         DatabasePopulatorUtils.execute(databasePopulator(), dataSource);
