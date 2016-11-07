@@ -61,6 +61,9 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
 
     @Value("#{jobParameters[classificarionScript]}")
     private String classificationScript;
+    
+    @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
+    private String onlyOneRandomFileFromIssue;
 
     @Override
     public ClassificatorLog process(Project project) throws Exception {
@@ -99,7 +102,14 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         int processedCommits = 0;
         for (Commit newCommit : newCommits) {
             log.info("{} of {} commits processed.", ++processedCommits, newCommits.size());
-            final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            // select changed files
+            final List<File> changedFiles;
+            if (StringUtils.isBlank(onlyOneRandomFileFromIssue)) {
+                changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            } else {
+                // get randomly chosen file in CalculatorProcessor
+                changedFiles = fileRepository.selectCalculatedChangedFilesIn(newCommit);
+            }
 
             final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
 

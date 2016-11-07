@@ -388,9 +388,8 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                 QueryUtils.getQueryForDatabase(
                         "SELECT f.file_id, f.file_path"
                         + "  FROM {0}.files_commits f"
-                        + "  JOIN (SELECT commit_id, file_id FROM {0}.file_metrics) t "
-                        + "       ON t.commit_id = f.commit_id AND t.file_id = f.file_id "
-                        + "   AND t.file_id = f.file_id"
+                        + "  JOIN {0}.file_metrics fm  ON fm.commit_id = f.commit_id AND fm.file_id = f.file_id "
+                        + "   AND fm.file_id = f.file_id"
                         + " WHERE f.commit_id = ?", project),
                 ROW_MAPPER,
                 commit.getId());
