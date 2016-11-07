@@ -7,6 +7,7 @@ import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -302,18 +303,21 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
     }
 
     public List<Commit> selectFirstCommitsOf(String... issueKey) {
-        return jdbcOperations.query(
+        MapSqlParameterSource param = new MapSqlParameterSource();
+        param.addValue("issues", Arrays.asList(issueKey));
+        param.addValue("max_files_per_commit", "max_files_per_commit");
+        return namedJdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"
                         + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i2s.issue_id "
-                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND iej.issue_key IN (?)"
+                        + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = :max_files_per_commit)"
+                        + "   AND iej.issue_key IN (:issues)"
                         + "   ORDER BY c.date ASC"
                         + "   LIMIT 1", project),
-                ROW_MAPPER,
-                "max_files_per_commit", issueKey);
+                param,
+                ROW_MAPPER);
     }
 
     public List<Commit> selectCommitsForAssociationRuleOf(String issueKey) {
