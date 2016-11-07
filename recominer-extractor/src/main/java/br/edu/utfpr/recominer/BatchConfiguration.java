@@ -99,10 +99,11 @@ public class BatchConfiguration {
             ExtractorProcessor processor,
             ExtractorWriter writer) {
         return steps.get("extractorStep")
-                .<Project, ExtractorLog>chunk(10)
+                .<Project, ExtractorLog>chunk(1)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+                .faultTolerant().retryLimit(0)
                 .build();
     }
 
@@ -111,10 +112,11 @@ public class BatchConfiguration {
             CalculatorProcessor processor,
             CalculatorWriter writer) {
         return steps.get("calculatorStep")
-                .<Project, CalculatorLog>chunk(10)
+                .<Project, CalculatorLog>chunk(1)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+                .faultTolerant().retryLimit(0)
                 .build();
     }
 
@@ -123,7 +125,7 @@ public class BatchConfiguration {
             DatasetProcessor processor,
             DatasetWriter writer) {
         return steps.get("datasetStep")
-                .<Project, DatasetLog>chunk(10)
+                .<Project, DatasetLog>chunk(1)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
@@ -135,10 +137,11 @@ public class BatchConfiguration {
             ClassificatorProcessor processor,
             ClassificatorWriter writer) {
         return steps.get("classificationStep")
-                .<Project, ClassificatorLog>chunk(10)
+                .<Project, ClassificatorLog>chunk(1)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+                .faultTolerant().retryLimit(0)
                 .build();
     }
 
@@ -147,10 +150,11 @@ public class BatchConfiguration {
             AssociationRuleProcessor processor,
             AssociationRuleWriter writer) {
         return steps.get("associationRuleStep")
-                .<Project, AssociationRuleLog>chunk(10)
+                .<Project, AssociationRuleLog>chunk(1)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
+                .faultTolerant().retryLimit(0)
                 .build();
     }
 }
