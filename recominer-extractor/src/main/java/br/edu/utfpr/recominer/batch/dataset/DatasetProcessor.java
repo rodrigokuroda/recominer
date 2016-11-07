@@ -150,7 +150,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
                 changedFiles = fileRepository.selectChangedFilesIn(newCommit);
             } else {
                 // get randomly chosen file in CalculatorProcessor
-                changedFiles = fileRepository.selectProcessedChangedFilesIn(newCommit);
+                changedFiles = fileRepository.selectCalculatedChangedFilesIn(newCommit);
             }
 
             final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
