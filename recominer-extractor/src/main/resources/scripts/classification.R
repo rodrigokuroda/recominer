@@ -62,7 +62,8 @@ for(cochangeSubfolder in sub.folders) {
     # Has obs. in test?
     if (nrow(test) > 0) {
       predicted <- predict(rf_model, test)
-      probability <- predict(rf_model, test, type = "prob")
+      # gets the first one (and only one) probability for predicted class (C or N)
+      probability <- predict(rf_model, test, type = "prob")[1, predicted]
     } else {
       predicted <- NA
       probability <- NA
@@ -72,6 +73,6 @@ for(cochangeSubfolder in sub.folders) {
     predicted <- NA
     probability <- NA
   }
-  output <- data.frame(file2Id, file2, predicted, probability[1, predicted], stringsAsFactors=TRUE)
+  output <- data.frame(file2Id, file2, predicted, probability, stringsAsFactors=TRUE)
   write.table(output, "resultsTest.csv", append=TRUE, eol = "\n", sep=";", col.names = F, row.names = F)  
 }
