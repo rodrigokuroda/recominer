@@ -53,6 +53,9 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
     @Value("#{jobParameters[filenameFilter]}")
     private String filter;
 
+    @Value("#{jobParameters[regexFilenameFilter]}")
+    private String regexFilenameFilter;
+
     @Value("#{jobParameters[workingDir]}")
     private String workingDir;
 
@@ -111,10 +114,12 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
                 changedFiles = fileRepository.selectCalculatedChangedFilesIn(newCommit);
             }
 
-            final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
+            final Predicate<File> fileFilter = FileFilter.getFilterByRegex(regexFilenameFilter);
 
             int processedFile = 0;
-            final List<File> filesToProcessed = changedFiles.stream().filter(fileFilter).collect(Collectors.toList());
+            final List<File> filesToProcessed = changedFiles.stream()
+                    .filter(fileFilter)
+                    .collect(Collectors.toList());
             for (File changedFile : filesToProcessed) {
                 log.info("{} of {} commits processed.", ++processedFile, filesToProcessed.size());
                 //List<FilePairIssueCommit> cochanges = filePairIssueCommitRepository.selectCochangesOf(changedFile, newCommit);

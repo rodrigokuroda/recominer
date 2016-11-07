@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,6 +28,21 @@ public class FileFilter {
         }
         Set<String> names = getFiltersFromString(filter);
         return f -> !names.contains(f.getFileName());
+    }
+
+    /**
+     * Receives a String containing names of files separated by comma.
+     * 
+     * @param filter String of names separated by comma.
+     * @return Predicate Filtering for Stream.
+     */
+    public static Predicate<File> getFilterByRegex(String filter) {
+        if (filter == null || StringUtils.isBlank(filter)) {
+            return f -> true;
+        }
+        Pattern pattern = Pattern.compile(filter);
+        
+        return f -> pattern.matcher(f.getFileName()).matches();
     }
     
     /**

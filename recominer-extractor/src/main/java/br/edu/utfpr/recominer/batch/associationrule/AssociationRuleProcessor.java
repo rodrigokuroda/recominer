@@ -70,6 +70,9 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
     @Value("#{jobParameters[filenameFilter]}")
     private String filter;
 
+    @Value("#{jobParameters[regexFilenameFilter]}")
+    private String regexFilenameFilter;
+
     @Value("#{jobParameters[topAssociationRules] ?: 10}")
     private Integer topAssociationRules;
     
@@ -93,7 +96,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         AssociationRuleLog associationRuleLog = new AssociationRuleLog(project, "Zimmermann");
         associationRuleLog.start();
 
-        final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
+        final Predicate<File> fileFilter = FileFilter.getFilterByRegex(regexFilenameFilter);
         
         // select new commits
         final List<Commit> newCommits;
@@ -117,7 +120,9 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
                 changedFiles = fileRepository.selectCalculatedChangedFilesIn(newCommit);
             }
             
-            for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
+            for (File changedFile : changedFiles.stream()
+                    .filter(fileFilter)
+                    .collect(Collectors.toList())) {
 
                 log.info("Computing association rule for file {} in the past.", changedFile.getId());
                 // find all issues/commits where file was changed
@@ -132,7 +137,11 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
                     
                     // Transaction is composed by files of commit
                     for (Commit commit : commits) {
-                        final List<File> changedFilesInIssue = fileRepository.selectChangedFilesIn(commit);
+                        final List<File> changedFilesInIssue = fileRepository
+                                .selectChangedFilesIn(commit)
+                                .stream()
+                                .filter(fileFilter)
+                                .collect(Collectors.toList());
                         final Transaction<File> transaction
                                 = new Transaction<>(issue.getId().longValue(), new HashSet<>(changedFilesInIssue));
                         transactions.add(transaction);

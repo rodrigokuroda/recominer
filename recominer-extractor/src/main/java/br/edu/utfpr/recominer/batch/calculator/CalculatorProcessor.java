@@ -77,6 +77,9 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Value("#{jobParameters[filenameFilter]}")
     private String filter;
 
+    @Value("#{jobParameters[regexFilenameFilter]}")
+    private String regexFilenameFilter;
+
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
     
@@ -121,7 +124,7 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
                 changedFiles.add(randomFile);
             }
 
-            final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
+            final Predicate<File> fileFilter = FileFilter.getFilterByRegex(regexFilenameFilter);
 
             for (File changedFile : changedFiles.stream()
                     .filter(fileFilter)

@@ -82,6 +82,9 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     
     @Value("#{jobParameters[filenameFilter]}")
     private String filter;
+
+    @Value("#{jobParameters[regexFilenameFilter]}")
+    private String regexFilenameFilter;
     
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
@@ -107,6 +110,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
         // select new commits
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
+            // TODO apply regexFilenameFilter to query
             newCommits = commitRepository.selectNewCommitsForDataset(FileFilter.getFiltersFromString(filter));
             log.info("{} new commits to be processed.", newCommits.size());
         } else {
@@ -153,9 +157,12 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
                 changedFiles = fileRepository.selectCalculatedChangedFilesIn(newCommit);
             }
 
-            final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
+            final Predicate<File> fileFilter = FileFilter.getFilterByRegex(regexFilenameFilter);
 
-            for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
+            for (File changedFile : changedFiles
+                    .stream()
+                    .filter(fileFilter)
+                    .collect(Collectors.toList())) {
 
                 FileMetrics fileMetrics = fileMetricsRepository.selectMetricsOf(changedFile, newCommit);
 
