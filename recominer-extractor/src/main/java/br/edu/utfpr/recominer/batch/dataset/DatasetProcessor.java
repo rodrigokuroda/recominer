@@ -271,6 +271,7 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
             log.info("No working directory was definied by parameter. Using default {}.", workingDir);
         }
         final java.io.File file = new java.io.File(workingDir);
+        file.mkdirs();
         log.info("Working directory path is {}.", file.getAbsolutePath());
         return file;
     }
