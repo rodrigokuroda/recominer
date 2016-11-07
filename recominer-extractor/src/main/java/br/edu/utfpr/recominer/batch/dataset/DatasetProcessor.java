@@ -205,7 +205,11 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
                         log.info("{} of {} past commits processed.", ++commitProcessed, commitsOfFile.size());
                         log.info("Getting metrics for file {} of commit {}.", changedFile.getId(), commit.getId());
                         
-                        final List<Cochange> cochangedFilesInCommit = fileRepository.selectCochangedFilesIn(commit, changedFile);
+                        final List<Cochange> cochangedFilesInCommit = fileRepository
+                                .selectCochangedFilesIn(commit, changedFile)
+                                .stream()
+                                .filter(cf -> fileFilter.test(cf.getFile()))
+                                .collect(Collectors.toList());
                         cochanges.addAll(cochangedFilesInCommit);
                         
                         filePairIssueCommitRepository.save(changedFile, cochangedFilesInCommit, issue, commit);
