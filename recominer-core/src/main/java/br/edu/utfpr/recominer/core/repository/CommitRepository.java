@@ -301,14 +301,15 @@ public class CommitRepository extends JdbcRepository<Commit, Integer> {
                 "max_files_per_commit", issueKey);
     }
 
-    public List<Commit> selectFirstCommitsOf(String issueKey) {
+    public List<Commit> selectFirstCommitsOf(String... issueKey) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT c.commit_id, c.rev, c.committer_id, c.date FROM " + getTable().getSchemaAndName() + " c"
                         + "  JOIN {0}.issues_scmlog i2s ON c.commit_id = i2s.scmlog_id "
                         + "  JOIN {0}_vcs.scmlog s ON s.id = c.commit_id"
+                        + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i2s.issue_id "
                         + " WHERE s.num_files BETWEEN 1 AND (SELECT config.value FROM recominer.configuration config WHERE config.key = ?)"
-                        + "   AND i2s.issue_id = (SELECT iej.issue_id FROM {0}_issues.issues_ext_jira iej WHERE iej.issue_key = ?)"
+                        + "   AND iej.issue_key IN (?)"
                         + "   ORDER BY c.date ASC"
                         + "   LIMIT 1", project),
                 ROW_MAPPER,
