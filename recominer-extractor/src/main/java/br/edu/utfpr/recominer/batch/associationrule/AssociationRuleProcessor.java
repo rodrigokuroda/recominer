@@ -75,6 +75,9 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
     
     @Value("#{jobParameters[issueKey]}")
     private String issueKey;
+    
+    @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
+    private String onlyOneRandomFileFromIssue;
 
     @Override
     public AssociationRuleLog process(Project project) throws Exception {
@@ -98,7 +101,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
             newCommits = commitRepository.selectNewCommitsForAssociationRule();
             log.info("{} new commits to be processed.", newCommits.size());
         } else {
-            newCommits = commitRepository.selectCommitsForAssociationRuleOf(issueKey);
+            newCommits = commitRepository.selectFirstCommitsOf(issueKey);
             log.info("Running association rules processor for issue {}", issueKey);
         }
         
@@ -106,7 +109,13 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         
             log.info("Computing metrics for changed files on commit {}.", newCommit.getId());
             // select changed files
-            final List<File> changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            final List<File> changedFiles;
+            if (StringUtils.isBlank(onlyOneRandomFileFromIssue)) {
+                changedFiles = fileRepository.selectChangedFilesIn(newCommit);
+            } else {
+                // get randomly chosen file in CalculatorProcessor
+                changedFiles = fileRepository.selectCalculatedChangedFilesIn(newCommit);
+            }
             
             for (File changedFile : changedFiles.stream().filter(fileFilter).collect(Collectors.toList())) {
 
