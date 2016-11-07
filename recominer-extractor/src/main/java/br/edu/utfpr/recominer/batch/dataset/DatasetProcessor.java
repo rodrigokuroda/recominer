@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -116,7 +115,6 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
         }
         
         final java.io.File workingDirectory = getWorkingDirectory();
-        final Random randomizer = new Random();
 
         for (Commit newCommit : newCommits) {
 
@@ -151,10 +149,8 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
             if (StringUtils.isBlank(onlyOneRandomFileFromIssue)) {
                 changedFiles = fileRepository.selectChangedFilesIn(newCommit);
             } else {
-                final List<File> files = fileRepository.selectChangedFilesIn(newCommit);
-                changedFiles = new ArrayList<>(1);
-                final File randomFile = files.get(randomizer.nextInt(files.size()));
-                changedFiles.add(randomFile);
+                // get randomly chosen file in CalculatorProcessor
+                changedFiles = fileRepository.selectProcessedChangedFilesIn(newCommit);
             }
 
             final Predicate<File> fileFilter = FileFilter.getFilterByFilename(filter);
