@@ -78,10 +78,10 @@ public class ClassificatorProcessor implements ItemProcessor<Project, Classifica
         final List<Commit> newCommits;
         if (StringUtils.isBlank(issueKey)) {
             newCommits = commitRepository.selectNewCommitsForClassification();
-            log.info("Running classification for issue {}", issueKey);
+            log.info("{} new commits to be processed.", newCommits.size());
         } else {
             newCommits = commitRepository.selectFirstCommitsOf(issueKey);
-            log.info("{} new commits to be processed.", newCommits.size());
+            log.info("Running classification for issue {}", issueKey);
         }
         
         // Load script location
