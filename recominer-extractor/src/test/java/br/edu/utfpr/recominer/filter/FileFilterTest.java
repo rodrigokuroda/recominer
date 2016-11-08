@@ -5,6 +5,7 @@ import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
@@ -20,6 +21,25 @@ public class FileFilterTest {
     
     @Test
     public void testGetFilterByFilename() {
+        List<Cochange> cochanges = new ArrayList<>();
+        final Cochange cochange1 = new Cochange(new File(1, "A.txt"), new Commit(1));
+        cochanges.add(cochange1);
+        final Cochange cochange2 = new Cochange(new File(2, "B.java"), new Commit(2));
+        cochanges.add(cochange2);
+        final Cochange cochange3 = new Cochange(new File(3, "C.xml"), new Commit(2));
+        cochanges.add(cochange3);
+        
+        Predicate<File> fileFilter = FileFilter.getFilterByFilename("A.txt");
+        
+        final List<Cochange> cochangedFilesInCommit = cochanges
+                                .stream()
+                                .filter(cf -> fileFilter.test(cf.getFile()))
+                                .collect(Collectors.toList());
+        
+        assertEquals(2, cochangedFilesInCommit.size());
+        assertFalse(cochangedFilesInCommit.contains(cochange1));
+        assertTrue(cochangedFilesInCommit.contains(cochange2));
+        assertTrue(cochangedFilesInCommit.contains(cochange3));
     }
 
     @Test
@@ -47,6 +67,12 @@ public class FileFilterTest {
 
     @Test
     public void testGetFiltersFromString() {
+        Set<String> files = FileFilter.getFiltersFromString("A.txt,C.xml");
+        
+        assertEquals(2, files.size());
+        assertTrue(files.remove("A.txt"));
+        assertFalse(files.remove("B.java"));
+        assertTrue(files.remove("C.xml"));
     }
     
 }
