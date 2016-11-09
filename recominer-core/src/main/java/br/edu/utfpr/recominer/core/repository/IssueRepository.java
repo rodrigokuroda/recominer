@@ -275,6 +275,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("commit", until.getId());
         params.addValue("file", changedFile.getId());
+        params.addValue("trainPastVersions", trainPastVersions);
 
         return namedJdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
