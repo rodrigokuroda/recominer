@@ -140,11 +140,11 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
 
                 final List<Issue> issuesOfFile;
                 if (Boolean.valueOf(trainAllData)) {
-                    issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit, Integer.valueOf(trainPastVersions));
-                    log.info("Retrieved {} issues from the last {} previous versions of commit {}.", issuesOfFile.size(), trainPastVersions, newCommit.getId());
-                } else {
                     issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
                     log.info("Retrieved {} issues from commit {}.", issuesOfFile.size(), newCommit.getId());
+                } else {
+                    issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit, Integer.valueOf(trainPastVersions));
+                    log.info("Retrieved {} issues from the last {} previous versions of commit {}.", issuesOfFile.size(), trainPastVersions, newCommit.getId());
                 }
                 
                 long issuesProcessed = 0;
