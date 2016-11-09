@@ -92,10 +92,10 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
     private String onlyOneRandomFileFromIssue;
     
-    @Value("#{jobParameters[trainPastVersions] ?: '1'}")
+    @Value("#{jobParameters[trainPastVersions] ?: 1}")
     private String trainPastVersions;
     
-    @Value("#{jobParameters[trainAllData] ?: 'false'}")
+    @Value("#{jobParameters[trainAllData] ?: false}")
     private String trainAllData;
 
     @Override

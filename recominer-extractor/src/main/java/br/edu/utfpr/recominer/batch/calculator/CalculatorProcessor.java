@@ -86,10 +86,10 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
     private String onlyOneRandomFileFromIssue;
     
-    @Value("#{jobParameters[trainPastVersions]}")
+    @Value("#{jobParameters[trainPastVersions] ?: 1}")
     private String trainPastVersions;
     
-    @Value("#{jobParameters[trainAllData] ?: 'false'}")
+    @Value("#{jobParameters[trainAllData] ?: false}")
     private String trainAllData;
     
     @Override
