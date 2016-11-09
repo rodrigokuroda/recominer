@@ -86,6 +86,12 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
     @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
     private String onlyOneRandomFileFromIssue;
     
+    @Value("#{jobParameters[trainPastVersions]}")
+    private String trainPastVersions;
+    
+    @Value("#{jobParameters[trainAllData] ?: 'false'}")
+    private String trainAllData;
+    
     @Override
     public CalculatorLog process(Project project) throws Exception {
         CalculatorLog calculatorLog = new CalculatorLog(project, "AllMetrics");
@@ -132,8 +138,15 @@ public class CalculatorProcessor implements ItemProcessor<Project, CalculatorLog
 
                 log.info("Computing metrics for file {} in the past.", changedFile.getId());
 
-                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
-
+                final List<Issue> issuesOfFile;
+                if (Boolean.valueOf(trainAllData)) {
+                    issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit, Integer.valueOf(trainPastVersions));
+                    log.info("Retrieved {} issues from the last {} previous versions of commit {}.", issuesOfFile.size(), trainPastVersions, newCommit.getId());
+                } else {
+                    issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
+                    log.info("Retrieved {} issues from commit {}.", issuesOfFile.size(), newCommit.getId());
+                }
+                
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {
                     log.info("{} of {} past issues processed.", ++issuesProcessed, issuesOfFile.size());

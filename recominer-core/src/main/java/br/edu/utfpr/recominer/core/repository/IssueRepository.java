@@ -271,7 +271,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
      * @param until The commit
      * @return
      */
-    public List<Issue> selectFixedIssuesFromLastVersionOf(File changedFile, Commit until) {
+    public List<Issue> selectFixedIssuesFromLastVersionOf(File changedFile, Commit until, Integer trainPastVersions) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("commit", until.getId());
         params.addValue("file", changedFile.getId());
@@ -290,12 +290,19 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  WHERE fc.file_id = :file "
                         + "    AND s.date < (SELECT s2.date FROM {0}_vcs.scmlog s2 WHERE s2.id = :commit) "
                         + "    AND i.fixed_on IS NOT NULL "
-                        + "    AND (ifvo.version_order = "
-                        + "          (SELECT MIN(ifvo2.version_order) - 1 "
+                        + "   AND (ifvo.version_order IN "
+                        + "          (SELECT ifvo2.version_order "
                         + "             FROM {0}.issues_fix_version_order ifvo2 "
                         + "             JOIN {0}.issues_fix_version ifv2 ON ifvo2.minor_fix_version = ifv2.minor_fix_version "
-                        + "             JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
-                        + "            WHERE i2s.scmlog_id = :commit "
+                        + "			 JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
+                        + "            WHERE i2s.scmlog_id = s.id "
+                        + "          )  "
+                        + "          OR ifvo.version_order = "
+                        + "          (SELECT MIN(ifvo2.version_order) - GREATEST(:trainPastVersions, 0) "
+                        + "             FROM {0}.issues_fix_version_order ifvo2 "
+                        + "             JOIN {0}.issues_fix_version ifv2 ON ifvo2.minor_fix_version = ifv2.minor_fix_version "
+                        + "			 JOIN {0}.issues_scmlog i2s ON ifv2.issue_id = i2s.issue_id "
+                        + "            WHERE i2s.scmlog_id = s.id "
                         + "          ) "
                         + "        )",
                         project),

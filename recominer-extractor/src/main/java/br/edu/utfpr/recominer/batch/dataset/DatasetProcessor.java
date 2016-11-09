@@ -91,6 +91,12 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
     
     @Value("#{jobParameters[onlyOneRandomFileFromIssue]}")
     private String onlyOneRandomFileFromIssue;
+    
+    @Value("#{jobParameters[trainPastVersions] ?: '1'}")
+    private String trainPastVersions;
+    
+    @Value("#{jobParameters[trainAllData] ?: 'false'}")
+    private String trainAllData;
 
     @Override
     public DatasetLog process(Project project) throws Exception {
@@ -190,7 +196,14 @@ public class DatasetProcessor implements ItemProcessor<Project, DatasetLog> {
 
                 log.info("Getting issues where file {} was changed.", changedFile.getId());
                 // find all issues/commits where file was changed
-                List<Issue> issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit);
+                final List<Issue> issuesOfFile;
+                if (Boolean.valueOf(trainAllData)) {
+                    issuesOfFile = issueRepository.selectFixedIssuesFromLastVersionOf(changedFile, newCommit, Integer.valueOf(trainPastVersions));
+                    log.info("Retrieved {} issues from the last {} previous versions of commit {}.", issuesOfFile.size(), trainPastVersions, newCommit.getId());
+                } else {
+                    issuesOfFile = issueRepository.selectFixedIssuesOf(changedFile, newCommit);
+                    log.info("Retrieved {} issues from commit {}.", issuesOfFile.size(), newCommit.getId());
+                }
 
                 long issuesProcessed = 0;
                 for (Issue issue : issuesOfFile) {
