@@ -154,8 +154,8 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                         + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_id = arp.id "
                         + " WHERE fs.file_id = ? "
                         + "   AND arp.commit_id = ? "
-                        + "   AND arp.prediction_result = \"C\" "
-                        + " ORDER BY rank ASC "),
+                        //+ "   AND arp.prediction_result = \"C\" "
+                        + " ORDER BY arp.prediction_result ASC, rank ASC"),
                 (ResultSet rs, int rowNum) -> {
                     AssociationRulePrediction associationRulePrediction = ROW_MAPPER.mapRow(rs, rowNum);
 
@@ -177,6 +177,52 @@ public class AssociationRulePredictionRepository extends JdbcRepository<Associat
                     return associationRulePrediction;
                 },
                 file.getId(), commit.getId()
+        );
+
+        return predictions;
+    }
+
+    public List<AssociationRulePrediction> selectPredictedCochangesFor(Commit commit, File file, Integer toLoad, Integer numLoaded) {
+        List<AssociationRulePrediction> predictions = jdbcOperations.query(
+                getQueryForSchema(
+                        "SELECT DISTINCT arp.*, "
+                        + "     pfs.file_id, "
+                        + "     pf.file_path, "
+                        + "     pfb.id AS prediction_feedback_id, "
+                        + "     pfb.changed, "
+                        + "     pfb.justification "
+                        + "  FROM {0}.ar_prediction arp "
+                        + "  JOIN {0}.fileset fs ON fs.id = arp.fileset_id "
+                        + "  LEFT JOIN {0}.fileset pfs ON pfs.id = arp.predicted_fileset_id "
+                        + "  LEFT JOIN {0}.files_commits pf ON pf.file_id = pfs.file_id AND pf.commit_id = "
+                        + "      (SELECT MAX(ifc.commit_id) FROM {0}.files_commits ifc WHERE ifc.file_id = pfs.file_id AND ifc.commit_id < arp.commit_id) "
+                        + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_id = arp.id "
+                        + " WHERE fs.file_id = ? "
+                        + "   AND arp.commit_id = ? "
+                        + "   AND arp.prediction_result = \"C\" "
+                        + " ORDER BY rank ASC, pfs.file_id ASC "
+                        + " LIMIT ? OFFSET ?"),
+                (ResultSet rs, int rowNum) -> {
+                    AssociationRulePrediction associationRulePrediction = ROW_MAPPER.mapRow(rs, rowNum);
+
+                    final Set<File> predictedFiles = new HashSet<>(1);
+                    predictedFiles.add(new File(rs.getInt("file_id"), rs.getString("file_path")));
+
+                    final Fileset predictedFileset = new Fileset(rs.getLong("predicted_fileset_id"));
+                    predictedFileset.setFile(predictedFiles);
+
+                    associationRulePrediction.setPredictedFileset(predictedFileset);
+
+                    final int feedbackId = rs.getInt("prediction_feedback_id");
+                    final PredictionFeedback predictionFeedback = new PredictionFeedback(feedbackId == 0 ? null : feedbackId);
+                    predictionFeedback.setChanged(rs.getBoolean("changed"));
+                    predictionFeedback.setPredictionId(rs.getInt("id"));
+                    predictionFeedback.setJustification(rs.getString("justification"));
+                    associationRulePrediction.setFeedback(predictionFeedback);
+
+                    return associationRulePrediction;
+                },
+                file.getId(), commit.getId(), toLoad, numLoaded
         );
 
         return predictions;

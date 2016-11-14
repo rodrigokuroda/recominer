@@ -54,7 +54,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
     public List<MachineLearningPrediction> selectPredictedCochangesFor(Commit commit, File file) {
         return jdbcOperations.query(
                 getQueryForSchema(
-                        "SELECT mlp.id, mlp.file_id, "
+                        "SELECT DISTINCT mlp.id, mlp.file_id, "
                         + "     mlp.commit_id, "
                         + "     mlp.predicted_file_id, "
                         + "     mlp.prediction_result, "
@@ -70,7 +70,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                         + " WHERE mlp.file_id = ? "
                         + "   AND mlp.commit_id = ? "
                         //+ "   AND mlp.prediction_result = \"C\" "
-                        + " ORDER BY mlp.prediction_result"),
+                        + " ORDER BY mlp.prediction_result ASC, mlp.probability DESC"),
                 (ResultSet rs, int rowNum) -> {
                     MachineLearningPrediction machineLearningPrediction = ROW_MAPPER.mapRow(rs, rowNum);
 
