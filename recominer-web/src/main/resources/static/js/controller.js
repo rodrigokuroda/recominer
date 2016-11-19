@@ -18,7 +18,6 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         $scope.loadingCochanges = false;
 
         $scope.numPerPage = 10;
-        $scope.currentPage = 0;
         $scope.paging = {
             total: 1,
             current: 1,
@@ -26,17 +25,24 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         };
 
         function loadPages() {
-            console.log('Current page is : ' + $scope.paging.current);
-
             var begin = (($scope.paging.current - 1) * $scope.numPerPage),
                 end = begin + $scope.numPerPage;
 
             $scope.paginatedCochanges = $scope.cochanges.slice(begin, end);
-            $scope.currentPage = $scope.paging.current;
         }
 
         function calculatePages() {
+            $scope.paging.current = 1;
             $scope.paging.total = Math.ceil($scope.cochanges.length / $scope.numPerPage);
+        }
+        
+        function resetPagination() {
+            $scope.paging = {
+                total: 1,
+                current: 1,
+                onPageChanged: loadPages,
+            };
+            $scope.paginatedCochanges = [];
         }
 
         $log.debug("Fetching project...");
@@ -79,6 +85,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             $scope.activeCommit = null;
             $scope.activeFile = null;
             $scope.cochanges = [];
+            resetPagination();
             $log.debug("Fetching opened issues from project " + project.name + "...");
             $http.post("/issues", project)
                 .then(function(response) {
@@ -100,6 +107,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             $scope.activeCommit = null;
             $scope.activeFile = null;
             $scope.cochanges = [];
+            resetPagination();
             $log.debug("Fetching commits from issue " + issue.key + "...");
             issue.project = $scope.activeProject;
             $http.post("/commits", issue)
@@ -121,6 +129,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             $scope.activeCommit = commit;
             $scope.activeFile = null;
             $scope.cochanges = [];
+            resetPagination();
             $log.debug("Fetching files from commit " + commit.revision + "...");
             commit.project = $scope.activeProject;
             $http.post("/files", commit)
@@ -140,7 +149,6 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         $scope.getPredictedCochangesOf = function(file) {
             $scope.loadingCochanges = true;
             $scope.activeFile = file;
-            $scope.cochanges = [];
             $log.debug("Fetching predicted cochanges for file " + file.name + "...");
             file.project = $scope.activeProject;
             file.commit = $scope.activeCommit;
@@ -148,13 +156,15 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.cochanges = response.data;
                         $scope.loadingCochanges = false;
+                        resetPagination();    
+                        loadPages();
+                        calculatePages();
                     },
                     function(response) {
                         $scope.cochanges = [];
                         $scope.loadingCochanges = false;
                     }
                 );
-            $scope.currentPage = 1;
         };
 
         // Load cochanges predicted by AR
@@ -168,13 +178,15 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.cochanges = response.data;
                         $scope.loadingCochanges = false;
+                        resetPagination();    
+                        loadPages();
+                        calculatePages();
                     },
                     function(response) {
                         $scope.cochanges = [];
                         $scope.loadingCochanges = false;
                     }
                 );
-            $scope.currentPage = 1;
         };
 
         // Load cochanges predicted by ML
@@ -188,6 +200,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.cochanges = response.data;
                         $scope.loadingCochanges = false;
+                        resetPagination();    
                         loadPages();
                         calculatePages();
                     },
@@ -196,7 +209,6 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                         $scope.loadingCochanges = false;
                     }
                 );
-            $scope.currentPage = 1;
         };
 
         // Submit feedback
