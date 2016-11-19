@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ngResource', 'ngMaterial']);
+var app = angular.module('app', ['ngRoute', 'ngResource', 'ngMaterial', 'cl.paging']);
 app.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
     $routeProvider
         .when('/', {

@@ -1,162 +1,216 @@
 app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdSidenav', '$mdToast',
-  function($scope, $log, $window, $http, $mdSidenav, $mdToast) {
-    $scope.projects = null;
-    $scope.issues = null;
-    $scope.commits = null;
-    $scope.files = null;
-    $scope.cochanges = null;
-    $scope.activeProject = null;
-    $scope.activeIssue = null;
-    $scope.activeCommit = null;
-    $scope.activeFile = null;
-    $scope.tabIndex = 0;
-
-    $log.debug("Fetching project...");
-    $http.get("/projects")
-        .then(function(response) {
-                $scope.projects = response.data;
-            },
-            function(response) {
-                $scope.projects = null;
-            }
-        );
-
-    // Toolbar search toggle
-    $scope.toggleSearchProjects = function(element) {
-        $scope.showSearchProjects = !$scope.showSearchProjects;
-    };
-    $scope.toggleSearchIssues = function(element) {
-        $scope.showSearchIssues = !$scope.showSearchIssues;
-    };
-    $scope.toggleSearchCommits = function(element) {
-        $scope.showSearchCommits = !$scope.showSearchCommits;
-    };
-    $scope.toggleSearchFiles = function(element) {
-        $scope.showSearchFiles = !$scope.showSearchFiles;
-    };
-
-    // Sidenav toggle
-    $scope.toggleSidenav = function(menuId) {
-        $mdSidenav(menuId).toggle();
-    };
-
-    // Load issues
-    $scope.getIssuesOf = function(project) {
-        $scope.activeProject = project;
+    function($scope, $log, $window, $http, $mdSidenav, $mdToast) {
+        $scope.projects = [];
+        $scope.issues = [];
+        $scope.commits = [];
+        $scope.files = [];
+        $scope.cochanges = [];
+        $scope.paginatedCochanges = [];
+        $scope.activeProject = null;
         $scope.activeIssue = null;
         $scope.activeCommit = null;
         $scope.activeFile = null;
-        $scope.cochanges = null;
-        $log.debug("Fetching opened issues from project " + project.name + "...");
-        $http.post("/issues", project)
+        $scope.tabIndex = 0;
+        $scope.loadingProjects = false;
+        $scope.loadingIssues = false;
+        $scope.loadingCommits = false;
+        $scope.loadingFiles = false;
+        $scope.loadingCochanges = false;
+
+        $scope.numPerPage = 10;
+        $scope.currentPage = 0;
+        $scope.paging = {
+            total: 1,
+            current: 1,
+            onPageChanged: loadPages,
+        };
+
+        function loadPages() {
+            console.log('Current page is : ' + $scope.paging.current);
+
+            var begin = (($scope.paging.current - 1) * $scope.numPerPage),
+                end = begin + $scope.numPerPage;
+
+            $scope.paginatedCochanges = $scope.cochanges.slice(begin, end);
+            $scope.currentPage = $scope.paging.current;
+        }
+
+        function calculatePages() {
+            $scope.paging.total = Math.ceil($scope.cochanges.length / $scope.numPerPage);
+        }
+
+        $log.debug("Fetching project...");
+        $scope.loadingProjects = true;
+        $http.get("/projects")
             .then(function(response) {
-                    $scope.issues = response.data;
+                    $scope.projects = response.data;
+                    $scope.loadingProjects = false;
                 },
                 function(response) {
-                    $scope.issues = null;
+                    $scope.projects = [];
+                    $scope.loadingProjects = false;
                 }
             );
-        $scope.tabIndex = 1;
-    };
 
-    // Load commits
-    $scope.getCommitsOf = function(issue) {
-        $scope.activeIssue = issue;
-        $scope.activeCommit = null;
-        $scope.activeFile = null;
-        $scope.cochanges = null;
-        $log.debug("Fetching commits from issue " + issue.key + "...");
-        issue.project = $scope.activeProject;
-        $http.post("/commits", issue)
-            .then(function(response) {
-                    $scope.commits = response.data;
-                },
-                function(response) {
-                    $scope.commits = null;
-                }
-            );
-        $scope.tabIndex = 2;
-    };
+        // Toolbar search toggle
+        $scope.toggleSearchProjects = function(element) {
+            $scope.showSearchProjects = !$scope.showSearchProjects;
+        };
+        $scope.toggleSearchIssues = function(element) {
+            $scope.showSearchIssues = !$scope.showSearchIssues;
+        };
+        $scope.toggleSearchCommits = function(element) {
+            $scope.showSearchCommits = !$scope.showSearchCommits;
+        };
+        $scope.toggleSearchFiles = function(element) {
+            $scope.showSearchFiles = !$scope.showSearchFiles;
+        };
 
-    // Load files
-    $scope.getFilesOf = function(commit) {
-        $scope.activeCommit = commit;
-        $scope.activeFile = null;
-        $scope.cochanges = null;
-        $log.debug("Fetching files from commit " + commit.revision + "...");
-        commit.project = $scope.activeProject;
-        $http.post("/files", commit)
-            .then(function(response) {
-                    $scope.files = response.data;
-                },
-                function(response) {
-                    $scope.files = null;
-                }
-            );
-        $scope.tabIndex = 3;
-    };
+        // Sidenav toggle
+        $scope.toggleSidenav = function(menuId) {
+            $mdSidenav(menuId).toggle();
+        };
 
-    // Load cochanges
-    $scope.getPredictedCochangesOf = function(file) {
-        $scope.activeFile = file;
-        $scope.cochanges = null;
-        $log.debug("Fetching predicted cochanges for file " + file.name + "...");
-        file.project = $scope.activeProject;
-        file.commit = $scope.activeCommit;
-        $http.post("/predictedCochanges", file)
-            .then(function(response) {
-                    $scope.cochanges = response.data;
-                },
-                function(response) {
-                    $scope.cochanges = null;
-                }
-            );
-    };
+        // Load issues
+        $scope.getIssuesOf = function(project) {
+            $scope.loadingIssues = true;
+            $scope.activeProject = project;
+            $scope.activeIssue = null;
+            $scope.activeCommit = null;
+            $scope.activeFile = null;
+            $scope.cochanges = [];
+            $log.debug("Fetching opened issues from project " + project.name + "...");
+            $http.post("/issues", project)
+                .then(function(response) {
+                        $scope.issues = response.data;
+                        $scope.loadingIssues = false;
+                    },
+                    function(response) {
+                        $scope.issues = [];
+                        $scope.loadingIssues = false;
+                    }
+                );
+            $scope.tabIndex = 1;
+        };
 
-    // Load cochanges predicted by AR
-    $scope.getArPredictedCochangesOf = function(file) {
-        $scope.activeFile = file;
-        $log.debug("Fetching predicted cochanges for file " + file.name + "...");
-        file.project = $scope.activeProject;
-        file.commit = $scope.activeCommit;
-        $http.post("/arPredictedCochanges", file)
-            .then(function(response) {
-                    $scope.cochanges = response.data;
-                },
-                function(response) {
-                    $scope.cochanges = null;
-                }
-            );
-    };
+        // Load commits
+        $scope.getCommitsOf = function(issue) {
+            $scope.loadingCommits = true;
+            $scope.activeIssue = issue;
+            $scope.activeCommit = null;
+            $scope.activeFile = null;
+            $scope.cochanges = [];
+            $log.debug("Fetching commits from issue " + issue.key + "...");
+            issue.project = $scope.activeProject;
+            $http.post("/commits", issue)
+                .then(function(response) {
+                        $scope.commits = response.data;
+                        $scope.loadingCommits = false;
+                    },
+                    function(response) {
+                        $scope.commits = [];
+                        $scope.loadingCommits = false;
+                    }
+                );
+            $scope.tabIndex = 2;
+        };
 
-    // Load cochanges predicted by ML
-    $scope.getMlPredictedCochangesOf = function(file) {
-        $scope.activeFile = file;
-        $log.debug("Fetching predicted cochanges for file " + file.name + "...");
-        file.project = $scope.activeProject;
-        file.commit = $scope.activeCommit;
-        $http.post("/mlPredictedCochanges", file)
-            .then(function(response) {
-                    $scope.cochanges = response.data;
-                },
-                function(response) {
-                    $scope.cochanges = null;
-                }
-            );
-    };
+        // Load files
+        $scope.getFilesOf = function(commit) {
+            $scope.loadingFiles = false;
+            $scope.activeCommit = commit;
+            $scope.activeFile = null;
+            $scope.cochanges = [];
+            $log.debug("Fetching files from commit " + commit.revision + "...");
+            commit.project = $scope.activeProject;
+            $http.post("/files", commit)
+                .then(function(response) {
+                        $scope.files = response.data;
+                        $scope.loadingFiles = false;
+                    },
+                    function(response) {
+                        $scope.files = [];
+                        $scope.loadingFiles = false;
+                    }
+                );
+            $scope.tabIndex = 3;
+        };
 
-    // Submit feedback
-    $scope.submitFeedback = function(cochange) {
-        cochange.file.project = $scope.activeProject;
-        $log.debug("Sending feedback of " + cochange.file.name + "...");
-        $http.post("/saveFeedback", cochange)
-            .then(function(response) {
-                    $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
-                },
-                function(response) {
-                    $mdToast.show($mdToast.simple().position('bottom right').textContent("Failed to submit feedback! " + response.data.message));
-                }
-            );
-    };
+        // Load cochanges
+        $scope.getPredictedCochangesOf = function(file) {
+            $scope.loadingCochanges = true;
+            $scope.activeFile = file;
+            $scope.cochanges = [];
+            $log.debug("Fetching predicted cochanges for file " + file.name + "...");
+            file.project = $scope.activeProject;
+            file.commit = $scope.activeCommit;
+            $http.post("/predictedCochanges", file)
+                .then(function(response) {
+                        $scope.cochanges = response.data;
+                        $scope.loadingCochanges = false;
+                    },
+                    function(response) {
+                        $scope.cochanges = [];
+                        $scope.loadingCochanges = false;
+                    }
+                );
+            $scope.currentPage = 1;
+        };
 
-}]);
+        // Load cochanges predicted by AR
+        $scope.getArPredictedCochangesOf = function(file) {
+            $scope.loadingCochanges = true;
+            $scope.activeFile = file;
+            $log.debug("Fetching predicted cochanges for file " + file.name + "...");
+            file.project = $scope.activeProject;
+            file.commit = $scope.activeCommit;
+            $http.post("/arPredictedCochanges", file)
+                .then(function(response) {
+                        $scope.cochanges = response.data;
+                        $scope.loadingCochanges = false;
+                    },
+                    function(response) {
+                        $scope.cochanges = [];
+                        $scope.loadingCochanges = false;
+                    }
+                );
+            $scope.currentPage = 1;
+        };
+
+        // Load cochanges predicted by ML
+        $scope.getMlPredictedCochangesOf = function(file) {
+            $scope.loadingCochanges = true;
+            $scope.activeFile = file;
+            $log.debug("Fetching predicted cochanges for file " + file.name + "...");
+            file.project = $scope.activeProject;
+            file.commit = $scope.activeCommit;
+            $http.post("/mlPredictedCochanges", file)
+                .then(function(response) {
+                        $scope.cochanges = response.data;
+                        $scope.loadingCochanges = false;
+                        loadPages();
+                        calculatePages();
+                    },
+                    function(response) {
+                        $scope.cochanges = [];
+                        $scope.loadingCochanges = false;
+                    }
+                );
+            $scope.currentPage = 1;
+        };
+
+        // Submit feedback
+        $scope.submitFeedback = function(cochange) {
+            cochange.file.project = $scope.activeProject;
+            $log.debug("Sending feedback of " + cochange.file.name + "...");
+            $http.post("/saveFeedback", cochange)
+                .then(function(response) {
+                        $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
+                    },
+                    function(response) {
+                        $mdToast.show($mdToast.simple().position('bottom right').textContent("Failed to submit feedback! " + response.data.message));
+                    }
+                );
+        };
+    }
+]);

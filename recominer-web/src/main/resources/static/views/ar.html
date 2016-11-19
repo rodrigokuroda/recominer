@@ -38,6 +38,9 @@
                                 </md-input-container>
                             </div>
                         </md-toolbar>
+                        <div ng-if="loadingProjects" layout="row" layout-sm="column" layout-align="space-around center">
+                            <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
+                        </div>
                         <md-list flex>
                             <md-list-item class="md-2-line" ng-repeat="project in projects| filter:searchProject" role="link" ng-click="getIssuesOf(project)" ng-class="{ 'nav-active': project == activeProject }">
                                 <div class="md-list-item-text">
@@ -69,6 +72,9 @@
                                 </md-input-container>
                             </div>
                         </md-toolbar>
+                        <div ng-if="loadingIssues" layout="row" layout-sm="column" layout-align="space-around center">
+                            <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
+                        </div>
                         <md-list flex>
                             <md-list-item class="md-2-line" ng-repeat="issue in issues| filter:searchIssue" role="link" ng-click="getCommitsOf(issue)" ng-class="{ 'nav-active': issue == activeIssue }">
                                 <div class="md-list-item-text">
@@ -100,6 +106,9 @@
                                 </md-input-container>
                             </div>
                         </md-toolbar>
+                        <div ng-if="loadingCommits" layout="row" layout-sm="column" layout-align="space-around center">
+                            <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
+                        </div>
                         <md-list flex>
                             <md-list-item class="md-2-line" ng-repeat="commit in commits| filter:searchCommit" role="link" ng-click="getFilesOf(commit)" ng-class="{ 'nav-active': commit == activeCommit }">
                                 <div class="md-list-item-text">
@@ -131,6 +140,9 @@
                                 </md-input-container>
                             </div>
                         </md-toolbar>
+                        <div ng-if="loadingFiles" layout="row" layout-sm="column" layout-align="space-around center">
+                            <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
+                        </div>
                         <md-list flex>
                             <md-list-item class="md-2-line" ng-repeat="file in files| filter:searchFile" role="link" ng-click="getArPredictedCochangesOf(file)" ng-class="{ 'nav-active': file == activeFile }">
                                 <div class="md-list-item-text">
@@ -158,7 +170,13 @@
                             </div>
                         </md-list-item>
                     </md-toolbar>
-                    <md-card ng-repeat="cochange in cochanges track by $index">
+                    <div ng-if="loadingCochanges" layout="row" layout-sm="column" layout-align="space-around center">
+                        <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
+                    </div>
+                    <div ng-if="paginatedCochanges != null && paginatedCochanges.length > 0" layout="row" layout-sm="column" layout-align="center center" layout-margin>
+                        <cl-paging flex cl-pages="paging.total" cl-steps="6" cl-page-changed="paging.onPageChanged()" cl-align="center center" cl-current-page="paging.current"></cl-paging>
+                    </div>
+                    <md-card ng-repeat="cochange in paginatedCochanges track by $index">
                         <md-card-header>
                             <md-icon
                                 md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}"
@@ -169,8 +187,8 @@
                             <md-card-header-text>
                                 <span class="md-title">{{ cochange.file.name }}</span>
                                 <span class="md-subhead">
-                                      {{ cochange.algorithmName }}
-                                      {{ cochange.probability == null ? '' : '(' + cochange.probability + ')' }}
+                                    {{ cochange.algorithmName }}
+                                    {{ cochange.probability == null ? '' : '(' + cochange.predictionResult + ' ' + cochange.probability + ')' }}
                                 </span>
                             </md-card-header-text>
                         </md-card-header>
@@ -205,18 +223,4 @@
             </div>
         </md-content>
     </md-content>
-    <div layout="row" flex="noshrink" layout-align="center center" class="layout-align-center-center layout-row flex-noshrink">
-        <div id="license-footer" layout="row" layout-align="center center" layout-fill class="ng-binding flex">
-            <div flex="none">
-                <a href="https://www.utfpr.edu.br/" target="_blank"><img ng-src="/svg/utfpr-logo-b.svg" alt="UTFPR Logo" width="68" height="25"/></a>
-            </div>
-            <div flex class="md-body-2">
-                Recominer by Universidade Tecnológica Federal do Paraná - UTFPR © 2016. Developed by
-                <a href="mailto:rodrigokuroda@alunos.utfpr.edu.br">Rodrigo T. Kuroda.</a>
-            </div>
-            <div flex="none">
-                <a href="https://github.com/rodrigokuroda/recominer" target="_blank"><img ng-src="/svg/github-logo.svg" alt="GitHub Logo" width="92" height="25"/></a>
-            </div>
-        </div>
-    </div>
 </md-content>
