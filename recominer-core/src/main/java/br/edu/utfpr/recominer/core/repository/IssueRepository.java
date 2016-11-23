@@ -214,7 +214,8 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
                         + "  JOIN {0}_vcs.scmlog s ON i2s.scmlog_id = s.id "
                         + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
-                        + "  JOIN (SELECT commit_id FROM cxf.ml_prediction UNION SELECT commit_id FROM cxf.ar_prediction) t ON t.commit_id = s.id"
+                        + "  JOIN {0}.ml_prediction ml ON ml.commit_id = s.id AND ml.prediction_result = \"C\""
+                        + "  JOIN {0}.ar_prediction ar ON ar.commit_id = s.id AND ar.prediction_result = \"C\""
                         + "  ORDER BY iej.issue_key",
                         project),
                 ROW_MAPPER);

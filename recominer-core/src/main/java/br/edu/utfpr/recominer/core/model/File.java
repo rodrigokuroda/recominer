@@ -1,6 +1,5 @@
 package br.edu.utfpr.recominer.core.model;
 
-import br.edu.utfpr.recominer.core.model.Commit;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
