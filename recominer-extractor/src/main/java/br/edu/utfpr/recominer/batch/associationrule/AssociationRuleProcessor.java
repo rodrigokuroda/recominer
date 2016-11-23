@@ -110,7 +110,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
         
         for (Commit newCommit : newCommits) {
         
-            log.info("Computing metrics for changed files on commit {}.", newCommit.getId());
+            log.info("Computing Association Rules for files changed on commit {}.", newCommit.getId());
             // select changed files
             final List<File> changedFiles;
             if (StringUtils.isBlank(onlyOneRandomFileFromIssue)) {
@@ -143,7 +143,7 @@ public class AssociationRuleProcessor implements ItemProcessor<Project, Associat
                                 .filter(fileFilter)
                                 .collect(Collectors.toList());
                         final Transaction<File> transaction
-                                = new Transaction<>(issue.getId().longValue(), new HashSet<>(changedFilesInIssue));
+                                = new Transaction<>(commit.getId().longValue(), new HashSet<>(changedFilesInIssue));
                         transactions.add(transaction);
                     }
                 }
