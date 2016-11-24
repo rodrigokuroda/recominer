@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,7 +66,8 @@ public class CochangesController {
             final List<CochangeDTO> cochangeDTOList = CochangeDTO.from(cochange);
             for (CochangeDTO cochangeDTO : cochangeDTOList) {
                 if (cochanges.containsKey(cochangeDTO)) {
-                    cochanges.get(cochangeDTO).append(cochangeDTO);
+                    // TODO append
+                    cochanges.get(cochangeDTO); //.append(cochangeDTO);
                 } else {
                     cochanges.put(cochangeDTO, cochangeDTO);
                 }
@@ -109,6 +111,33 @@ public class CochangesController {
         for (MachineLearningPrediction cochange : mlPredictionRepository.selectPredictedCochangesFor(commit, file)) {
             cochanges.add(CochangeDTO.from(cochange));
         }
-        return cochanges;
+        return cochanges.stream().sorted((CochangeDTO o1, CochangeDTO o2) -> {
+            if ("C".equals(o1.getPredictionResult())
+                    && "N".equals(o2.getPredictionResult())) {
+                return -1;
+            } else if ("N".equals(o1.getPredictionResult())
+                    && "C".equals(o2.getPredictionResult())) {
+                return 1;
+            }
+            if ("N".equals(o1.getPredictionResult())
+                    && "N".equals(o2.getPredictionResult())) {
+                if (o1.getProbability() < o2.getProbability()) {
+                    return -1;
+                } else if (o1.getProbability() > o2.getProbability()) {
+                    return 1; 
+                }
+                return 0;
+            }
+            if ("C".equals(o1.getPredictionResult())
+                    && "C".equals(o2.getPredictionResult())) {
+                if (o1.getProbability() < o2.getProbability()) {
+                    return 1;
+                } else if (o1.getProbability() > o2.getProbability()) {
+                    return -1; 
+                }
+                return 0;
+            }
+            return 0;
+        }).collect(Collectors.toList());
     }
 }

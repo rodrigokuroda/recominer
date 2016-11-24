@@ -35,7 +35,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             $scope.paging.current = 1;
             $scope.paging.total = Math.ceil($scope.cochanges.length / $scope.numPerPage);
         }
-        
+
         function resetPagination() {
             $scope.paging = {
                 total: 1,
@@ -101,7 +101,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         };
 
         // Load commits
-        $scope.getCommitsOf = function(issue) {
+        $scope.getCommitsOf = function(issue, technique) {
             $scope.loadingCommits = true;
             $scope.activeIssue = issue;
             $scope.activeCommit = null;
@@ -114,17 +114,18 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.commits = response.data;
                         $scope.loadingCommits = false;
+                        $scope.activeCommit = $scope.commits[0];
+                        $scope.getFilesOf($scope.activeCommit, technique);
                     },
                     function(response) {
                         $scope.commits = [];
                         $scope.loadingCommits = false;
                     }
                 );
-            $scope.tabIndex = 2;
         };
 
         // Load files
-        $scope.getFilesOf = function(commit) {
+        $scope.getFilesOf = function(commit, technique) {
             $scope.loadingFiles = false;
             $scope.activeCommit = commit;
             $scope.activeFile = null;
@@ -136,13 +137,20 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.files = response.data;
                         $scope.loadingFiles = false;
+                        $scope.activeFile = $scope.files[0];
+                        if (technique == 'ML') {
+                            $scope.getMlPredictedCochangesOf($scope.activeFile, technique);
+                        } else if (technique = 'AR') {
+                          $scope.getArPredictedCochangesOf($scope.activeFile, technique);
+                        } else {
+                          $scope.getPredictedCochangesOf($scope.activeFile, technique);
+                        }
                     },
                     function(response) {
                         $scope.files = [];
                         $scope.loadingFiles = false;
                     }
                 );
-            $scope.tabIndex = 3;
         };
 
         // Load cochanges
@@ -156,7 +164,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.cochanges = response.data;
                         $scope.loadingCochanges = false;
-                        resetPagination();    
+                        resetPagination();
                         loadPages();
                         calculatePages();
                     },
@@ -178,7 +186,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.cochanges = response.data;
                         $scope.loadingCochanges = false;
-                        resetPagination();    
+                        resetPagination();
                         loadPages();
                         calculatePages();
                     },
@@ -200,7 +208,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 .then(function(response) {
                         $scope.cochanges = response.data;
                         $scope.loadingCochanges = false;
-                        resetPagination();    
+                        resetPagination();
                         loadPages();
                         calculatePages();
                     },

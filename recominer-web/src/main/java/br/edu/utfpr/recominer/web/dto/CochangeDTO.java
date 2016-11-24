@@ -25,7 +25,7 @@ public class CochangeDTO {
     private String predictionResult;
     private String algorithmName;
     private PredictionFeedbackDTO feedback;
-    private String probability;
+    private double probability;
 
     public CochangeDTO() {
     }
@@ -42,7 +42,7 @@ public class CochangeDTO {
         dto.algorithmName = cochange.getAlgorithmType();
         dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
         final BigDecimal probability = BigDecimal.valueOf(cochange.getProbability() * 100).setScale(2, RoundingMode.DOWN);
-        dto.probability = probability + "%";
+        dto.probability = probability.doubleValue();
         
         return dto;
     }
@@ -62,17 +62,17 @@ public class CochangeDTO {
             dto.algorithmName = ASSOCIATION_RULE;
             dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
             final BigDecimal probability = BigDecimal.valueOf(cochange.getConfidence() * 100).setScale(2, RoundingMode.DOWN);
-            dto.probability = probability + "% (Changed " + cochange.getSupport().intValue() + " / " + cochange.getTransactions().intValue() + ")";
+            dto.probability = probability.doubleValue();
             cochanges.add(dto);
         }
         
         return cochanges;
     }
 
-    public void append(CochangeDTO cochangeDTO) {
-        algorithmName += " / " + cochangeDTO.getAlgorithmName();
-        probability += " / " + cochangeDTO.getProbability();
-    }
+//    public void append(CochangeDTO cochangeDTO) {
+//        algorithmName += " / " + cochangeDTO.getAlgorithmName();
+//        probability += " / " + cochangeDTO.getProbability();
+//    }
 
     public Integer getId() {
         return id;
@@ -122,11 +122,11 @@ public class CochangeDTO {
         this.feedback = feedback;
     }
 
-    public String getProbability() {
+    public double getProbability() {
         return probability;
     }
 
-    public void setProbability(String probability) {
+    public void setProbability(double probability) {
         this.probability = probability;
     }
 

@@ -73,8 +73,11 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                         + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_id = mlp.id "
                         + " WHERE mlp.file_id = ? "
                         + "   AND mlp.commit_id = ? "
-                        //+ "   AND mlp.prediction_result = \"C\" "
-                        + " ORDER BY mlp.prediction_result ASC, mlp.probability DESC"),
+                        + "   AND mlp.prediction_result <> \"NA\" "
+                        + " ORDER BY mlp.prediction_result ASC, "
+                        + "  CASE WHEN mlp.prediction_result = \"N\" THEN mlp.probability ELSE '' END ASC,"
+                        + "  CASE WHEN mlp.prediction_result = \"C\" THEN mlp.probability ELSE '' END DESC"
+                ),
                 (ResultSet rs, int rowNum) -> {
                     MachineLearningPrediction machineLearningPrediction = ROW_MAPPER.mapRow(rs, rowNum);
 

@@ -16,7 +16,7 @@ public class ProjectDTO {
 
     public ProjectDTO(Project project) {
         this.id = project.getId();
-        this.name = project.getProjectName();
+        this.name = project.getProjectName().toUpperCase();
     }
 
     public Integer getId() {
