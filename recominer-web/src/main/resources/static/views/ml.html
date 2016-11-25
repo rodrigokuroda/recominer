@@ -93,7 +93,10 @@
                             <md-icon class="md-avatar" hide-sm md-svg-icon="{{'communication:ic_live_help_24px'}}"></md-icon>
                             <div class="md-list-item-text">
                                 <div ng-if="activeFile != null && activeIssue != null && activeProject != null" class="md-body-1">Dado que o arquivo <b>{{activeFile.name}}</b> foi modificado para corrigir a tarefa <b>{{activeIssue.key}}</b> do projeto <b>{{activeProject.name}}</b>,
-                                  foram preditos os arquivos que provavelmente mudariam para completar essa tarefa. <br/> Quais desses arquivos preditos você mudaria para completar a tarefa <b>{{activeIssue.key}}</b>?</div>
+                                  os arquivos que provavelmente mudariam para completar essa tarefa foram preditos e são apresentados abaixo. <br/> Dado a descrição dessa tarefa a seguir, quais desses arquivos preditos você mudaria para completar a tarefa <b>{{activeIssue.key}}</b>?
+                                  <br/>
+
+                                </div>
 
                                 <div ng-if="activeFile == null && activeIssue == null && activeProject == null" class="md-body-1">Por favor, selecione um projeto</div>
                               <div ng-if="activeFile == null && activeIssue == null && activeProject != null" class="md-body-1">Por favor, selecione uma tarefa</div>
@@ -103,31 +106,23 @@
                     <div ng-if="loadingCochanges" layout="row" layout-sm="column" layout-align="space-around center">
                         <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
                     </div>
-                    <div ng-if="paginatedCochanges != null && paginatedCochanges.length > 0" layout="row" layout-sm="column" layout-align="center center" layout-margin>
-                        <cl-paging flex cl-pages="paging.total" cl-steps="6" cl-page-changed="paging.onPageChanged()" cl-align="center center" cl-current-page="paging.current"></cl-paging>
-                    </div>
-                    <md-card ng-repeat="cochange in paginatedCochanges track by $index">
-                        <md-card-header>
-                            <md-card-header-text>
-                                <span class="md-title">{{ cochange.file.name }}</span>
-                                <span class="md-title">
-                                  <md-icon
-                                      md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}"
-                                      md-svg-icon="{{cochange.predictionResult == 'C' ? 'action:ic_done_24px' : 'content:ic_clear_24px'}}"></md-icon>
-                                    A probabilidade desse arquivo {{cochange.predictionResult == 'C' ? 'mudar' : 'não mudar'}} é de {{cochange.probability | number:2}}%.
-                                </span>
-                                <div layout="row" layout-align="start end">
-                                  <md-checkbox ng-model="cochange.feedback.changed">
-                                    Marque se você mudaria esse arquivo para completar essa tarefa
-                                  </md-checkbox>
-                                </div>
-                            </md-card-header-text>
-                        </md-card-header>
-                    </md-card>
-                    <div ng-if="paginatedCochanges != null && paginatedCochanges.length > 0" layout="row" layout-sm="column" layout-align="center center" layout-margin>
-                        <cl-paging flex cl-pages="paging.total" cl-steps="6" cl-page-changed="paging.onPageChanged()" cl-align="center center" cl-current-page="paging.current"></cl-paging>
-                    </div>
-                    <md-card ng-if="paginatedCochanges != null && paginatedCochanges.length > 0">
+                    <md-list>
+                      <md-list-item class="md-3-line" ng-repeat="cochange in cochanges track by $index">
+                        <div class="md-list-item-text">
+                          <span class="md-title">{{ cochange.file.name }}</span><br/>
+                          <span class="md-body-1" md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}">
+                              A probabilidade desse arquivo {{cochange.predictionResult == 'C' ? 'mudar' : 'não mudar'}} é de {{cochange.probability | number:2}}%.
+                          </span>
+                          <div layout="row" layout-align="start end">
+                            <md-checkbox ng-model="cochange.feedback.changed">
+                              Marque se você mudaria esse arquivo para completar essa tarefa
+                            </md-checkbox>
+                          </div>
+                        </div>
+                        <md-divider ng-if="!$last"></md-divider>
+                      </md-list-item>
+                    </md-list>
+                    <md-card ng-if="cochanges != null && cochanges.length > 0">
                         <md-card-header>
                             <md-card-header-text>
                                 <div layout="row" layout-align="start end">
