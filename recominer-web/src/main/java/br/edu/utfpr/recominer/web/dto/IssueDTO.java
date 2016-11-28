@@ -11,6 +11,9 @@ public class IssueDTO {
     private Integer id;
     private ProjectDTO project;
     private String key;
+    private String summary;
+    private String description;
+    private FeedbackJustificationDTO feedback;
 
     public IssueDTO() {
     }
@@ -18,6 +21,30 @@ public class IssueDTO {
     public IssueDTO(Issue issue) {
         this.id = issue.getId();
         this.key = issue.getKey();
+        this.summary = issue.getSummary();
+        this.description = issue.getDescription();
+        this.feedback = FeedbackJustificationDTO.from(issue.getFeedbackJustification());
+    }
+
+    public Issue toEntity() {
+        Issue issue = new Issue(id);
+        return issue;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Issue getIssue() {
@@ -47,4 +74,13 @@ public class IssueDTO {
     public void setKey(String key) {
         this.key = key;
     }
+
+    public FeedbackJustificationDTO getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(FeedbackJustificationDTO feedback) {
+        this.feedback = feedback;
+    }
+    
 }

@@ -16,6 +16,9 @@ public class Issue implements Persistable<Integer>, Comparable<Issue> {
     private final Date fixDate;
     private final Date submittedOn;
     private Date updatedOn;
+    private FeedbackJustification feedbackJustification;
+    private String summary;
+    private String description;
 
     public Issue(Integer id) {
         this.id = id;
@@ -63,6 +66,30 @@ public class Issue implements Persistable<Integer>, Comparable<Issue> {
 
     public Date getSubmittedOn() {
         return submittedOn;
+    }
+
+    public FeedbackJustification getFeedbackJustification() {
+        return feedbackJustification;
+    }
+
+    public void setFeedbackJustification(FeedbackJustification feedbackJustification) {
+        this.feedbackJustification = feedbackJustification;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

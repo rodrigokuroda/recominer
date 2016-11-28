@@ -1,10 +1,13 @@
 package br.edu.utfpr.recominer.web.controller;
 
 import br.edu.utfpr.recominer.core.model.Project;
+import br.edu.utfpr.recominer.core.repository.FeedbackJustificationRepository;
 import br.edu.utfpr.recominer.core.repository.PredictionFeedbackRepository;
 import br.edu.utfpr.recominer.core.repository.ProjectRepository;
 import br.edu.utfpr.recominer.web.dto.BusinessMessageDTO;
 import br.edu.utfpr.recominer.web.dto.CochangeDTO;
+import br.edu.utfpr.recominer.web.dto.FeedbackJustificationDTO;
+import br.edu.utfpr.recominer.web.dto.IssueDTO;
 import br.edu.utfpr.recominer.web.dto.PredictionFeedbackDTO;
 import javax.inject.Inject;
 import org.springframework.http.MediaType;
@@ -26,14 +29,24 @@ public class PredictionFeedbackController {
     @Inject
     private PredictionFeedbackRepository feedbackRepository;
     
+    @Inject
+    private FeedbackJustificationRepository feedbackJustificationRepository;
+    
     @RequestMapping(value = "/saveFeedback", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public BusinessMessageDTO saveFeedback(@RequestBody CochangeDTO cochange) {
-        final Project project = projectRepository.findOne(cochange.getFile().getProject().getId());
+    public BusinessMessageDTO saveFeedback(@RequestBody IssueDTO issue) {
+        FeedbackJustificationDTO feedback = issue.getFeedback();
+        final Project project = projectRepository.findOne(issue.getProject().getId());
         feedbackRepository.setProject(project);
+        feedbackJustificationRepository.setProject(project);
         
-        PredictionFeedbackDTO feedback = cochange.getFeedback();
-        feedback.setCochange(cochange);
-        feedbackRepository.save(feedback.toEntity());
-        return new BusinessMessageDTO("0", "The feedback was saved successfully.");
+        for (CochangeDTO cochange : feedback.getCochanges()) {
+            PredictionFeedbackDTO predictionFeedback = cochange.getFeedback();
+            feedbackRepository.save(predictionFeedback.toEntity(cochange));
+        }
+        feedbackJustificationRepository.save(feedback.toEntity(issue));
+        
+        
+        return new BusinessMessageDTO("0", "Sua resposta foi salva com sucesso. Obrigado!");
     }
+    
 }

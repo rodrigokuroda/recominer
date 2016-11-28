@@ -13,6 +13,8 @@ public class FileDTO {
     private ProjectDTO project;
     private CommitDTO commit;
     private String name;
+    private Integer toLoad;
+    private Integer numLoaded;
 
     public FileDTO() {
     }
@@ -52,6 +54,22 @@ public class FileDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getToLoad() {
+        return toLoad;
+    }
+
+    public void setToLoad(Integer toLoad) {
+        this.toLoad = toLoad;
+    }
+
+    public Integer getNumLoaded() {
+        return numLoaded;
+    }
+
+    public void setNumLoaded(Integer numLoaded) {
+        this.numLoaded = numLoaded;
     }
 
     @Override

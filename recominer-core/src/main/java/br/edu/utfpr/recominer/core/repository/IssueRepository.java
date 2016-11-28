@@ -1,6 +1,7 @@
 package br.edu.utfpr.recominer.core.repository;
 
 import br.edu.utfpr.recominer.core.model.Commit;
+import br.edu.utfpr.recominer.core.model.FeedbackJustification;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.Issue;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
@@ -208,7 +209,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
     public List<Issue> selectProcessedIssuesOfProject() {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT DISTINCT " + FIELDS
+                        "SELECT DISTINCT " + FIELDS + ", i.summary, i.description, fj.id AS fj_id, fj.justification "
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
@@ -216,9 +217,20 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN {0}.files_commits fc ON i2s.scmlog_id = fc.commit_id "
                         + "  JOIN {0}.ml_prediction ml ON ml.commit_id = s.id AND ml.prediction_result = \"C\""
                         + "  JOIN {0}.ar_prediction ar ON ar.commit_id = s.id AND ar.prediction_result = \"C\""
+                        + "  LEFT JOIN {0}.feedback_justification fj ON fj.issue_id = i.id "
+                        + "       AND fj.id = (SELECT MAX(fj2.id) FROM {0}.feedback_justification fj2 WHERE fj2.issue_id = i.id)"
                         + "  ORDER BY iej.issue_key",
                         project),
-                ROW_MAPPER);
+                (ResultSet rs, int rowNum) -> {
+                    Issue issue = ROW_MAPPER.mapRow(rs, rowNum);
+                    issue.setSummary(rs.getString("summary"));
+                    issue.setDescription(rs.getString("description"));
+
+                    FeedbackJustification feedbackJustification = new FeedbackJustification(rs.getInt("fj_id"));
+                    feedbackJustification.setJustification("justification");
+                    issue.setFeedbackJustification(feedbackJustification);
+                    return issue;
+                });
     }
 
     public Long countComputedIssues() {

@@ -62,7 +62,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                         + "     mlp.probability, "
                         + "     pfb.id AS prediction_feedback_id, "
                         + "     pfb.changed, "
-                        + "     pfb.justification, "
+//                        + "     pfb.justification, "
                         + "     f.file_path"
                         + "  FROM {0}.ml_prediction mlp "
                         + "  JOIN {0}.files_commits f ON f.file_id = mlp.predicted_file_id "
@@ -85,7 +85,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                     final PredictionFeedback predictionFeedback = new PredictionFeedback(feedbackId == 0 ? null : feedbackId);
                     predictionFeedback.setChanged(rs.getBoolean("changed"));
                     predictionFeedback.setPredictionId(rs.getInt("id"));
-                    predictionFeedback.setJustification(rs.getString("justification"));
+//                    predictionFeedback.setJustification(rs.getString("justification"));
                     machineLearningPrediction.setFeedback(predictionFeedback);
 
                     return machineLearningPrediction;

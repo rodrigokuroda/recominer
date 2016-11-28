@@ -140,4 +140,19 @@ public class CochangesController {
             return 0;
         }).collect(Collectors.toList());
     }
+
+    @RequestMapping(value = "/allFiles", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CochangeDTO> allFiles(@RequestBody FileDTO fileDTO) {
+        final Project project = projectRepository.findOne(fileDTO.getProject().getId());
+
+        fileRepository.setProject(project);
+
+        final List<File> files = fileRepository.listFiles();
+
+        List<CochangeDTO> cochanges = new ArrayList<>();
+        for (File file : files) {
+            cochanges.add(CochangeDTO.from(file));
+        }
+        return cochanges;
+    }
 }

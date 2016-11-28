@@ -1,5 +1,5 @@
-app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdSidenav', '$mdToast',
-    function($scope, $log, $window, $http, $mdSidenav, $mdToast) {
+app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdSidenav', '$mdToast', '$mdDialog', '$sce',
+    function($scope, $log, $window, $http, $mdSidenav, $mdToast, $mdDialog, $sce) {
         $scope.projects = [];
         $scope.issues = [];
         $scope.commits = [];
@@ -141,9 +141,9 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                         if (technique == 'ML') {
                             $scope.getMlPredictedCochangesOf($scope.activeFile, technique);
                         } else if (technique = 'AR') {
-                          $scope.getArPredictedCochangesOf($scope.activeFile, technique);
+                            $scope.getArPredictedCochangesOf($scope.activeFile, technique);
                         } else {
-                          $scope.getPredictedCochangesOf($scope.activeFile, technique);
+                            $scope.getPredictedCochangesOf($scope.activeFile, technique);
                         }
                     },
                     function(response) {
@@ -219,18 +219,54 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                 );
         };
 
+        // Load cochanges predicted by ML
+        $scope.getCochangesOf = function(file) {
+            $scope.loadingCochanges = true;
+            $scope.activeFile = file;
+            $log.debug("Fetching predicted cochanges for file " + file.name + "...");
+            file.project = $scope.activeProject;
+            file.commit = $scope.activeCommit;
+            $http.post("/cochangesOfFile", file)
+                .then(function(response) {
+                        $scope.cochanges = response.data;
+                        $scope.loadingCochanges = false;
+                        resetPagination();
+                        loadPages();
+                        calculatePages();
+                    },
+                    function(response) {
+                        $scope.cochanges = [];
+                        $scope.loadingCochanges = false;
+                    }
+                );
+        };
+
         // Submit feedback
-        $scope.submitFeedback = function(cochange) {
-            cochange.file.project = $scope.activeProject;
-            $log.debug("Sending feedback of " + cochange.file.name + "...");
-            $http.post("/saveFeedback", cochange)
+        $scope.submitFeedback = function() {
+            $scope.activeIssue.project = $scope.activeProject;
+            $scope.activeIssue.feedback.cochanges = $scope.cochanges;
+            $log.debug("Sending feedback of " + $scope.activeIssue.key + "...");
+            $http.post("/saveFeedback", $scope.activeIssue)
                 .then(function(response) {
                         $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
                     },
                     function(response) {
-                        $mdToast.show($mdToast.simple().position('bottom right').textContent("Failed to submit feedback! " + response.data.message));
+                        $mdToast.show($mdToast.simple().position('bottom right').textContent("Ocorreu um erro ao enviar seu feedback! Por favor, tente novamente." + response.data.message));
                     }
                 );
+        };
+
+        $scope.showAlert = function(ev) {
+            $scope.issueDescription = $sce.trustAsHtml($scope.activeIssue.description);
+            $mdDialog.show(
+                $mdDialog.alert()
+                .parent(angular.element(document.querySelector('#popupContainer')))
+                .clickOutsideToClose(true)
+                .title($scope.activeIssue.summary)
+                .htmlContent($scope.issueDescription)
+                .ok('Fechar')
+                .targetEvent(ev)
+            );
         };
     }
 ]);

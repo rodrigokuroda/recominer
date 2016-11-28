@@ -25,7 +25,7 @@ public class CochangeDTO {
     private String predictionResult;
     private String algorithmName;
     private PredictionFeedbackDTO feedback;
-    private double probability;
+    private Double probability;
 
     public CochangeDTO() {
     }
@@ -67,6 +67,20 @@ public class CochangeDTO {
         }
         
         return cochanges;
+    }
+
+    // TODO criar uma tabela com todos os arquivos 
+    public static CochangeDTO from(File file) {
+        CochangeDTO dto = new CochangeDTO();        
+        dto.id = file.getId();
+        dto.file = new FileDTO(file);
+        dto.rank = null;
+        dto.predictionResult = null;
+        dto.algorithmName = null;
+        dto.probability = null;
+        dto.feedback  = new PredictionFeedbackDTO();
+        
+        return dto;
     }
 
 //    public void append(CochangeDTO cochangeDTO) {

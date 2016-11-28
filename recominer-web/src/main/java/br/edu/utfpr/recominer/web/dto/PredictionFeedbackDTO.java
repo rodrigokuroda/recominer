@@ -12,25 +12,21 @@ public class PredictionFeedbackDTO {
     private Integer id;
     private boolean changed;
     private String justification;
-    private CochangeDTO cochange;
 
     public PredictionFeedbackDTO() {
     }
 
-    public PredictionFeedbackDTO(Integer id, CochangeDTO cochange, boolean changed, String justification) {
+    public PredictionFeedbackDTO(Integer id, boolean changed, String justification) {
         this.id = id;
-        this.cochange = cochange;
         this.changed = changed;
-        this.justification = justification;
     }
 
-    public PredictionFeedback toEntity() {
-        return new PredictionFeedback(id, cochange.getId(), changed, justification);
+    public PredictionFeedback toEntity(CochangeDTO dto) {
+        return new PredictionFeedback(id, dto.getId(), changed, justification);
     }
     
     public static PredictionFeedbackDTO from(PredictionFeedback feedback) {
         return new PredictionFeedbackDTO(feedback.getId(), 
-                new CochangeDTO(feedback.getPredictionId()), 
                 feedback.isChanged(), 
                 feedback.getJustification());
     }
@@ -57,14 +53,6 @@ public class PredictionFeedbackDTO {
 
     public void setJustification(String justification) {
         this.justification = justification;
-    }
-
-    public CochangeDTO getCochange() {
-        return cochange;
-    }
-
-    public void setCochange(CochangeDTO cochange) {
-        this.cochange = cochange;
     }
 
     @Override
