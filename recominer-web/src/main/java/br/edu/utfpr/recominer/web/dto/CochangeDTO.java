@@ -77,7 +77,7 @@ public class CochangeDTO {
         dto.rank = null;
         dto.predictionResult = null;
         dto.algorithmName = null;
-        dto.probability = null;
+        dto.probability = .0d;
         dto.feedback  = new PredictionFeedbackDTO();
         
         return dto;

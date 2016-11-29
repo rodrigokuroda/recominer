@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import static br.edu.utfpr.recominer.core.util.QueryUtils.filterByIssues;
-import static br.edu.utfpr.recominer.core.util.QueryUtils.filterByIssues;
 
 /**
  *
@@ -437,9 +435,9 @@ public class FileRepository extends JdbcRepository<File, Integer> {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
                         "SELECT DISTINCT fc.file_id, fc.file_path "
-                        + "  FROM cxf.files_commits fc "
-                        + "  JOIN cxf.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
-                        + " WHERE i2s.scmlog_id = (SELECT MAX(fc2.commit_id) FROM files_commits fc2 WHERE fc2.file_id = fc.file_id) "
+                        + "  FROM {0}.files_commits fc "
+                        + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
+                        + " WHERE i2s.scmlog_id = (SELECT MAX(fc2.commit_id) FROM {0}.files_commits fc2 WHERE fc2.file_id = fc.file_id) "
                         + "   AND (fc.file_path LIKE \"%.java\" OR fc.file_path LIKE \"%.xml\")", project),
                 (ResultSet rs, int rowNum) -> new File(rs.getInt("file_id"), rs.getString("file_path")));
     }

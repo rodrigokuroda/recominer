@@ -16,6 +16,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         $scope.loadingCommits = false;
         $scope.loadingFiles = false;
         $scope.loadingCochanges = false;
+        $scope.submitting = false;
 
         $scope.numPerPage = 10;
         $scope.paging = {
@@ -140,10 +141,10 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
                         $scope.activeFile = $scope.files[0];
                         if (technique == 'ML') {
                             $scope.getMlPredictedCochangesOf($scope.activeFile, technique);
-                        } else if (technique = 'AR') {
+                        } else if (technique == 'AR') {
                             $scope.getArPredictedCochangesOf($scope.activeFile, technique);
                         } else {
-                            $scope.getPredictedCochangesOf($scope.activeFile, technique);
+                            $scope.getCochangesOf($scope.activeFile, technique);
                         }
                     },
                     function(response) {
@@ -226,7 +227,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             $log.debug("Fetching predicted cochanges for file " + file.name + "...");
             file.project = $scope.activeProject;
             file.commit = $scope.activeCommit;
-            $http.post("/cochangesOfFile", file)
+            $http.post("/allFiles", file)
                 .then(function(response) {
                         $scope.cochanges = response.data;
                         $scope.loadingCochanges = false;
@@ -243,15 +244,18 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
 
         // Submit feedback
         $scope.submitFeedback = function() {
+            $scope.submitting = true;
             $scope.activeIssue.project = $scope.activeProject;
             $scope.activeIssue.feedback.cochanges = $scope.cochanges;
             $log.debug("Sending feedback of " + $scope.activeIssue.key + "...");
             $http.post("/saveFeedback", $scope.activeIssue)
                 .then(function(response) {
                         $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
+                        $scope.submitting = false;
                     },
                     function(response) {
                         $mdToast.show($mdToast.simple().position('bottom right').textContent("Ocorreu um erro ao enviar seu feedback! Por favor, tente novamente." + response.data.message));
+                        $scope.submitting = false;
                     }
                 );
         };

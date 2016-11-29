@@ -128,11 +128,11 @@
                                 <div layout="row" layout-align="start end">
                                   <md-input-container class="md-block" flex="80">
                                       <label>Justifique a escolha dos arquivos que você mudaria ou não para completar a tarefa {{activeIssue.key}}.</label>
-                                      <textarea ng-model="activeIssue.feedback.justification" rows="3">
+                                      <textarea ng-disabled="submiting" ng-model="activeIssue.feedback.justification" rows="3">
                                       </textarea>
                                   </md-input-container>
                                   <md-input-container class="md-block" flex="10">
-                                    <md-button type="button" class="md-raised md-primary" ng-click="submitFeedback()">
+                                    <md-button type="button" class="md-raised md-primary" ng-disabled="submitting" ng-click="submitFeedback()" ng-dblclick="return false">
                                       <md-icon md-svg-icon="content:ic_send_24px"></md-icon>
                                       Enviar
                                     </md-button>
