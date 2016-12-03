@@ -109,7 +109,7 @@
                     <md-list>
                       <md-list-item class="md-3-line" ng-repeat="cochange in cochanges track by $index">
                         <div class="md-list-item-text">
-                          <span class="md-title">{{ cochange.file.name }}</span><br/>
+                          <span class="md-body-1"><b>{{ cochange.file.name }}</b></span><br/>
                           <span ng-if="cochange.probability > 0" class="md-body-1" md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}">
                               A probabilidade desse arquivo {{cochange.predictionResult == 'C' ? 'mudar' : 'não mudar'}} é de {{cochange.probability | number:2}}%.
                           </span>

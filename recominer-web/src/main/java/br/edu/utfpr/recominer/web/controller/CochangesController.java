@@ -147,7 +147,7 @@ public class CochangesController {
 
         fileRepository.setProject(project);
 
-        final List<File> files = fileRepository.listFiles();
+        final List<File> files = fileRepository.listFiles(fileDTO.toEntity());
 
         List<CochangeDTO> cochanges = new ArrayList<>();
         for (File file : files) {

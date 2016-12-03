@@ -1,15 +1,15 @@
 var app = angular.module('app', ['ngRoute', 'ngResource', 'ngMaterial', 'ngMessages', 'ngSanitize', 'cl.paging']);
 app.config(['$locationProvider', '$routeProvider', function($locationProvider, $routeProvider) {
     $routeProvider
-        .when('/', {
+        .when('/3', {
             templateUrl: '/views/project.html',
             controller: 'projectController'
         })
-        .when('/ar', {
+        .when('/1', {
             templateUrl: '/views/ar.html',
             controller: 'projectController'
         })
-        .when('/ml', {
+        .when('/2', {
             templateUrl: '/views/ml.html',
             controller: 'projectController'
         })

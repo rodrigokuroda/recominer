@@ -431,15 +431,19 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                 issue.getId());
     }
 
-    public List<File> listFiles() {
+    public List<File> listFiles(File file) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT DISTINCT fc.file_id, fc.file_path "
+                        "SELECT MAX(fc.file_id) as file_id, fc.file_path "
                         + "  FROM {0}.files_commits fc "
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
                         + " WHERE i2s.scmlog_id = (SELECT MAX(fc2.commit_id) FROM {0}.files_commits fc2 WHERE fc2.file_id = fc.file_id) "
-                        + "   AND (fc.file_path LIKE \"%.java\" OR fc.file_path LIKE \"%.xml\")", project),
-                (ResultSet rs, int rowNum) -> new File(rs.getInt("file_id"), rs.getString("file_path")));
+                        + "   AND (fc.file_path LIKE \"%.java\" OR fc.file_path LIKE \"%.xml\")"
+                        + "   AND fc.file_path <> ?"
+                        + " GROUP BY fc.file_path "
+                        + " ORDER BY fc.file_path", project),
+                (ResultSet rs, int rowNum) -> new File(rs.getInt("file_id"), rs.getString("file_path")),
+                file.getFileName());
     }
 
 }
