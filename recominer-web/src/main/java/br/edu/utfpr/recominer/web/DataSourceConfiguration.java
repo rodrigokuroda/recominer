@@ -3,6 +3,7 @@ package br.edu.utfpr.recominer.web;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,14 +23,23 @@ public class DataSourceConfiguration {
 //    @Value("classpath:schema-mysql.sql")
 //    private Resource schemaScript;
 
+    @Value("${database.url}")
+    private String databaseUrl;
+    
+    @Value("${database.username}")
+    private String databaseUsername;
+    
+    @Value("${database.password}")
+    private String databasePassword;
+    
     @Bean
     @Primary
     public DataSource mysqlDataSource() throws SQLException {
         final SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
         dataSource.setDriver(new com.mysql.jdbc.Driver());
-        dataSource.setUrl("jdbc:mysql://localhost:3306/?autoReconnect=true&verifyServerCertificate=false&useSSL=false&requireSSL=false");
-        dataSource.setUsername("root");
-        dataSource.setPassword("root");
+        dataSource.setUrl(databaseUrl);
+        dataSource.setUsername(databaseUsername);
+        dataSource.setPassword(databasePassword);
         DatabasePopulatorUtils.execute(databasePopulator(), dataSource);
         return dataSource;
     }
