@@ -1,0 +1,22 @@
+FROM mysql:latest
+
+MAINTAINER Rodrigo Kuroda <rodrigokuroda@alunos.utfpr.edu.br>
+
+# Update apt
+RUN apt-get update -y && apt-get upgrade -y
+
+# Install wget
+RUN apt-get install -y --no-install-recommends wget ca-certificates unzip \ 
+  && apt-get clean
+
+# Download Recominer database for experiment
+RUN wget -P /opt/recominer https://github.com/rodrigokuroda/recominer/releases/download/0.7/experiment-db.zip
+WORKDIR /opt/recominer
+RUN unzip experiment-db.zip
+ADD setupDatabase.sh /opt/recominer
+RUN ["chmod", "+x", "/opt/recominer/setupDatabase.sh"]
+CMD ["/opt/recominer/setupDatabase.sh"]
+
+EXPOSE 3306
+CMD ["mysqld"]
+
