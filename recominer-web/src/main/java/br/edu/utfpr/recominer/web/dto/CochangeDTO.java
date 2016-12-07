@@ -62,7 +62,7 @@ public class CochangeDTO {
             dto.algorithmName = ASSOCIATION_RULE;
             dto.feedback = PredictionFeedbackDTO.from(cochange.getFeedback());
             final BigDecimal probability = BigDecimal.valueOf(cochange.getConfidence() * 100).setScale(2, RoundingMode.DOWN);
-            dto.probability = probability.doubleValue();
+            dto.probability = dto.predictionResult.equals("N") ? 100 - probability.doubleValue() : probability.doubleValue();
             cochanges.add(dto);
         }
         
