@@ -29,6 +29,7 @@ public class ArPredictionFeedbackRepository extends JdbcRepository<PredictionFee
                 feedback.setPredictionId(rs.getInt("prediction_id"));
                 feedback.setChanged(rs.getBoolean("changed"));
                 feedback.setJustification(rs.getString("justification"));
+                feedback.setSubmitDate(rs.getDate("submit_date"));
                 return feedback;
             };
 
@@ -39,7 +40,7 @@ public class ArPredictionFeedbackRepository extends JdbcRepository<PredictionFee
                 mapping.put("prediction_id", feedback.getPredictionId());
                 mapping.put("changed", feedback.isChanged());
                 mapping.put("justification", feedback.getJustification());
+                mapping.put("submit_date", feedback.getSubmitDate());
                 return mapping;
             };
-
 }

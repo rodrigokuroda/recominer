@@ -20,7 +20,8 @@ public class AllPredictionFeedbackRepository extends JdbcRepository<PredictionFe
     }
 
     private static final String ID_COLUMN = "id";
-    private static final String TABLE_NAME = "ar_prediction_feedback";
+    private static final String TABLE_NAME = "all_prediction_feedback";
+
 
     public static final RowMapper<PredictionFeedback> ROW_MAPPER
             = (ResultSet rs, int rowNum) -> {
@@ -29,6 +30,7 @@ public class AllPredictionFeedbackRepository extends JdbcRepository<PredictionFe
                 feedback.setPredictionId(rs.getInt("prediction_id"));
                 feedback.setChanged(rs.getBoolean("changed"));
                 feedback.setJustification(rs.getString("justification"));
+                feedback.setSubmitDate(rs.getDate("submit_date"));
                 return feedback;
             };
 
@@ -39,7 +41,7 @@ public class AllPredictionFeedbackRepository extends JdbcRepository<PredictionFe
                 mapping.put("prediction_id", feedback.getPredictionId());
                 mapping.put("changed", feedback.isChanged());
                 mapping.put("justification", feedback.getJustification());
+                mapping.put("submit_date", feedback.getSubmitDate());
                 return mapping;
             };
-
 }
