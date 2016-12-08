@@ -4,7 +4,7 @@ set -e
 
 echo "Downloading workspaces..."
 if [ ! -d ~/recominer/workspace ]; then
-    mkdir ~/recominer/workspace 
+    mkdir -p ~/recominer/workspace 
 fi
 
 if [ ! -d ~/recominer/workspace/CXF-3742.zip ]; then
