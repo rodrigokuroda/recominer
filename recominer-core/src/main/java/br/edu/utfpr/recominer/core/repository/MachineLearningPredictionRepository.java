@@ -70,7 +70,7 @@ public class MachineLearningPredictionRepository extends JdbcRepository<MachineL
                         + "                        FROM {0}.files_commits ifc "
                         + "                       WHERE ifc.commit_id <= mlp.commit_id "
                         + "                         AND ifc.file_id = mlp.predicted_file_id)"
-                        + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_id = mlp.id "
+                        + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_ml_id = mlp.id "
                         + " WHERE mlp.file_id = ? "
                         + "   AND mlp.commit_id = ? "
                         + "   AND mlp.prediction_result <> \"NA\" "

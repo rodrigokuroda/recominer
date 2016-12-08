@@ -25,7 +25,7 @@ public class FeedbackJustificationRepository extends JdbcRepository<FeedbackJust
 
     public static final RowMapper<FeedbackJustification> ROW_MAPPER
             = (ResultSet rs, int rowNum) -> {
-                FeedbackJustification feedback = new FeedbackJustification(rs.getInt("id"));
+                FeedbackJustification feedback = new FeedbackJustification(rs.getInt("id"), rs.getString("technique"));
                 feedback.setIssue(new Issue(rs.getInt("issue_id")));
                 feedback.setJustification(rs.getString("justification"));
                 feedback.setSubmitDate(rs.getDate("submit_date"));
@@ -39,6 +39,7 @@ public class FeedbackJustificationRepository extends JdbcRepository<FeedbackJust
                 mapping.put("issue_id", feedback.getIssue().getId());
                 mapping.put("justification", feedback.getJustification());
                 mapping.put("submit_date", feedback.getSubmitDate());
+                mapping.put("technique", feedback.getTechnique());
                 return mapping;
             };
 

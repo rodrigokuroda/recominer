@@ -6,6 +6,7 @@ import br.edu.utfpr.recominer.core.model.Commit;
 import br.edu.utfpr.recominer.core.model.File;
 import br.edu.utfpr.recominer.core.model.FilePair;
 import br.edu.utfpr.recominer.core.model.Issue;
+import br.edu.utfpr.recominer.core.model.PredictionFeedback;
 import br.edu.utfpr.recominer.core.repository.helper.RowUnmapper;
 import br.edu.utfpr.recominer.core.util.QueryUtils;
 import static br.edu.utfpr.recominer.core.util.QueryUtils.filterByIssues;
@@ -434,15 +435,28 @@ public class FileRepository extends JdbcRepository<File, Integer> {
     public List<File> listFiles(File file) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT MAX(fc.file_id) as file_id, fc.file_path "
+                        "SELECT MAX(fc.file_id) as file_id, fc.file_path, "
+                        + "     pfb.id AS prediction_feedback_id, "
+                        + "     pfb.changed, "
+                        + "     pfb.justification "
                         + "  FROM {0}.files_commits fc "
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
+                        + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_file_id = fc.file_id "
                         + " WHERE i2s.scmlog_id = (SELECT MAX(fc2.commit_id) FROM {0}.files_commits fc2 WHERE fc2.file_id = fc.file_id) "
                         + "   AND (fc.file_path LIKE \"%.java\" OR fc.file_path LIKE \"%.xml\")"
                         + "   AND fc.file_path <> ?"
-                        + " GROUP BY fc.file_path "
+                        + " GROUP BY fc.file_path, pfb.id "
                         + " ORDER BY fc.file_path", project),
-                (ResultSet rs, int rowNum) -> new File(rs.getInt("file_id"), rs.getString("file_path")),
+                (ResultSet rs, int rowNum) -> {
+
+                    final int feedbackId = rs.getInt("prediction_feedback_id");
+                    final PredictionFeedback predictionFeedback = new PredictionFeedback(feedbackId == 0 ? null : feedbackId);
+                    predictionFeedback.setChanged(rs.getBoolean("changed"));
+                    predictionFeedback.setPredictionId(rs.getInt("file_id"));
+                    predictionFeedback.setJustification(rs.getString("justification"));
+
+                    return new File(rs.getInt("file_id"), rs.getString("file_path"), predictionFeedback);
+                },
                 file.getFileName());
     }
 

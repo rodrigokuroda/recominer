@@ -13,12 +13,14 @@ public class FeedbackJustification implements Persistable<Integer> {
     
     private Integer id;
     private Issue issue;
+    private String technique;
     private String justification;
     private List<Cochange> cochanges;
     private Date submitDate;
 
-    public FeedbackJustification(Integer id) {
+    public FeedbackJustification(Integer id, String technique) {
         this.id = id;
+        this.technique = technique;
     }
 
     @Override
@@ -41,6 +43,14 @@ public class FeedbackJustification implements Persistable<Integer> {
 
     public void setIssue(Issue issue) {
         this.issue = issue;
+    }
+
+    public String getTechnique() {
+        return technique;
+    }
+
+    public void setTechnique(String technique) {
+        this.technique = technique;
     }
 
     public String getJustification() {

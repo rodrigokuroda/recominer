@@ -39,7 +39,7 @@
                             <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
                         </div>
                         <md-list flex>
-                            <md-list-item class="md-2-line" ng-repeat="project in projects| filter:searchProject" role="link" ng-click="getIssuesOf(project)" ng-class="{ 'nav-active': project == activeProject }">
+                            <md-list-item class="md-2-line" ng-repeat="project in projects| filter:searchProject" role="link" ng-click="getIssuesOf(project, 'ALL')" ng-class="{ 'nav-active': project == activeProject }">
                                 <div class="md-list-item-text">
                                     <div class="md-body-2">{{project.name}}</div>
                                 </div>
@@ -106,8 +106,11 @@
                     <div ng-if="loadingCochanges" layout="row" layout-sm="column" layout-align="space-around center">
                         <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
                     </div>
+                    <div ng-if="paginatedCochanges != null && paginatedCochanges.length > 0" layout="row" layout-sm="column" layout-align="center center" layout-margin>
+                        <cl-paging flex cl-pages="paging.total" cl-steps="6" cl-page-changed="paging.onPageChanged()" cl-align="center center" cl-current-page="paging.current"></cl-paging>
+                    </div>
                     <md-list>
-                      <md-list-item class="md-3-line" ng-repeat="cochange in cochanges track by $index">
+                      <md-list-item class="md-3-line" ng-repeat="cochange in paginatedCochanges track by $index">
                         <div class="md-list-item-text">
                           <span class="md-body-1"><b>{{ cochange.file.name }}</b></span><br/>
                           <span ng-if="cochange.probability > 0" class="md-body-1" md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}">

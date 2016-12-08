@@ -13,14 +13,14 @@ import org.springframework.stereotype.Repository;
  * @author Rodrigo T. Kuroda <rodrigokuroda at alunos.utfpr.edu.br>
  */
 @Repository
-public class PredictionFeedbackRepository extends JdbcRepository<PredictionFeedback, Integer> {
+public class ArPredictionFeedbackRepository extends JdbcRepository<PredictionFeedback, Integer> {
 
-    public PredictionFeedbackRepository() {
+    public ArPredictionFeedbackRepository() {
         super(ROW_MAPPER, ROW_UNMAPPER, TABLE_NAME, ID_COLUMN);
     }
 
     private static final String ID_COLUMN = "id";
-    private static final String TABLE_NAME = "prediction_feedback";
+    private static final String TABLE_NAME = "ar_prediction_feedback";
 
     public static final RowMapper<PredictionFeedback> ROW_MAPPER
             = (ResultSet rs, int rowNum) -> {

@@ -11,6 +11,7 @@ import java.util.List;
 public class FeedbackJustificationDTO {
 
     private Integer id;
+    private String technique;
     private String justification;
     private List<CochangeDTO> cochanges;
 
@@ -18,11 +19,12 @@ public class FeedbackJustificationDTO {
         FeedbackJustificationDTO dto = new FeedbackJustificationDTO();
         dto.setId(feedbackJustification.getId());
         dto.setJustification(feedbackJustification.getJustification());
+        dto.setTechnique(feedbackJustification.getTechnique());
         return dto;
     }
 
     public FeedbackJustification toEntity(IssueDTO issue) {
-        FeedbackJustification feedbackJustification = new FeedbackJustification(id);
+        FeedbackJustification feedbackJustification = new FeedbackJustification(id, technique);
         feedbackJustification.setJustification(justification);
         feedbackJustification.setIssue(issue.toEntity());
         feedbackJustification.setSubmitDate(new Date());
@@ -43,6 +45,14 @@ public class FeedbackJustificationDTO {
 
     public void setCochanges(List<CochangeDTO> cochanges) {
         this.cochanges = cochanges;
+    }
+
+    public String getTechnique() {
+        return technique;
+    }
+
+    public void setTechnique(String technique) {
+        this.technique = technique;
     }
 
     public String getJustification() {

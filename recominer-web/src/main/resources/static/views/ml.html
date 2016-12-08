@@ -39,7 +39,7 @@
                             <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
                         </div>
                         <md-list flex>
-                            <md-list-item class="md-2-line" ng-repeat="project in projects| filter:searchProject" role="link" ng-click="getIssuesOf(project)" ng-class="{ 'nav-active': project == activeProject }">
+                            <md-list-item class="md-2-line" ng-repeat="project in projects| filter:searchProject" role="link" ng-click="getIssuesOf(project, 'ML')" ng-class="{ 'nav-active': project == activeProject }">
                                 <div class="md-list-item-text">
                                     <div class="md-body-2">{{project.name}}</div>
                                 </div>

@@ -10,6 +10,7 @@ public class ProjectDTO {
 
     private Integer id;
     private String name;
+    private String technique;
 
     public ProjectDTO() {
     }
@@ -33,5 +34,13 @@ public class ProjectDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTechnique() {
+        return technique;
+    }
+
+    public void setTechnique(String technique) {
+        this.technique = technique;
     }
 }

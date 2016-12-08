@@ -2,7 +2,7 @@ package br.edu.utfpr.recominer.web.controller;
 
 import br.edu.utfpr.recominer.core.model.Project;
 import br.edu.utfpr.recominer.core.repository.FeedbackJustificationRepository;
-import br.edu.utfpr.recominer.core.repository.PredictionFeedbackRepository;
+import br.edu.utfpr.recominer.core.repository.ArPredictionFeedbackRepository;
 import br.edu.utfpr.recominer.core.repository.ProjectRepository;
 import br.edu.utfpr.recominer.web.dto.BusinessMessageDTO;
 import br.edu.utfpr.recominer.web.dto.CochangeDTO;
@@ -27,7 +27,7 @@ public class PredictionFeedbackController {
     private ProjectRepository projectRepository;
     
     @Inject
-    private PredictionFeedbackRepository feedbackRepository;
+    private ArPredictionFeedbackRepository feedbackRepository;
     
     @Inject
     private FeedbackJustificationRepository feedbackJustificationRepository;

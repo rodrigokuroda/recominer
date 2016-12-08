@@ -18,7 +18,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         $scope.loadingCochanges = false;
         $scope.submitting = false;
 
-        $scope.numPerPage = 10;
+        $scope.numPerPage = 100;
         $scope.paging = {
             total: 1,
             current: 1,
@@ -79,9 +79,10 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         };
 
         // Load issues
-        $scope.getIssuesOf = function(project) {
+        $scope.getIssuesOf = function(project, technique) {
             $scope.loadingIssues = true;
             $scope.activeProject = project;
+            $scope.activeProject.technique = technique;
             $scope.activeIssue = null;
             $scope.activeCommit = null;
             $scope.activeFile = null;

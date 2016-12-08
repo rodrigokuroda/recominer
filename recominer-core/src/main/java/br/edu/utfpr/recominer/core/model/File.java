@@ -14,17 +14,27 @@ public class File implements Persistable<Integer>{
     private final Integer id;
     private final String fileName;
     private final Set<Commit> commits;
+    private final PredictionFeedback feedback;
 
     public File(Integer id) {
         this.id = id;
         this.fileName = null;
         this.commits = new HashSet<>();
+        this.feedback = null;
     }
     
     public File(Integer id, String fileName) {
         this.id = id;
         this.fileName = fileName;
         this.commits = new HashSet<>();
+        this.feedback = null;
+    }
+
+    public File(Integer id, String fileName, PredictionFeedback feedback) {
+        this.id = id;
+        this.fileName = fileName;
+        this.commits = new HashSet<>();
+        this.feedback = feedback;
     }
 
     @Override
