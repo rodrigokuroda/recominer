@@ -441,7 +441,7 @@ public class FileRepository extends JdbcRepository<File, Integer> {
                         + "     pfb.justification "
                         + "  FROM {0}.files_commits fc "
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.scmlog_id = fc.commit_id "
-                        + "  LEFT JOIN {0}.prediction_feedback pfb ON pfb.prediction_file_id = fc.file_id "
+                        + "  LEFT JOIN {0}.all_prediction_feedback pfb ON pfb.prediction_id = fc.file_id "
                         + " WHERE i2s.scmlog_id = (SELECT MAX(fc2.commit_id) FROM {0}.files_commits fc2 WHERE fc2.file_id = fc.file_id) "
                         + "   AND (fc.file_path LIKE \"%.java\" OR fc.file_path LIKE \"%.xml\")"
                         + "   AND fc.file_path <> ?"

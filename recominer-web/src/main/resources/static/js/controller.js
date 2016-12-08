@@ -244,12 +244,46 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         };
 
         // Submit feedback
-        $scope.submitFeedback = function() {
+        $scope.submitArFeedback = function() {
             $scope.submitting = true;
             $scope.activeIssue.project = $scope.activeProject;
             $scope.activeIssue.feedback.cochanges = $scope.cochanges;
             $log.debug("Sending feedback of " + $scope.activeIssue.key + "...");
             $http.post("/saveFeedback", $scope.activeIssue)
+                .then(function(response) {
+                        $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
+                        $scope.submitting = false;
+                    },
+                    function(response) {
+                        $mdToast.show($mdToast.simple().position('bottom right').textContent("Ocorreu um erro ao enviar seu feedback! Por favor, tente novamente." + response.data.message));
+                        $scope.submitting = false;
+                    }
+                );
+        };
+
+        $scope.submitMlFeedback = function() {
+            $scope.submitting = true;
+            $scope.activeIssue.project = $scope.activeProject;
+            $scope.activeIssue.feedback.cochanges = $scope.cochanges;
+            $log.debug("Sending feedback of " + $scope.activeIssue.key + "...");
+            $http.post("/saveMlFeedback", $scope.activeIssue)
+                .then(function(response) {
+                        $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
+                        $scope.submitting = false;
+                    },
+                    function(response) {
+                        $mdToast.show($mdToast.simple().position('bottom right').textContent("Ocorreu um erro ao enviar seu feedback! Por favor, tente novamente." + response.data.message));
+                        $scope.submitting = false;
+                    }
+                );
+        };
+
+        $scope.submitAllFeedback = function() {
+            $scope.submitting = true;
+            $scope.activeIssue.project = $scope.activeProject;
+            $scope.activeIssue.feedback.cochanges = $scope.cochanges;
+            $log.debug("Sending feedback of " + $scope.activeIssue.key + "...");
+            $http.post("/saveAllFeedback", $scope.activeIssue)
                 .then(function(response) {
                         $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
                         $scope.submitting = false;
