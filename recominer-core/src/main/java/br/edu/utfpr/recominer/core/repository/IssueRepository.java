@@ -218,7 +218,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN (SELECT commit_id FROM cxf.ml_prediction UNION SELECT commit_id FROM cxf.ar_prediction) t ON t.commit_id = s.id"
                         + "  LEFT JOIN {0}.feedback_justification fj ON fj.issue_id = i.id "
                         + "       AND fj.id = (SELECT MAX(fj2.id) FROM {0}.feedback_justification fj2 WHERE fj2.issue_id = i.id)"
-                        + " WHERE fj.technique = ? "
+                        + "       AND fj.technique = ? "
                         + "  ORDER BY iej.issue_key",
                         project),
                 (ResultSet rs, int rowNum) -> {
