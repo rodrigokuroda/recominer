@@ -209,7 +209,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
     public List<Issue> selectProcessedIssuesOfProject(String technique) {
         return jdbcOperations.query(
                 QueryUtils.getQueryForDatabase(
-                        "SELECT DISTINCT " + FIELDS + ", i.summary, i.description, fj.id AS fj_id, fj.justification "
+                        "SELECT DISTINCT " + FIELDS + ", i.summary, i.description, fj.id AS fj_id, fj.technique, fj.justification "
                         + "  FROM {0}_issues.issues i"
                         + "  JOIN {0}.issues_scmlog i2s ON i2s.issue_id = i.id "
                         + "  JOIN {0}_issues.issues_ext_jira iej ON iej.issue_id = i.id "
@@ -218,6 +218,7 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                         + "  JOIN (SELECT commit_id FROM cxf.ml_prediction UNION SELECT commit_id FROM cxf.ar_prediction) t ON t.commit_id = s.id"
                         + "  LEFT JOIN {0}.feedback_justification fj ON fj.issue_id = i.id "
                         + "       AND fj.id = (SELECT MAX(fj2.id) FROM {0}.feedback_justification fj2 WHERE fj2.issue_id = i.id)"
+                        + " WHERE fj.technique = ? "
                         + "  ORDER BY iej.issue_key",
                         project),
                 (ResultSet rs, int rowNum) -> {
@@ -230,7 +231,9 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                     feedbackJustification.setJustification(rs.getString("justification"));
                     issue.setFeedbackJustification(feedbackJustification);
                     return issue;
-                });
+                },
+                technique
+                );
     }
 
     public Long countComputedIssues() {
