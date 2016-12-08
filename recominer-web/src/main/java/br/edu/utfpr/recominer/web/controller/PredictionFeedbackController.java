@@ -11,6 +11,7 @@ import br.edu.utfpr.recominer.web.dto.CochangeDTO;
 import br.edu.utfpr.recominer.web.dto.FeedbackJustificationDTO;
 import br.edu.utfpr.recominer.web.dto.IssueDTO;
 import br.edu.utfpr.recominer.web.dto.PredictionFeedbackDTO;
+import java.util.Date;
 import javax.inject.Inject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,10 +47,11 @@ public class PredictionFeedbackController {
         final Project project = projectRepository.findOne(issue.getProject().getId());
         arFeedbackRepository.setProject(project);
         feedbackJustificationRepository.setProject(project);
+        final Date submitDate = new Date();
         
         for (CochangeDTO cochange : feedback.getCochanges()) {
             PredictionFeedbackDTO predictionFeedback = cochange.getFeedback();
-            arFeedbackRepository.save(predictionFeedback.toEntity(cochange));
+            arFeedbackRepository.save(predictionFeedback.toEntity(cochange, submitDate));
         }
         feedbackJustificationRepository.save(feedback.toEntity(issue));
         
@@ -64,10 +66,11 @@ public class PredictionFeedbackController {
         final Project project = projectRepository.findOne(issue.getProject().getId());
         mlFeedbackRepository.setProject(project);
         feedbackJustificationRepository.setProject(project);
+        final Date submitDate = new Date();
         
         for (CochangeDTO cochange : feedback.getCochanges()) {
             PredictionFeedbackDTO predictionFeedback = cochange.getFeedback();
-            mlFeedbackRepository.save(predictionFeedback.toEntity(cochange));
+            mlFeedbackRepository.save(predictionFeedback.toEntity(cochange, submitDate));
         }
         feedbackJustificationRepository.save(feedback.toEntity(issue));
         
@@ -82,10 +85,10 @@ public class PredictionFeedbackController {
         final Project project = projectRepository.findOne(issue.getProject().getId());
         allFeedbackRepository.setProject(project);
         feedbackJustificationRepository.setProject(project);
-        
+        final Date submitDate = new Date();
         for (CochangeDTO cochange : feedback.getCochanges()) {
             PredictionFeedbackDTO predictionFeedback = cochange.getFeedback();
-            allFeedbackRepository.save(predictionFeedback.toEntity(cochange));
+            allFeedbackRepository.save(predictionFeedback.toEntity(cochange, submitDate));
         }
         feedbackJustificationRepository.save(feedback.toEntity(issue));
         

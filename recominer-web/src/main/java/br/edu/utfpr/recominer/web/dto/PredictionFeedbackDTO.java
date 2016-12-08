@@ -1,6 +1,7 @@
 package br.edu.utfpr.recominer.web.dto;
 
 import br.edu.utfpr.recominer.core.model.PredictionFeedback;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -21,8 +22,8 @@ public class PredictionFeedbackDTO {
         this.changed = changed;
     }
 
-    public PredictionFeedback toEntity(CochangeDTO dto) {
-        return new PredictionFeedback(id, dto.getId(), changed, justification);
+    public PredictionFeedback toEntity(CochangeDTO dto, Date submitDate) {
+        return new PredictionFeedback(id, dto.getId(), changed, justification, submitDate);
     }
     
     public static PredictionFeedbackDTO from(PredictionFeedback feedback) {

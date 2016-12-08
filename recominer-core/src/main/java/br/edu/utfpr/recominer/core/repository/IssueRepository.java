@@ -223,7 +223,8 @@ public class IssueRepository extends JdbcRepository<Issue, Integer> {
                 (ResultSet rs, int rowNum) -> {
                     Issue issue = ROW_MAPPER.mapRow(rs, rowNum);
                     issue.setSummary(rs.getString("summary"));
-                    issue.setDescription("<" + rs.getString("description"));
+                    final String description = rs.getString("description");
+                    issue.setDescription(description.length() > 0 ? "<" + description : "");
 
                     FeedbackJustification feedbackJustification = new FeedbackJustification(rs.getInt("fj_id"), technique);
                     feedbackJustification.setJustification(rs.getString("justification"));

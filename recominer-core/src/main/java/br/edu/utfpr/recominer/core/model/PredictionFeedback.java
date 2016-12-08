@@ -1,5 +1,6 @@
 package br.edu.utfpr.recominer.core.model;
 
+import java.util.Date;
 import java.util.Objects;
 import org.springframework.data.domain.Persistable;
 
@@ -13,6 +14,7 @@ public class PredictionFeedback implements Persistable<Integer> {
     private Integer predictionId;
     private boolean changed;
     private String justification;
+    private Date submitDate;
 
     public PredictionFeedback() {
     }
@@ -21,11 +23,12 @@ public class PredictionFeedback implements Persistable<Integer> {
         this.id = id;
     }
 
-    public PredictionFeedback(Integer id, Integer predictionId, boolean changed, String justification) {
+    public PredictionFeedback(Integer id, Integer predictionId, boolean changed, String justification, Date submitDate) {
         this.id = id;
         this.predictionId = predictionId;
         this.changed = changed;
         this.justification = justification;
+        this.submitDate = submitDate;
     }
 
     @Override
@@ -64,6 +67,14 @@ public class PredictionFeedback implements Persistable<Integer> {
 
     public void setJustification(String justification) {
         this.justification = justification;
+    }
+
+    public Date getSubmitDate() {
+        return submitDate;
+    }
+
+    public void setSubmitDate(Date submitDate) {
+        this.submitDate = submitDate;
     }
 
     @Override
