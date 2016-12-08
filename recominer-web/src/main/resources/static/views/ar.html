@@ -133,7 +133,7 @@
                                 </md-button>
                                 <md-input-container md-theme="input" ng-show="showSearchFiles">
                                     <label>&nbsp;</label>
-                                    <input ng-model="searchFile.name" placeholder="File Name">
+                                    <input ng-model="searchFile.name" placeholder="Nome do arquivo">
                                 </md-input-container>
                             </div>
                         </md-toolbar>
@@ -174,8 +174,11 @@
                     <div ng-if="loadingCochanges" layout="row" layout-sm="column" layout-align="space-around center">
                         <md-progress-circular class="md-accent md-hue-1" md-diameter="50"></md-progress-circular>
                     </div>
+                    <div ng-if="paginatedCochanges != null && paginatedCochanges.length > 0" layout="row" layout-sm="column" layout-align="center center" layout-margin>
+                        <cl-paging flex cl-pages="paging.total" cl-steps="6" cl-page-changed="paging.onPageChanged()" cl-align="center center" cl-current-page="paging.current"></cl-paging>
+                    </div>
                     <md-list>
-                      <md-list-item class="md-3-line" ng-repeat="cochange in cochanges track by $index">
+                      <md-list-item class="md-3-line" ng-repeat="cochange in paginatedCochanges track by $index">
                         <div class="md-list-item-text">
                           <span class="md-body-1"><b>{{ cochange.file.name }}</b></span><br/>
                           <span class="md-body-1" md-colors="{color: cochange.predictionResult == 'C' ? 'green' : 'red'}">
@@ -200,7 +203,7 @@
                                       </textarea>
                                   </md-input-container>
                                   <md-input-container class="md-block" flex="10">
-                                    <md-button type="button" class="md-raised md-primary" ng-disabled="submitting" ng-click="submitArFeedback()" ng-dblclick="return false">
+                                    <md-button type="button" class="md-raised md-primary" ng-disabled="submitting" ng-click="submitArFeedback()">
                                       <div ng-if="submitting" layout="row" layout-sm="column" layout-align="space-around center">
                                         <md-progress-circular class="md-accent md-hue-1" md-diameter="25"></md-progress-circular>
                                       </div>

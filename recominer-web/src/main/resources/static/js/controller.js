@@ -18,7 +18,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
         $scope.loadingCochanges = false;
         $scope.submitting = false;
 
-        $scope.numPerPage = 100;
+        $scope.numPerPage = 250;
         $scope.paging = {
             total: 1,
             current: 1,
