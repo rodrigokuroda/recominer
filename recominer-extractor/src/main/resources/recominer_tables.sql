@@ -171,10 +171,32 @@ CREATE TABLE IF NOT EXISTS {0}.ml_prediction(
     UNIQUE KEY (commit_id, file_id, predicted_file_id)
 );
 
-CREATE TABLE IF NOT EXISTS {0}.prediction_feedback(
+CREATE TABLE IF NOT EXISTS {0}.ar_prediction_feedback(
     id INT(11) NOT NULL AUTO_INCREMENT,
     prediction_id INT(11) NOT NULL,
     changed BOOLEAN NOT NULL,
-    justification VARCHAR(4096) NOT NULL,
+    justification VARCHAR(4096),
+    PRIMARY KEY (id)
+);
+ CREATE TABLE IF NOT EXISTS {0}.ml_prediction_feedback(
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    prediction_id INT(11) NOT NULL,
+    changed BOOLEAN NOT NULL,
+    justification VARCHAR(4096),
+    PRIMARY KEY (id)
+);
+ CREATE TABLE IF NOT EXISTS {0}.all_prediction_feedback(
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    prediction_id INT(11) NOT NULL,
+    changed BOOLEAN NOT NULL,
+    justification VARCHAR(4096),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS {0}.feedback_justification(
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    technique VARCHAR(5) NOT NULL,
+    issue_id INT(11) NOT NULL,
+    justification LONGTEXT NOT NULL,
     PRIMARY KEY (id)
 );
