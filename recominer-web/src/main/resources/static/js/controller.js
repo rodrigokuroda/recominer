@@ -249,7 +249,7 @@ app.controller("projectController", ['$scope', '$log', '$window', '$http', '$mdS
             $scope.activeIssue.project = $scope.activeProject;
             $scope.activeIssue.feedback.cochanges = $scope.cochanges;
             $log.debug("Sending feedback of " + $scope.activeIssue.key + "...");
-            $http.post("/saveFeedback", $scope.activeIssue)
+            $http.post("/saveArFeedback", $scope.activeIssue)
                 .then(function(response) {
                         $mdToast.show($mdToast.simple().position('bottom right').textContent(response.data.message));
                         $scope.submitting = false;
