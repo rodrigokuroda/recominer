@@ -30,12 +30,12 @@ mvn clean build
 
 To extract data from repository, you will need run the following command:
 ```
-java -jar recominer-extractor-[version].jar versionControlUrl=[url] issueTrackerUrl=[url] issueTrackerSystem=[BUGZILLA|JIRA|GITHUB]
+java -jar recominer-extractor-[version].jar --projectName=[NAME] --versionControlUrl=[url] --repositoryPath=[local_path_of_downloaded_repostiory] --issueTrackerUrl=[url] --issueTrackerSystem=[BUGZILLA|JIRA|GITHUB]
 ```
 
 A practical example:
 ```
-java -jar recominer-extractor-0.6.0.jar -D --projectName=CXF --versionControlUrl=git://git.apache.org/cxf.git --issueTrackerUrl=https://issues.apache.org/jira/browse/CXF --issueTrackerSystem=JIRA
+java -jar recominer-extractor-0.6.0.jar -D --projectName=CXF --versionControlUrl=git://git.apache.org/cxf.git --repositoryPath=/home/user/repositories/cxf --issueTrackerUrl=https://issues.apache.org/jira/browse/CXF --issueTrackerSystem=JIRA
 ``` 
 
 To run the Recominer Web module (interface to view the prediction results), you will need run the following command:
