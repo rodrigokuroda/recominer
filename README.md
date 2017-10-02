@@ -1,4 +1,4 @@
-# Recominer [![Build Status](https://travis-ci.org/rodrigokuroda/recominer.svg?branch=removefiles)](https://travis-ci.org/rodrigokuroda/recominer.svg?branch=removefiles)
+# Recominer [![Build Status](https://travis-ci.org/rodrigokuroda/recominer.svg?branch=master)](https://travis-ci.org/rodrigokuroda/recominer)
 
 Recominer is a tool aiming to help developers to make changes into source code file. Therefore, using historical information of the commits and issues from software project, it is applied Machine Learning's Classification and Association Rules in order to predict files that are change-prone to complete a particular issue.
 
