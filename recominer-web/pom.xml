@@ -5,7 +5,7 @@
 
     <groupId>br.com.utfpr</groupId>
     <artifactId>recominer-web</artifactId>
-    <version>0.6</version>
+    <version>0.6.0</version>
     <packaging>jar</packaging>
     
     <name>Recominer Web</name>
@@ -13,7 +13,7 @@
     <parent>
         <groupId>br.edu.utfpr</groupId>
         <artifactId>recominer</artifactId>
-        <version>0.2</version>
+        <version>0.3.0</version>
     </parent>
 
     <properties>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>br.edu.utfpr</groupId>
             <artifactId>recominer-core</artifactId>
-            <version>0.4</version>
+            <version>0.6.0</version>
         </dependency>
         
         <dependency>

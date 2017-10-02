@@ -13,8 +13,8 @@ import java.util.List;
  */
 class BichoCommand implements ExternalCommand {
 
-    private static final String PYTHON = "/usr/bin/python";
-    private static final String BICHO = "/usr/local/bin/bicho";
+    private static final String PYTHON = "python";
+    private static final String BICHO = "bicho";
     private static final String BICHO_BACKEND_USER = "--backend-user=${BACKEND_USER}";
     private static final String BICHO_BACKEND_PASSWORD = "--backend-password=${BACKEND_PASSWORD}";
     private static final String BICHO_BACKEND_TOKEN = "--backend-token=${TOKEN}";

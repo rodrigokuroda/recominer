@@ -11,7 +11,7 @@ import java.io.File;
  */
 public class GitCloneCommand implements ExternalCommand {
 
-    private static final String GIT = "/usr/bin/git";
+    private static final String GIT = "git";
     private static final String CLONE = "clone";
     
     private final Project project;

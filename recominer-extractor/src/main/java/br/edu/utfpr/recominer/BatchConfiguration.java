@@ -88,7 +88,7 @@ public class BatchConfiguration {
         }
 
         return job
-                .next(datasetStep)
+        		.next(datasetStep)
                 .next(classificationStep)
                 .next(associationRuleStep)
                 .build();

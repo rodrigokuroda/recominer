@@ -10,7 +10,7 @@ import br.edu.utfpr.recominer.core.model.Project;
  */
 public class GitPullCommand implements ExternalCommand {
 
-    private static final String GIT = "/usr/bin/git";
+    private static final String GIT = "git";
     private static final String GIT_DIR = "--git-dir=${GIT_DIR}/.git";
     private static final String GIT_WORK_TREE = "--work-tree=${WORK_TREE}";
     private static final String GIT_PULL = "pull";

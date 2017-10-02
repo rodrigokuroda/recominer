@@ -49,13 +49,17 @@ public class ProjectRepository extends JdbcRepository<Project, Integer> {
             = (Project p) -> {
                 Map<String, Object> mapping = new LinkedHashMap<>();
                 mapping.put("id", p.getId());
-                mapping.put("issue_tracker_id", p.getIssueTracker().getId());
+                if (p.getIssueTracker() != null) {
+                	mapping.put("issue_tracker", p.getIssueTracker().getId());
+                }
                 mapping.put("issue_tracker_url", p.getIssueTrackerUrl());
                 mapping.put("project_name", p.getProjectName());
                 mapping.put("schema_prefix", p.getSchemaPrefix());
                 mapping.put("repository_path", p.getRepositoryPath());
-                mapping.put("version_control", p.getVersionControl().getId());
-                mapping.put("version_constrol", p.getVersionControlUrl());
+                if (p.getVersionControl() != null) {
+                	mapping.put("version_control", p.getVersionControl().getId());
+                }
+                mapping.put("version_control_url", p.getVersionControlUrl());
 
                 return mapping;
             };

@@ -15,8 +15,8 @@ import java.util.List;
  */
 class CvsanalyCommand implements ExternalCommand {
 
-    private static final String PYTHON = "/usr/bin/python";
-    private static final String CVSANALY = "/usr/local/bin/cvsanaly2";
+    private static final String PYTHON = "python";
+    private static final String CVSANALY = "cvsanaly2";
     private static final String CVSANALY_DB_USER = "--db-user=root";
     private static final String CVSANALY_DB_PASSWORD = "--db-password=root";
     private static final String CVSANALY_DB_NAME = "--db-database=${DB_NAME}_vcs";

@@ -3,9 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>br.edu.utfpr</groupId>
     <artifactId>recominer-extractor</artifactId>
-    <version>0.5</version>
+    <version>0.6.0</version>
     <packaging>jar</packaging>
 
     <name>Recominer Extractor</name>
@@ -14,10 +13,11 @@
     <parent>
         <groupId>br.edu.utfpr</groupId>
         <artifactId>recominer</artifactId>
-        <version>0.2</version>
+        <version>0.3.0</version>
     </parent>
 
     <properties>
+    	<start-class>br.edu.utfpr.recominer.Application</start-class>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>br.edu.utfpr</groupId>
             <artifactId>recominer-core</artifactId>
-            <version>0.4</version>
+            <version>0.6.0</version>
         </dependency>
 
         <dependency>

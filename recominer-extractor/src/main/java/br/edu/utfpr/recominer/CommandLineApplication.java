@@ -1,10 +1,11 @@
 package br.edu.utfpr.recominer;
 
-import br.edu.utfpr.recominer.model.Configuration;
-import br.edu.utfpr.recominer.repository.ConfigurationRepository;
+import java.util.Arrays;
 import java.util.List;
+
 import javax.batch.operations.JobRestartException;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -16,9 +17,14 @@ import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import br.edu.utfpr.recominer.model.Configuration;
+import br.edu.utfpr.recominer.repository.ConfigurationRepository;
 
 /**
  *
@@ -26,7 +32,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Profile(value = "prod")
-public class CommandLineApplication implements CommandLineRunner {
+public class CommandLineApplication implements CommandLineRunner, ApplicationRunner {
     private static final Logger LOG = LoggerFactory.getLogger(CommandLineApplication.class);
 
     @Inject
@@ -40,7 +46,8 @@ public class CommandLineApplication implements CommandLineRunner {
 
     @Override
     public void run(String... params) throws Exception {
-        LOG.info("Starting Recominer Extractor...");
+        LOG.info("Starting Recominer Extractor with command-line arguments: {}", Arrays.toString(params));
+        
         final JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addLong("run.id", System.currentTimeMillis());
 
@@ -72,4 +79,15 @@ public class CommandLineApplication implements CommandLineRunner {
             LOG.error("The JobInstance identified by the properties already has an execution running.", ex);
         }
     }
+
+	@Override
+	public void run(ApplicationArguments args) throws Exception {
+		LOG.info("Application started with command-line arguments: {}", Arrays.toString(args.getSourceArgs()));
+		LOG.info("NonOptionArgs: {}", args.getNonOptionArgs());
+		LOG.info("OptionNames: {}", args.getOptionNames());
+
+        for (String name : args.getOptionNames()){
+            LOG.info("arg-" + name + "=" + args.getOptionValues(name));
+        }
+	}
 }
