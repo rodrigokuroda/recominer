@@ -11,3 +11,12 @@ jdk:
 
 before_script:
   - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
+  
+addons:
+  sonarcloud:
+    organization: "rodrigokuroda-github"
+    token:
+      secure: f8baecc88433c7ac33e2c6f308f8b7fd21a52f9d
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - mvn sonar:sonar -Dsonar.projectKey=rodrigokuroda_recominer -Dsonar.organization=rodrigokuroda-github -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=f8baecc88433c7ac33e2c6f308f8b7fd21a52f9d
