@@ -10,14 +10,12 @@ These instructions will get you a copy of the project up and running on your loc
 
 You will need to install the following software:
 
-```
 * [Java 8](https://www.java.com/download/) to run Recominer
 * [MySQL Database Server](https://dev.mysql.com/downloads/mysql/) for save data
 * [Python 2.x](https://www.python.org/downloads/) to run Bicho and CVSAnalY2
 * [Bicho](https://github.com/MetricsGrimoire/Bicho) to extract data from issue tracker repository
 * [CVSAnalY2](https://github.com/MetricsGrimoire/CVSAnalY) to extract data from version control repository
-* [Git/SVN/CVS] to extract data from version control repository.
-```
+* Git, SVN and/or CVS client to extract data from version control repository.
 
 These software needs to be configured in your Operational System's classpath in order to Recominer work (python, csvanaly, bicho, java, git, etc).
 
